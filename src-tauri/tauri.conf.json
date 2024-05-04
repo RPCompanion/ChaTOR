@@ -7,7 +7,7 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "default-tauri-setup",
+    "productName": "SWTOR-Chat",
     "version": "0.1.0"
   },
   "tauri": {
