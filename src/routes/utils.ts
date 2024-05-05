@@ -43,7 +43,7 @@ function remove_starting_pronouns(message: string): string {
     const pronouns = ["i", "you", "he", "she", "it", "we", "they"];
     for (let pronoun of pronouns) {
 
-        if (message.toLocaleLowerCase().startsWith(pronoun)) {
+        if (message.toLocaleLowerCase().startsWith(pronoun + " ")) {
             return message.substring(pronoun.length).trim();
         }
     
@@ -90,10 +90,16 @@ export function auto_message_split(message: string): Result<string[], string> {
         t_a_msg = remove_starting_pronouns(t_a_msg);
         if (temp.length + t_a_msg.length + " ".length > 255) {
             messages.push(temp);
+            temp = "";
+            i--;
         } else {
             temp += " " + t_a_msg;
         }
 
+    }
+
+    if (temp.length > 0) {
+        messages.push(temp);
     }
 
     return Result.ok(messages);
