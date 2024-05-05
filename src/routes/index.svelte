@@ -1,5 +1,7 @@
 
 <script lang="ts">
+
+    import { SvelteToast } from '@zerodevx/svelte-toast';
     import TabsContainer from "../lib/tabs/TabsContainer.svelte";
     import watercolor from "../assets/watercolor.webp";
     import Manual from "./_Manual.svelte";
@@ -18,6 +20,7 @@
 
 </script>
 
+<SvelteToast/>
 <img src={watercolor} alt="background-watercolor" class="absolute inset-0 w-full h-full object-cover z-0"/>
 <div class="z-10 absolute w-full">
     <TabsContainer {tabs} on:tab-selected={on_tab_selected}/>

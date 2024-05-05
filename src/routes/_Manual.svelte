@@ -1,6 +1,7 @@
 
 <script lang="ts">
 
+    import { toast } from "@zerodevx/svelte-toast";
     import ConfirmationModal from "../lib/ConfirmationModal.svelte";
     import { valid_messages, truncate_messages } from "./utils";
     import { submit_post } from "../lib/network";
@@ -43,7 +44,11 @@
     function on_yes_confirmation() {
 
         show_modal = false;
-        submit_post(messages);
+        let resposne = submit_post(messages);
+
+        if (resposne.is_error()) {
+            toast.push("Error: " + resposne.unwrap_error());
+        }
         
     }
 
