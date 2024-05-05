@@ -2,7 +2,7 @@
 <script lang="ts">
 
     import { createEventDispatcher } from "svelte";
-    let checked: boolean = false;
+    export let checked: boolean = false;
 
     const dispatch = createEventDispatcher();
     $: dispatch("checked", checked);

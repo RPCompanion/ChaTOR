@@ -3,12 +3,14 @@
 
     import { toast } from "@zerodevx/svelte-toast";
     import ConfirmationModal from "../lib/ConfirmationModal.svelte";
+    import Checkbox from "../lib/Checkbox.svelte";
     import { valid_messages, truncate_messages } from "./utils";
     import { submit_post } from "../lib/network";
 
     let messages: string[] = [""];
 
-    let show_modal: boolean = false;
+    let show_modal: boolean        = false;
+    let automated_posting: boolean = true;
 
     function delete_message(idx: number) {
         messages.splice(idx, 1);
@@ -53,15 +55,29 @@
         show_modal = false;
     }
 
+    function on_single_post(idx: number) {
+
+        let response = submit_post([messages[idx]]);
+        if (response.is_error()) {
+            toast.push("Error: " + response.unwrap_error());
+        }
+
+    }
+
     function clear_chat() {
         messages = [""];
+    }
+
+    function on_checked(event: any) {
+        automated_posting = event.detail;
     }
 
 </script>
 
 <div class="flex flex-col gap-2 w-full p-10">
-    <div class="text-white text-center bg-slate-700 text-xl">Manual Formatting Mode</div>
+    <div class="text-white text-center bg-slate-700 text-2xl">Manual Formatting Mode</div>
     <div class="relative h-6">
+        <Checkbox on:checked={on_checked} checked={automated_posting}>Automated posting</Checkbox>
         <button type="button" class="bg-slate-800 text-white rounded-sm shadow-sm w-32 absolute right-0" on:click={clear_chat}>Clear chat</button>
     </div>
     {#each messages as message, idx}
@@ -71,10 +87,15 @@
                 <button class="absolute bg-slate-700 px-1 -right-2 -top-3 text-white" style="border-radius: 50%" on:click={() => { delete_message(idx); }}>X</button>
             {/if}
             <div class="absolute bottom-1 right-0">{message.length}/255</div>
+            {#if !automated_posting}
+                <button type="button" class="bg-slate-700 text-white rounded-sm shadow-sm px-2 absolute top-1/3 -right-8 hover:text-gray-300" on:click={() => { on_single_post(idx); }}>Post</button>
+            {/if}
         </div>
     {/each}
-    <button type="button" class="bg-slate-700 text-white rounded-sm shadow-sm" on:click={on_new_message}>New</button>
-    <button type="button" class="bg-slate-700 text-white rounded-sm shadow-sm" on:click={enable_confirmation_modal}>Post</button>
+    <button type="button" class="bg-slate-700 text-white rounded-sm shadow-sm hover:text-gray-300" on:click={on_new_message}>New</button>
+    {#if automated_posting}
+        <button type="button" class="bg-slate-700 text-white rounded-sm shadow-sm hover:text-gray-300" on:click={enable_confirmation_modal}>Post all</button>
+    {/if}
 </div>
 <ConfirmationModal {show_modal} on:no={on_no_confirmation} on:yes={on_yes_confirmation}>
     Are you sure you want to post?
