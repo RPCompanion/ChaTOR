@@ -16,11 +16,23 @@
 
 {#if show_modal}
     <div class="z-20 w-full h-full absolute left-0 top-0">
-        <div class="flex flex-col gap-2 absolute w-36 bg-slate-800">
+        <div class="flex flex-col gap-2 absolute w-3/4 bg-slate-700 rounded-md container-position border-black border-2">
+            <div class="text-white text-2xl text-center">Posts</div>
             {#each messages as message, idx}
-                <div class="text-white">{message}</div>
+                <textarea class="w-full outline-none p-1 rounded-md border-2 resize-none" bind:value={messages[idx]}/>
             {/each}
-            <button type="button" on:click={on_cancel}>Cancel</button>
+            <div class="flex flex-row gap-2">
+                <button type="button" class="bg-slate-800 text-white w-1/2" on:click={on_cancel}>Post</button>
+                <button type="button" class="bg-slate-800 text-white w-1/2" on:click={on_cancel}>Cancel</button>
+            </div>
         </div>
     </div>
 {/if}
+
+<style>
+    .container-position {
+        position: absolute;
+        left: calc(50% - 75%/2);
+        top: 100px;
+    }
+</style>

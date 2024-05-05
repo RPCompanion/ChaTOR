@@ -92,9 +92,10 @@ function split_on_puncutation(message: string): Result<string[], string> {
         }
 
         let t_a_msg = array[i].trim();
+        t_a_msg = remove_starting_pronouns(t_a_msg);
         if (temp.length == 0) {
   
-            if (!t_a_msg.startsWith("/say") || !t_a_msg.startsWith("/e")) {
+            if (!t_a_msg.startsWith("/say") && !t_a_msg.startsWith("/e")) {
                 if (t_a_msg.startsWith("\"")) {
                     temp += "/say";
                 } else {
@@ -104,7 +105,6 @@ function split_on_puncutation(message: string): Result<string[], string> {
 
         }
 
-        t_a_msg = remove_starting_pronouns(t_a_msg);
         if (temp.length + t_a_msg.length + " ".length > 255) {
             messages.push(temp);
             temp = "";
