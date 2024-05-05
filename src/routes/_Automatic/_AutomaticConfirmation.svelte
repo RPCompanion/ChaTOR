@@ -3,6 +3,7 @@
     
     import { fly } from "svelte/transition";
     import { createEventDispatcher } from "svelte";
+    import { submit_post } from "../../lib/network";
 
     export let messages: string[];
     export let show_modal: boolean = false;
@@ -12,17 +13,22 @@
         dispatch("cancel");
     }
 
+    function on_submit() {
+        submit_post(messages);
+        dispatch("cancel");
+    }
+
 </script>
 
 {#if show_modal}
     <div class="z-20 w-full h-full absolute left-0 top-0">
-        <div class="flex flex-col gap-2 absolute w-3/4 bg-slate-700 rounded-md container-position border-black border-2">
-            <div class="text-white text-2xl text-center">Posts</div>
+        <div class="flex flex-col gap-2 absolute w-3/4 bg-slate-700 rounded-md container-position border-black border-2" transition:fly={{duration: 400, y: -500}}>
+            <div class="text-white text-2xl text-center">Auto format - Final edits</div>
             {#each messages as message, idx}
                 <textarea class="w-full outline-none p-1 rounded-md border-2 resize-none" bind:value={messages[idx]}/>
             {/each}
             <div class="flex flex-row gap-2">
-                <button type="button" class="bg-slate-800 text-white w-1/2" on:click={on_cancel}>Post</button>
+                <button type="button" class="bg-slate-800 text-white w-1/2" on:click={on_submit}>Submit</button>
                 <button type="button" class="bg-slate-800 text-white w-1/2" on:click={on_cancel}>Cancel</button>
             </div>
         </div>
