@@ -161,8 +161,7 @@ pub fn submit_actual_post(character_message: NewCharacterMessage) {
 
     thread::spawn(move || {
 
-        //post_message(WM_KEYDOWN, ESC_KEY, 250);
-        //post_message(WM_KEYDOWN, ESC_KEY, 250);
+        post_message(WM_KEYDOWN, ESC_KEY, 250);
         for message in character_message.messages {        
 
             let post = message
@@ -174,11 +173,6 @@ pub fn submit_actual_post(character_message: NewCharacterMessage) {
             for c in post.chars() {
                 post_message(WM_CHAR, c as usize, 10);
             }
-
-            //set_clipboard(Unicode, &post).unwrap();
-
-            //send_message(WM_KEYDOWN, CONTROL_KEY, 50);
-            //send_message(WM_KEYDOWN, V_KEY, 50);
 
             post_message(WM_KEYDOWN, ENTER_KEY, 20);
             thread::sleep(Duration::from_millis(250));

@@ -1,6 +1,8 @@
 
 <script lang="ts">
     import { appWindow } from '@tauri-apps/api/window';
+    import Checkbox from '../lib/Checkbox.svelte';
+
     let always_on_top: boolean = false;
 
     $: if (always_on_top) {
@@ -9,11 +11,12 @@
         appWindow.setAlwaysOnTop(false);
     }
 
+    function on_checked(event: CustomEvent<boolean>) {
+        always_on_top = event.detail;
+    }
+
 </script>
 
 <div class="z-10 absolute bottom-2 left-2 flex flex-row gap-2">
-    <label class="text-white text-xl bg-slate-900 rounded-md shadow-lg p-1">
-        <input type="checkbox" bind:checked={always_on_top} class="ml-2 scale-150"/>
-        Always on top
-    </label>
+    <Checkbox on:checked={on_checked}>Always on top</Checkbox>
 </div>
