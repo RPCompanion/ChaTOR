@@ -18,8 +18,8 @@ export function init_hook() {
 
 export function submit_post(messages: string[]): Result<[], string> {
 
-    if (get(hooked_in) == false) {
-        return Result.error("SWTOR not hooked in");
+    if (!get(hooked_in)) {
+        return Result.error("SWTOR not hooked in. Have you launched the game?");
     }
 
     interface NewCharacterMessage {
