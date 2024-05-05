@@ -1,25 +1,22 @@
 
-export interface ValidMessage {
-    valid: boolean;
-    reason?: string;
-}
+import { Result } from "../lib/result";
 
-export function valid_messages(messages: string[]): ValidMessage {
+export function valid_messages(messages: string[]): Result<[], string> {
 
     if (messages.length === 0) {
-        return { valid: false, reason: "No messages to submit" }
+        return Result.error("No messages to submit");
     }
 
     for (let message of messages) {
 
         let temp = message.trim();
         if (temp.length === 0 || temp.length > 255) {
-            return { valid: false, reason: "Messages must be between 1 and 255 characters" }
+            return Result.error("Messages must be between 1 and 255 characters");
         }
 
     }
 
-    return { valid: true }
+    return Result.ok([]);
 
 }
 

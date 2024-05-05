@@ -29,14 +29,11 @@
 
         messages = truncate_messages(messages);
         let message_response = valid_messages(messages);
-        if (message_response.valid) {
-
+        
+        if (message_response.is_ok()) {
             show_modal = true;
-
         } else {
-
-            alert(message_response.reason!);
-
+            alert(message_response.unwrap_error());
         }
 
     }

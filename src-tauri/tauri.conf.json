@@ -70,8 +70,8 @@
       {
         "fullscreen": false,
         "height": 600,
-        "resizable": true,
-        "title": "default-tauri-setup",
+        "resizable": false,
+        "title": "SWTOR-RP-Chat",
         "width": 800
       }
     ]
