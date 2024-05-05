@@ -53,18 +53,33 @@ function remove_starting_pronouns(message: string): string {
 
 }
 
-export function auto_message_split(message: string): Result<string[], string> {
-
-    let messages: string[] = [];
-    let t_message = message.trim();
-
-    if (t_message.length <= 255) {
-        messages.push(t_message);
-        return Result.ok(messages);
+function prefix_message(message: string): Result<string, string> {
+    
+    if (message.startsWith("/say") || message.startsWith("/e")) {
+        return Result.ok(message);
     }
 
+    let t_message = "";
+    if (message.startsWith("\"")) {
+        t_message = "/say " + message;
+    } else {
+        t_message = "/e " + message;
+    }
+
+    if (t_message.length > 255) {
+        return Result.error("Message too long. -> " + message + " <- Unable to prefix");
+    }
+
+    return Result.ok(t_message);
+
+}
+
+function split_on_puncutation(message: string): Result<string[], string> {
+
+    let messages = [];
+
     const reg = new RegExp(/[^.!?]+[.!?]["']?(?=\s|$)/g);
-    let array = t_message.match(reg);
+    let array = message.match(reg);
     if (array == null) {
         return Result.error("No valid sentences found.");
     }
@@ -79,10 +94,12 @@ export function auto_message_split(message: string): Result<string[], string> {
         let t_a_msg = array[i].trim();
         if (temp.length == 0) {
   
-            if (t_a_msg.startsWith("\"")) {
-                temp += "/say";
-            } else {
-                temp += "/e";
+            if (!t_a_msg.startsWith("/say") || !t_a_msg.startsWith("/e")) {
+                if (t_a_msg.startsWith("\"")) {
+                    temp += "/say";
+                } else {
+                    temp += "/e";
+                }
             }
 
         }
@@ -103,5 +120,23 @@ export function auto_message_split(message: string): Result<string[], string> {
     }
 
     return Result.ok(messages);
+
+}
+
+export function auto_message_split(message: string): Result<string[], string> {
+
+    let t_message = message.trim();
+    if (t_message.length <= 255) {
+
+        let prefixed = prefix_message(t_message);
+
+        if (prefixed.is_error()) {
+            return Result.error(prefixed.unwrap_error());
+        }
+        return Result.ok([prefixed.unwrap()]);
+
+    }
+
+    return split_on_puncutation(t_message);
 
 }

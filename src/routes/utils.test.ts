@@ -7,21 +7,21 @@ import { auto_message_split } from './utils';
 
 test("auto_message_split simple string", () => {
 
-    let expected = { ok: ["Hello, my name is Liza."], error: null }
+    let expected = { ok: ["/e Hello, my name is Liza."], error: null }
     expect(auto_message_split("Hello, my name is Liza.")).toEqual(expected);
 
 })
 
 test("auto_message_split long string", () => {
 
-    let expected = { ok: ["Hello, my name is Liza. I am a software engineer."], error: null }
+    let expected = { ok: ["/e Hello, my name is Liza. I am a software engineer."], error: null }
     expect(auto_message_split("Hello, my name is Liza. I am a software engineer.")).toEqual(expected)
 
 })
 
 test("auto_message_split long string with quotes", () => {
 
-    let expected = { ok: ["\"Hello, my name is Liza.\" she said."], error: null }
+    let expected = { ok: ["/say \"Hello, my name is Liza.\" she said."], error: null }
     expect(auto_message_split("\"Hello, my name is Liza.\" she said.")).toEqual(expected)
 
 })

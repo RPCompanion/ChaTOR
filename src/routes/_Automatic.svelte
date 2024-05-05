@@ -4,9 +4,12 @@
     import { toast } from "@zerodevx/svelte-toast";
     import { Result } from "../lib/result";
     import Checkbox from "../lib/Checkbox.svelte";
-  import { auto_message_split } from "./utils";
+    import { auto_message_split } from "./utils";
+    import AutomaticConfirmation from "./_Automatic/_AutomaticConfirmation.svelte";
 
-   let message: string = "";
+    let message: string     = "";
+    let messages: string[]  = [];
+    let show_modal: boolean = false;
 
     function clear_chat() {
         message = "";
@@ -25,6 +28,9 @@
             return;
         }
 
+        messages = response.unwrap();
+        show_modal = true;
+
     }
 
 </script>
@@ -41,3 +47,4 @@
     </div>
     <button type="button" class="bg-slate-700 text-white rounded-sm shadow-sm" on:click={enable_confirmation_modal}>Post</button>
 </div>
+<AutomaticConfirmation {messages} {show_modal} on:cancel={() => { show_modal = false; }}/>
