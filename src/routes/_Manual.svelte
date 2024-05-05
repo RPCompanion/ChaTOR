@@ -3,6 +3,7 @@
 
     import ConfirmationModal from "../lib/ConfirmationModal.svelte";
     import { valid_messages, truncate_messages } from "./utils";
+    import { submit_post } from "../lib/network";
 
     let messages: string[] = [""];
 
@@ -20,22 +21,30 @@
 
     function enable_confirmation_modal() {
 
+        if (messages.length == 1 && messages[0].length == 0) {
+            alert("You have no content to post.");
+            return;
+        }
+
         messages = truncate_messages(messages);
-        if (valid_messages(messages)) {
+        let message_response = valid_messages(messages);
+        if (message_response.valid) {
 
             show_modal = true;
 
         } else {
 
-            alert("Unable to post. Either you there are no messages to post, or no content to post.");
+            alert(message_response.reason!);
 
         }
 
     }
 
     function on_yes_confirmation() {
+
         show_modal = false;
-        console.log("TODO")
+        submit_post(messages);
+
     }
 
     function on_no_confirmation() {

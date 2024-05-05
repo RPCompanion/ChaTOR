@@ -14,12 +14,17 @@
     "allowlist": {
       "all": false,
         "dialog": {
+          "all": true,
+          "ask": true,
+          "confirm": true,
+          "message": true,
+          "open": true,
+          "save": true
+      },
+      "window": {
         "all": true,
-        "ask": true,
-        "confirm": true,
-        "message": true,
-        "open": true,
-        "save": true
+        "close": true,
+        "setAlwaysOnTop": true
       }
     },
     "bundle": {
