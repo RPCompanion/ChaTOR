@@ -19,14 +19,16 @@
 
 </script>
 
-<div class="z-10 absolute bottom-0 left-0 w-full grid grid-cols-2">
+<div class="z-10 absolute bottom-0 left-0 w-full grid grid-cols-2 px-1">
     <div>
         <Checkbox on:checked={on_checked}>Always on top</Checkbox>
     </div>
     <div class="flex flex-row-reverse gap-2">
-        <button class="cursor-pointer bg-slate-500 rounded-md px-2" on:click={() => { open_link("https://discord.gg/2TPvYF79yz"); }}>
-            <DiscordLogo size={32} color="white" />
-        </button>
+        <!--
+            <button class="cursor-pointer bg-slate-500 rounded-md px-2" on:click={() => { open_link("https://discord.gg/2TPvYF79yz"); }}>
+                <DiscordLogo size={32} color="white" />
+            </button>
+        -->
         <button class="cursor-pointer bg-slate-500 rounded-md px-2" on:click={() => { open_link("https://github.com/Davenport-Physics/SWTOR-Chat"); }}>
             <GithubLogo size={32} color="white"/>
         </button>
