@@ -26,6 +26,7 @@ use clipboard_win::{formats::Unicode, set_clipboard};
 
 lazy_static! {
     static ref SWTOR_HWND: Arc<Mutex<Option<HWND>>> = Arc::new(Mutex::new(None));
+    static ref WRITING: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
 }
 
 #[derive(Deserialize, Serialize)]
@@ -159,6 +160,12 @@ fn window_in_focus() -> bool {
 #[tauri::command]
 pub fn submit_actual_post(character_message: NewCharacterMessage) {
 
+    if WRITING.load(Ordering::Relaxed) {
+        return;
+    }
+
+    WRITING.store(true, Ordering::Relaxed);
+
     thread::spawn(move || {
 
         //post_message(WM_KEYDOWN, ESC_KEY, 250);
@@ -178,6 +185,9 @@ pub fn submit_actual_post(character_message: NewCharacterMessage) {
             thread::sleep(Duration::from_millis(250));
             
         }
+
+        WRITING.store(false, Ordering::Relaxed);
+
     });    
 
 }
