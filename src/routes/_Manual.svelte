@@ -54,7 +54,7 @@
         let resposne = submit_post(messages);
 
         if (resposne.is_error()) {
-            toast.push("Error: " + resposne.unwrap_error());
+            toast.push(resposne.unwrap_error());
         }
         
     }
@@ -67,7 +67,7 @@
 
         let response = submit_post([messages[idx]]);
         if (response.is_error()) {
-            toast.push("Error: " + response.unwrap_error());
+            toast.push(response.unwrap_error());
         }
 
     }
