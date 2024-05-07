@@ -2,6 +2,8 @@
 <script lang="ts">
     import { appWindow } from '@tauri-apps/api/window';
     import Checkbox from '../lib/Checkbox.svelte';
+    import { GithubLogo, DiscordLogo } from 'phosphor-svelte'
+    import { open_link } from '../lib/network';
 
     let always_on_top: boolean = false;
 
@@ -17,6 +19,16 @@
 
 </script>
 
-<div class="z-10 absolute bottom-2 left-2 flex flex-row gap-2">
-    <Checkbox on:checked={on_checked}>Always on top</Checkbox>
+<div class="z-10 absolute bottom-0 left-0 w-full grid grid-cols-2">
+    <div>
+        <Checkbox on:checked={on_checked}>Always on top</Checkbox>
+    </div>
+    <div class="flex flex-row-reverse gap-2">
+        <button class="cursor-pointer" on:click={() => { open_link("https://discord.gg/2TPvYF79yz"); }}>
+            <DiscordLogo size={32} color="white" />
+        </button>
+        <button class="cursor-pointer" on:click={() => { open_link("https://github.com/Davenport-Physics/SWTOR-Chat"); }}>
+            <GithubLogo size={32} color="white"/>
+        </button>
+    </div>
 </div>

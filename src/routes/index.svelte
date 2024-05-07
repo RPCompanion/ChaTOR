@@ -3,7 +3,7 @@
 
     import { SvelteToast } from '@zerodevx/svelte-toast';
     import TabsContainer from "../lib/tabs/TabsContainer.svelte";
-    import watercolor from "../assets/watercolor.webp";
+    import watercolor from "../assets/watercolor-2.png";
     import Manual from "./_Manual.svelte";
     import Automatic from "./_Automatic.svelte";
     import FooterControls from "./_FooterControls.svelte";

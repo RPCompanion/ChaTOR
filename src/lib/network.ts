@@ -22,6 +22,14 @@ export function submit_post(messages: string[]): Result<[], string> {
         return Result.error("SWTOR not hooked in. Have you launched the game?");
     }
 
+    for (let message of messages) { 
+
+        if (message.trim().length == 0) {
+            return Result.error("Empty message detected. Please remove it.");
+        }
+
+    }
+
     interface NewCharacterMessage {
         messages: string[];
     }
@@ -33,4 +41,9 @@ export function submit_post(messages: string[]): Result<[], string> {
     invoke("submit_actual_post", { characterMessage: character_message});
     return Result.ok([]);
 
+}
+
+
+export function open_link(link: string) {
+    invoke("open_link", { link: link });
 }
