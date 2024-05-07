@@ -6,6 +6,7 @@
     import Checkbox from "../lib/Checkbox.svelte";
     import { valid_messages, truncate_messages } from "./utils";
     import { submit_post } from "../lib/network";
+    import StandardMenuButton from "../lib/buttons/StandardMenuButton.svelte";
 
     let messages: string[] = [""];
 
@@ -77,7 +78,7 @@
 <div class="flex flex-col gap-2 w-full p-10">
     <div class="text-white text-center bg-slate-700 text-2xl">Manual Formatting Mode</div>
     <div class="relative h-6">
-        <Checkbox on:checked={on_checked} checked={automated_posting}>Automated posting</Checkbox>
+        <Checkbox on:checked={on_checked} checked={automated_posting} size="small">Automated posting</Checkbox>
         <button type="button" class="bg-slate-800 text-white rounded-sm shadow-sm w-32 absolute right-0" on:click={clear_chat}>Clear chat</button>
     </div>
     {#each messages as message, idx}
@@ -92,9 +93,9 @@
             {/if}
         </div>
     {/each}
-    <button type="button" class="bg-slate-700 text-white rounded-sm shadow-sm hover:text-gray-300" on:click={on_new_message}>New</button>
+    <StandardMenuButton text="New" on:click={on_new_message}/>
     {#if automated_posting}
-        <button type="button" class="bg-slate-700 text-white rounded-sm shadow-sm hover:text-gray-300" on:click={enable_confirmation_modal}>Post all</button>
+        <StandardMenuButton text="Post all" on:click={enable_confirmation_modal}/>
     {/if}
 </div>
 <ConfirmationModal {show_modal} on:no={on_no_confirmation} on:yes={on_yes_confirmation}>
