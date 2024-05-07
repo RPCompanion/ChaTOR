@@ -7,6 +7,7 @@
     import { valid_messages, truncate_messages } from "./utils";
     import { submit_post } from "../lib/network";
     import StandardMenuButton from "../lib/buttons/StandardMenuButton.svelte";
+  import { message } from "@tauri-apps/api/dialog";
 
     let messages: string[] = [""];
 
@@ -19,6 +20,12 @@
     }
 
     function on_new_message() {
+
+        if (messages.length >= 3) {
+            toast.push("You can only have 3 messages at a time.");
+            return;
+        }
+
         messages.push("");
         messages = messages;
     }
@@ -26,7 +33,7 @@
     function enable_confirmation_modal() {
 
         if (messages.length == 1 && messages[0].length == 0) {
-            alert("You have no content to post.");
+            toast.push("You have no content to post.");
             return;
         }
 
@@ -36,7 +43,7 @@
         if (message_response.is_ok()) {
             show_modal = true;
         } else {
-            alert(message_response.unwrap_error());
+            toast.push(message_response.unwrap_error());
         }
 
     }
@@ -81,18 +88,20 @@
         <Checkbox on:checked={on_checked} checked={automated_posting} size="small">Automated posting</Checkbox>
         <button type="button" class="bg-slate-800 text-white rounded-sm shadow-sm w-32 absolute right-0" on:click={clear_chat}>Clear chat</button>
     </div>
-    {#each messages as message, idx}
-        <div class="relative">
-            <textarea class="w-full min-h-24 outline-none p-1 resize-none rounded-md border-2" class:border-yellow-400={message.length >= 200 && message.length <= 255} class:border-red-500={message.length > 255} bind:value={message}/>
-            {#if idx != 0}
-                <button class="absolute bg-slate-700 px-1 -right-2 -top-3 text-white" style="border-radius: 50%" on:click={() => { delete_message(idx); }}>X</button>
-            {/if}
-            <div class="absolute bottom-1 right-0">{message.length}/255</div>
-            {#if !automated_posting}
-                <button type="button" class="bg-slate-700 text-white rounded-sm shadow-sm px-2 absolute top-1/3 -right-8 hover:text-gray-300" on:click={() => { on_single_post(idx); }}>Post</button>
-            {/if}
-        </div>
-    {/each}
+    <div class="">
+        {#each messages as message, idx}
+            <div class="relative">
+                <textarea class="w-full min-h-24 outline-none p-1 resize-none rounded-md border-2" class:border-yellow-400={message.length >= 200 && message.length <= 255} class:border-red-500={message.length > 255} bind:value={message}/>
+                {#if idx != 0}
+                    <button class="absolute bg-slate-700 px-1 -right-2 -top-3 text-white" style="border-radius: 50%" on:click={() => { delete_message(idx); }}>X</button>
+                {/if}
+                <div class="absolute bottom-1 right-0">{message.length}/255</div>
+                {#if !automated_posting}
+                    <button type="button" class="bg-slate-700 text-white rounded-sm shadow-sm px-2 absolute top-1/3 -right-8 hover:text-gray-300" on:click={() => { on_single_post(idx); }}>Post</button>
+                {/if}
+            </div>
+        {/each}
+    </div>
     <StandardMenuButton text="New" on:click={on_new_message}/>
     {#if automated_posting}
         <StandardMenuButton text="Post all" on:click={enable_confirmation_modal}/>
@@ -101,3 +110,6 @@
 <ConfirmationModal {show_modal} on:no={on_no_confirmation} on:yes={on_yes_confirmation}>
     Are you sure you want to post?
 </ConfirmationModal>
+
+<style>
+</style>
