@@ -136,7 +136,7 @@ pub fn get_all_custom_emotes() -> Result<Vec<CustomEmote>, &'static str> {
 }
 
 #[tauri::command]
-pub fn new_custom_emote(emote_name: String, emote: String) -> Result<CustomEmote, &'static str> {
+pub fn create_custom_emote(emote_name: String, emote: String) -> Result<CustomEmote, &'static str> {
 
     CustomEmote::new(emote_name, emote)
 
@@ -150,7 +150,7 @@ pub fn delete_custom_emote(custom_emote_id: i32) {
 }
 
 #[tauri::command]
-pub fn save_custom_emote(custom_emote: CustomEmote) {
+pub fn update_custom_emote(custom_emote: CustomEmote) {
 
     custom_emote.save()
 

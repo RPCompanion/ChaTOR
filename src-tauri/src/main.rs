@@ -20,9 +20,9 @@ fn main() {
             swtor_hook::submit_actual_post,
             open_link,
             dal::db::custom_emote::get_all_custom_emotes,
-            dal::db::custom_emote::new_custom_emote,
+            dal::db::custom_emote::create_custom_emote,
             dal::db::custom_emote::delete_custom_emote,
-            dal::db::custom_emote::save_custom_emote
+            dal::db::custom_emote::update_custom_emote
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
