@@ -23,7 +23,7 @@
     <div>
         <Checkbox on:checked={on_checked}>Always on top</Checkbox>
     </div>
-    <div class="flex flex-row-reverse gap-2 ">
+    <div class="flex flex-row-reverse gap-2">
         <button class="cursor-pointer bg-slate-500 rounded-md px-2" on:click={() => { open_link("https://discord.gg/2TPvYF79yz"); }}>
             <DiscordLogo size={32} color="white" />
         </button>

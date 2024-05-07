@@ -7,14 +7,22 @@ use open;
 extern crate lazy_static;
 
 mod swtor_hook;
+mod dal;
 
 fn main() {
+
+    dal::init();
+
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             swtor_hook::start_swtor_hook,
             swtor_hook::is_hooked_in,
             swtor_hook::submit_actual_post,
-            open_link
+            open_link,
+            dal::db::custom_emote::get_all_custom_emotes,
+            dal::db::custom_emote::new_custom_emote,
+            dal::db::custom_emote::delete_custom_emote,
+            dal::db::custom_emote::save_custom_emote
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
