@@ -22,5 +22,5 @@ fn main() {
 
 #[tauri::command]
 fn open_link(link: String) {
-    open::that(link);
+    let _ = open::that(link);
 }
