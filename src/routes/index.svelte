@@ -1,10 +1,10 @@
 
 <script lang="ts">
 
-    import { init_hook } from "../lib/network";
+    import { init_network } from "../lib/network";
     import { goto } from "@roxi/routify";
 
-    init_hook();
+    init_network();
     $goto("/manual");
 
 </script>

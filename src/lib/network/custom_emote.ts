@@ -13,7 +13,7 @@ export const custom_emotes = writable<ICustomEmote[]>([]);
 export function init_custom_emotes() {
 
     invoke("get_all_custom_emotes").then((response: any) => {
-        custom_emotes.set(response.payload);
+        custom_emotes.set(response);
     });
 
 }
@@ -22,10 +22,14 @@ export function create_custom_emote(emote_name: string, emote: string) {
 
     invoke("create_custom_emote", { emoteName: emote_name, emote: emote }).then((response: any) => {
 
+        console.log(response)
         custom_emotes.update((current) => {
-            return [...current, response.payload];
+            return [...current, response];
         });
 
+    })
+    .catch((error) => {
+        console.log(error);
     });
 
 }
@@ -57,7 +61,7 @@ export function update_custom_emote(custom_emote: ICustomEmote) {
                 }
 
             });
-            
+
         });
 
     });

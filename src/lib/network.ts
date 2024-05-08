@@ -4,10 +4,15 @@ import { listen } from "@tauri-apps/api/event";
 import { writable, get } from "svelte/store";
 
 import { Result } from "./result";
+import { init_custom_emotes } from "./network/custom_emote";
 
 export const hooked_in = writable<boolean>(false);
 
-export function init_hook() {
+export function init_network() {
+    init_custom_emotes();
+}
+
+function init_hook() {
 
     invoke("start_swtor_hook");
     listen("swtor_hooked_in", (response: any) => {

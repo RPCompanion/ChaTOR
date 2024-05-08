@@ -30,8 +30,8 @@ impl CustomEmote {
         let conn = db::get_connection();
         const INSERT_QUERY: &str = 
         "  
-            INSERT INTO custom_emotes (emote_name, emote)
-            VALUES (?, ?)
+            INSERT INTO CustomEmotes (emote_name, emote)
+            VALUES (?1, ?2)
             RETURNING custom_emote_id;
         ";
 
@@ -64,7 +64,7 @@ impl CustomEmote {
             SELECT 
                 custom_emote_id, emote_name, emote
             FROM 
-                custom_emotes;
+                CustomEmotes;
         ";
 
         let mut stmt = conn.prepare(SELECT_QUERY).unwrap();
@@ -100,7 +100,7 @@ impl CustomEmote {
         const DELETE_QUERY: &str = 
         "
             DELETE FROM 
-                custom_emotes
+                CustomEmotes
             WHERE 
                 custom_emote_id = ?;
         ";
@@ -115,11 +115,11 @@ impl CustomEmote {
         const UPDATE_QUERY: &str = 
         "
             UPDATE 
-                custom_emotes
+                CustomEmotes
             SET 
-                emote_name = ?, emote = ?
+                emote_name = ?1, emote = ?2
             WHERE 
-                custom_emote_id = ?;
+                custom_emote_id = ?3;
         ";
 
         conn.execute(UPDATE_QUERY, params![&self.emote_name, &self.emote, self.custom_emote_id]).unwrap();

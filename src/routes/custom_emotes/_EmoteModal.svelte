@@ -7,7 +7,7 @@
     import { GAME_MESSAGE_MAXIMUM } from "../utils";
     import { Result } from "../../lib/result";
 
-    import { create_custom_emote } from "../../lib/com/custom_emote";
+    import { create_custom_emote } from "../../lib/network/custom_emote";
 
     export let show_modal: boolean = false;
 
@@ -17,7 +17,12 @@
     let emote: string = "";
 
     function on_cancel() {
+
+        emote_name = "";
+        emote = "";
+
         dispatch("cancel");
+        
     }
 
     function validate_emote(): Result<[], string> {
