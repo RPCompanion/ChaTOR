@@ -9,7 +9,7 @@
 
 <img src={watercolor} alt="background-watercolor" class="absolute inset-0 w-full h-full object-cover z-0"/>
 <Navbar/>
-<div>
+<div class="relative">
     <slot></slot>
 </div>
 <FooterControls/>

@@ -35,7 +35,7 @@
 </script>
 
 
-<div class="flex flex-col gap-2 w-full p-10">
+<div class="flex flex-col gap-2 w-full p-10 relative">
     <div class="text-white text-center bg-slate-700 text-2xl">Automatic Formatting Mode</div>
     <div class="relative h-6">
         <button type="button" class="bg-slate-800 text-white rounded-sm shadow-sm w-32 absolute right-0" on:click={clear_chat}>Clear chat</button>

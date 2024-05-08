@@ -1,6 +1,7 @@
 
 <script lang="ts">
 
+    import { slide } from "svelte/transition";
     import { goto } from "@roxi/routify";
     import { type INavbarSection } from "./navbar";
 
@@ -24,7 +25,7 @@
         <div class="relative top-2 text-xs">&#9660;</div>
     </button>
     {#if show_dropdown}
-        <div class="flex flex-col gap-1 bg-white p-2 relative top-2 shadow-md">
+        <div class="flex flex-col gap-1 bg-white p-2 relative top-2 shadow-md" in:slide={{duration: 300}}>
             {#each section.elements as element}
                 <button type="button" on:click={() => { goto_link(element.link); }} class="hover:text-slate-500 text-center">{element.name}</button>
             {/each}

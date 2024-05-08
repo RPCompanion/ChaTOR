@@ -1,6 +1,9 @@
 
 import { Result } from "../lib/result";
 
+export const GAME_MESSAGE_MINIMUM = 1;
+export const GAME_MESSAGE_MAXIMUM = 255;
+
 export function valid_messages(messages: string[]): Result<[], string> {
 
     if (messages.length === 0) {
@@ -10,7 +13,7 @@ export function valid_messages(messages: string[]): Result<[], string> {
     for (let message of messages) {
 
         let temp = message.trim();
-        if (temp.length === 0 || temp.length > 255) {
+        if (temp.length < GAME_MESSAGE_MINIMUM || temp.length > GAME_MESSAGE_MAXIMUM) {
             return Result.error("Messages must be between 1 and 255 characters");
         }
 
@@ -66,7 +69,7 @@ function prefix_message(message: string): Result<string, string> {
         t_message = "/e " + message;
     }
 
-    if (t_message.length > 255) {
+    if (t_message.length > GAME_MESSAGE_MAXIMUM) {
         return Result.error("Message too long. -> " + message + " <- Unable to prefix");
     }
 
@@ -95,7 +98,7 @@ function split_on_puncutation(message: string): Result<string[], string> {
     let temp = "";
     for (let i = 0; i < array.length; i++) {
 
-        if (array[i].length > 255) {
+        if (array[i].length > GAME_MESSAGE_MAXIMUM) {
             return Result.error("Sentence too long. -> " + array[i] + " <- Unable to auto format");
         }
 
@@ -113,7 +116,7 @@ function split_on_puncutation(message: string): Result<string[], string> {
 
         }
 
-        if (temp.length + t_a_msg.length + " ".length > 255) {
+        if (temp.length + t_a_msg.length + " ".length > GAME_MESSAGE_MAXIMUM) {
             messages.push(temp);
             temp = "";
             i--;
@@ -134,7 +137,7 @@ function split_on_puncutation(message: string): Result<string[], string> {
 export function auto_message_split(message: string): Result<string[], string> {
 
     let t_message = message.trim();
-    if (t_message.length <= 255) {
+    if (t_message.length <= GAME_MESSAGE_MAXIMUM) {
 
         let prefixed = prefix_message(t_message);
 

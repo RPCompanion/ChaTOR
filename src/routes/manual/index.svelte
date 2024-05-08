@@ -7,7 +7,6 @@
     import { valid_messages, truncate_messages } from "../utils";
     import { submit_post } from "../../lib/network";
     import StandardMenuButton from "../../lib/buttons/StandardMenuButton.svelte";
-    import { message } from "@tauri-apps/api/dialog";
 
     let messages: string[] = [""];
 
@@ -82,7 +81,7 @@
 
 </script>
 
-<div class="flex flex-col gap-2 w-full p-10">
+<div class="flex flex-col gap-2 w-full p-10 relative">
     <div class="text-white text-center bg-slate-700 text-2xl">Manual Formatting Mode</div>
     <div class="relative h-6">
         <Checkbox on:checked={on_checked} checked={automated_posting} size="small">Automated posting</Checkbox>
