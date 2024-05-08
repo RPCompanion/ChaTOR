@@ -7,5 +7,6 @@ export interface INavbarSectionElement {
 
 export interface INavbarSection {
     name: string;
-    elements: INavbarSectionElement[];
+    link?: string;
+    elements?: INavbarSectionElement[];
 }
