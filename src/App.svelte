@@ -1,5 +1,6 @@
 <script lang="ts">
 
+    import { SvelteToast } from '@zerodevx/svelte-toast';
     import { Router, createRouter } from '@roxi/routify'
     import routes from '../.routify/routes.default.js'
 
@@ -8,5 +9,6 @@
 </script>
 
 <main>
+    <SvelteToast/>
     <Router {router}/>
 </main>

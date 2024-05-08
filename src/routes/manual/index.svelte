@@ -2,12 +2,12 @@
 <script lang="ts">
 
     import { toast } from "@zerodevx/svelte-toast";
-    import ConfirmationModal from "../lib/ConfirmationModal.svelte";
-    import Checkbox from "../lib/Checkbox.svelte";
-    import { valid_messages, truncate_messages } from "./utils";
-    import { submit_post } from "../lib/network";
-    import StandardMenuButton from "../lib/buttons/StandardMenuButton.svelte";
-  import { message } from "@tauri-apps/api/dialog";
+    import ConfirmationModal from "../../lib/ConfirmationModal.svelte";
+    import Checkbox from "../../lib/Checkbox.svelte";
+    import { valid_messages, truncate_messages } from "../utils";
+    import { submit_post } from "../../lib/network";
+    import StandardMenuButton from "../../lib/buttons/StandardMenuButton.svelte";
+    import { message } from "@tauri-apps/api/dialog";
 
     let messages: string[] = [""];
 

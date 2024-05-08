@@ -2,9 +2,9 @@
 <script lang="ts">
    
     import { toast } from "@zerodevx/svelte-toast";
-    import StandardMenuButton from "../lib/buttons/StandardMenuButton.svelte";
-    import { auto_message_split } from "./utils";
-    import AutomaticConfirmation from "./_Automatic/_AutomaticConfirmation.svelte";
+    import StandardMenuButton from "../../lib/buttons/StandardMenuButton.svelte";
+    import { auto_message_split } from "../utils";
+    import AutomaticConfirmation from "./_AutomaticConfirmation.svelte";
 
     let message: string     = "";
     let messages: string[]  = [];
