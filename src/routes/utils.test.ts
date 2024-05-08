@@ -52,3 +52,21 @@ test("auto_message_split single paragraph string", () => {
     expect(result).toEqual(expected);
 
 });
+
+test("auto_message_split ellipsis", () => {
+
+    const input = `
+        made a face like she really didn't want to answer that particular question. "Well ... I'm getting assigned to a new post. At least that's the word coming from up top. No idea where I'm off to next, but I do know that I'm not going to have an immediate C.O" she stated. "Instead ..." she gazed off into the distance. "I'll be directly reporting to a Sith."
+    `;
+
+    const expected = {
+        ok: [
+            "/e made a face like she really didn't want to answer that particular question.",
+            `/say "Well ... I'm getting assigned to a new post. At least that's the word coming from up top. No idea where I'm off to next, but I do know that I'm not going to have an immediate C.O" she stated. "Instead ..." she gazed off into the distance.`,
+            `/say "I'll be directly reporting to a Sith."`
+        ],
+        error: null
+    }
+    expect(auto_message_split(input)).toEqual(expected);
+
+})

@@ -78,7 +78,7 @@ function split_on_puncutation(message: string): Result<string[], string> {
 
     let messages = [];
 
-    const reg = new RegExp(/[^.!?]+[.!?]["']?(?=\s|$)/g);
+    const reg = new RegExp(/(?:[^.!?]+[.!?]|\b[^.!?]+\b[.!?]{3}|"[^"]*")(?=\s|$)/g);
     let array = message.match(reg);
     if (array == null) {
         return Result.error("No valid sentences found.");
@@ -92,9 +92,9 @@ function split_on_puncutation(message: string): Result<string[], string> {
         }
 
         let t_a_msg = array[i].trim();
-        t_a_msg = remove_starting_pronouns(t_a_msg);
         if (temp.length == 0) {
   
+            t_a_msg = remove_starting_pronouns(t_a_msg);
             if (!t_a_msg.startsWith("/say") && !t_a_msg.startsWith("/e")) {
                 if (t_a_msg.startsWith("\"")) {
                     temp += "/say";
