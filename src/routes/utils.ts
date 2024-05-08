@@ -78,6 +78,14 @@ function split_on_puncutation(message: string): Result<string[], string> {
 
     let messages = [];
 
+    /*
+        (?:[^.!?]+[.!?]|\b[^.!?]+\b[.!?]{3}|"[^"]*"): This is a non-capturing group that matches three different patterns:
+            [^.!?]+[.!?]: Matches a sentence that ends with a single punctuation mark (period, exclamation mark, or question mark).
+            \b[^.!?]+\b[.!?]{3}: Matches a sentence that ends with an ellipsis (three consecutive punctuation marks).
+            "[^"]*": Matches a quoted speech, treating the entire speech as a single sentence, regardless of its length or internal punctuation.
+        (?=\s|$): Positive lookahead assertion that ensures the matched sentence is followed by a whitespace character or the end of the string.
+    */
+
     const reg = new RegExp(/(?:[^.!?]+[.!?]|\b[^.!?]+\b[.!?]{3}|"[^"]*")(?=\s|$)/g);
     let array = message.match(reg);
     if (array == null) {
