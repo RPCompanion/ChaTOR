@@ -44,7 +44,7 @@
                     <button type="button" on:click={() => { goto_link(element.link); }} class="hover:text-slate-500 text-center">{element.name}</button>
                 {/each}
             {/if}
-            </div>
+        </div>
     {/if}
 </div>
 
