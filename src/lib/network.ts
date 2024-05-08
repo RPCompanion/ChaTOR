@@ -24,8 +24,12 @@ export function submit_post(messages: string[]): Result<[], string> {
 
     for (let message of messages) { 
 
-        if (message.trim().length == 0) {
+        message = message.trim();
+        
+        if (message.length == 0) {
             return Result.error("Empty message detected. Please remove it.");
+        } else if (message.length > 255) {
+            return Result.error("Long message detected. Please shorten it.");
         }
 
     }
