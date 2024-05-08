@@ -21,7 +21,7 @@
         
         if (section.link != undefined) {
             goto_link(section.link);
-            return;   
+            return;
         }
 
         toggle_dropdown();
