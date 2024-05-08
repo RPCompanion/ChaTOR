@@ -19,7 +19,7 @@
 
 </script>
 
-<div class="z-10 absolute bottom-0 left-0 w-full grid grid-cols-2 px-1">
+<div class="relative w-full grid grid-cols-2 px-1">
     <div>
         <Checkbox on:checked={on_checked}>Always on top</Checkbox>
     </div>

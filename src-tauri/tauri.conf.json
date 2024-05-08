@@ -69,11 +69,11 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
+        "height": 720,
         "resizable": true,
         "title": "SWTOR-RP-Chat - EmmaLabs",
         "width": 800,
-        "minHeight": 600,
+        "minHeight": 720,
         "minWidth": 800,
         "maxHeight": 720,
         "maxWidth": 1280
