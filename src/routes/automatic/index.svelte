@@ -5,6 +5,7 @@
     import StandardMenuButton from "../../lib/buttons/StandardMenuButton.svelte";
     import { auto_message_split } from "../utils";
     import AutomaticConfirmation from "./_AutomaticConfirmation.svelte";
+    import CustomEmotesList from "../../lib/_CustomEmotesList.svelte";
 
     let message: string     = "";
     let messages: string[]  = [];
@@ -45,5 +46,7 @@
         <div class="absolute bottom-1 right-2">{message.length}</div>
     </div>
     <StandardMenuButton text="Post" on:click={enable_confirmation_modal}/>
+    <div class="h-6"></div>
+    <CustomEmotesList/>
 </div>
 <AutomaticConfirmation {messages} {show_modal} on:cancel={() => { show_modal = false; }}/>

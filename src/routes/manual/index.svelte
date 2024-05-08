@@ -7,6 +7,7 @@
     import { valid_messages, truncate_messages } from "../utils";
     import { submit_post } from "../../lib/network";
     import StandardMenuButton from "../../lib/buttons/StandardMenuButton.svelte";
+    import CustomEmotesList from "../../lib/_CustomEmotesList.svelte";
 
     let messages: string[] = [""];
 
@@ -105,6 +106,8 @@
     {#if automated_posting}
         <StandardMenuButton text="Post all" on:click={enable_confirmation_modal}/>
     {/if}
+    <div class="h-6"></div>
+    <CustomEmotesList/>
 </div>
 <ConfirmationModal {show_modal} on:no={on_no_confirmation} on:yes={on_yes_confirmation}>
     Are you sure you want to post?

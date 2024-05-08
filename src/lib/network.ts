@@ -9,6 +9,7 @@ import { init_custom_emotes } from "./network/custom_emote";
 export const hooked_in = writable<boolean>(false);
 
 export function init_network() {
+    init_hook();
     init_custom_emotes();
 }
 
