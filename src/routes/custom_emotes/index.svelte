@@ -13,7 +13,7 @@
 </script>
 
 <div class="h-12"></div>
-<div class="block w-full">
+<div class="w-full relative">
     <div class="flex flex-col gap-2">
         {#each $custom_emotes as emote}
             <div class="flex flex-row gap-2 px-2 relative">
