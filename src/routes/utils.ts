@@ -117,7 +117,7 @@ function split_on_puncutation(message: string): Result<string[], string> {
         }
 
         if (temp.length + t_a_msg.length + " ".length > GAME_MESSAGE_MAXIMUM) {
-            messages.push(temp);
+            messages.push(temp.trim());
             temp = "";
             i--;
         } else {
@@ -127,7 +127,7 @@ function split_on_puncutation(message: string): Result<string[], string> {
     }
 
     if (temp.length > 0) {
-        messages.push(temp);
+        messages.push(temp.trim());
     }
 
     return Result.ok(messages);
