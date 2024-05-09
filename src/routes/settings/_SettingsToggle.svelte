@@ -6,4 +6,4 @@
 
 </script>
 
-<input type="checkbox" bind:checked={checked} on:change={() => { $settings = $settings }} class="scale-150" />
+<input type="checkbox" bind:checked={checked} class="scale-150" />
