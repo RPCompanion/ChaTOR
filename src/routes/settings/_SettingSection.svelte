@@ -8,5 +8,7 @@
     <div class="w-full pl-6">
         <slot/>
     </div>
-    <div class="border border-gray-200"></div>
+    <!--
+        <div class="border border-gray-200"></div>
+    -->
 </div>
