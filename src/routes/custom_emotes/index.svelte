@@ -17,7 +17,7 @@
 
 <div class="h-12"></div>
 <div class="w-full relative">
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-2 max-h-96 overflow-y-auto">
         {#each $custom_emotes as emote, idx}
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <!-- svelte-ignore a11y-mouse-events-have-key-events -->
