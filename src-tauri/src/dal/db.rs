@@ -1,10 +1,11 @@
 
 use crate::dal;
-use rusqlite::{params, Connection};
+use rusqlite::Connection;
 
 const TABLES: &str = include_str!("../../sql/tables.sql");
 
 pub mod custom_emote;
+pub mod settings;
 
 pub fn get_connection() -> Connection {
 

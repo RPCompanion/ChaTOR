@@ -5,12 +5,14 @@ import { writable, get } from "svelte/store";
 
 import { Result } from "./result";
 import { init_custom_emotes } from "./network/custom_emote";
+import { init_settings } from "./network/settings";
 
 export const hooked_in = writable<boolean>(false);
 
 export function init_network() {
     init_hook();
     init_custom_emotes();
+    init_settings();
 }
 
 function init_hook() {

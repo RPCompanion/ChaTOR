@@ -22,7 +22,9 @@ fn main() {
             dal::db::custom_emote::get_all_custom_emotes,
             dal::db::custom_emote::create_custom_emote,
             dal::db::custom_emote::delete_custom_emote,
-            dal::db::custom_emote::update_custom_emote
+            dal::db::custom_emote::update_custom_emote,
+            dal::db::settings::get_settings,
+            dal::db::settings::update_settings
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
