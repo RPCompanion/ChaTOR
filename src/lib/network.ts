@@ -30,9 +30,9 @@ export function submit_post(messages: string[]): Result<[], string> {
         return Result.error("SWTOR not hooked in. Have you launched the game?");
     }
 
+    messages = messages.map((message) => message.trim());
+    
     for (let message of messages) { 
-
-        message = message.trim();
         
         if (message.length == 0) {
             return Result.error("Empty message detected. Please remove it.");
