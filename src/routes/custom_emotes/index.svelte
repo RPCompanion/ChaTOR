@@ -1,6 +1,7 @@
 
 <script lang="ts">
 
+    import { afterUpdate } from "svelte";
     import { flip } from "svelte/animate";
     import { dndzone } from 'svelte-dnd-action';
 
@@ -13,9 +14,16 @@
     let show_x_button_idx: number | undefined = undefined;
     let emotes: any = $custom_emotes;
 
+    let scroll_bottom: boolean = false;
+    let emote_section: HTMLElement;
+
     set_emote_ids();
 
     function on_cancel_modal() {
+        show_modal = false;
+    }
+
+    function on_save_modal() {
         show_modal = false;
     }
 
@@ -38,16 +46,32 @@
 
     $: if ($custom_emotes.length != emotes.length) {
 
+        if ($custom_emotes.length > emotes.length) {
+            scroll_bottom = true;
+        }
+
         emotes = $custom_emotes;
         set_emote_ids();
 
     }
 
+    afterUpdate(() => {
+
+        if (scroll_bottom) {
+            const last_emote = emote_section.lastElementChild;
+            if (last_emote) {
+                last_emote.scrollIntoView({ behavior: "smooth" });
+            }
+            scroll_bottom = false;
+        }
+
+    });
+
 </script>
 
 <div class="h-12"></div>
 <div class="w-full relative">
-    <section class="flex flex-col gap-2 max-h-96 overflow-y-auto" use:dndzone="{{items: emotes, flipDurationMs: 300}}" on:consider={handle_dnd_consider} on:finalize={handle_dnd_finalize}>
+    <section class="flex flex-col gap-2 max-h-96 overflow-y-auto" bind:this={emote_section} use:dndzone="{{items: emotes, flipDurationMs: 300}}" on:consider={handle_dnd_consider} on:finalize={handle_dnd_finalize}>
         {#each emotes as emote (emote.id)}
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <!-- svelte-ignore a11y-mouse-events-have-key-events -->
@@ -66,5 +90,5 @@
     <div class="flex flex-row justify-center">
         <button class="bg-slate-700 text-white text-xl px-2 rounded-md w-32 hover:text-gray-500" on:click={() => { show_modal = true; }}>New Emote</button>
     </div>
-    <EmoteModal {show_modal} on:cancel={on_cancel_modal}/>
+    <EmoteModal {show_modal} on:save={on_save_modal} on:cancel={on_cancel_modal}/>
 </div>

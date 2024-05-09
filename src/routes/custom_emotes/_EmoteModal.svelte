@@ -16,11 +16,16 @@
     let emote_name: string = "";
     let emote: string = "";
 
-    function on_cancel() {
-
+    function clear_vars() {
+            
         emote_name = "";
         emote = "";
 
+    }
+
+    function on_cancel() {
+
+        clear_vars();
         dispatch("cancel");
         
     }
@@ -53,7 +58,8 @@
         }
 
         create_custom_emote(emote_name, emote);
-        on_cancel();
+        clear_vars();
+        dispatch("save");
 
     }
 
