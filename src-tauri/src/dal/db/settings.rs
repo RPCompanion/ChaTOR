@@ -62,10 +62,14 @@ impl Settings {
 
         const UPDATE_QUERY: &str = 
         "
-            UPDATE 
-                Settings
-            SET 
-                settings = ?1
+            INSERT INTO 
+                Settings (settings_id, settings)
+            VALUES 
+                (1, ?1)
+            ON CONFLICT(settings_id) 
+            DO 
+                UPDATE 
+                SET settings = ?1;
         ";
 
         let conn = get_connection();

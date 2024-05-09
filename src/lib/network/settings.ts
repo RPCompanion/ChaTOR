@@ -1,5 +1,5 @@
 
-import { writable } from "svelte/store";
+import { writable, get } from "svelte/store";
 import { invoke } from "@tauri-apps/api";
 
 export interface IChatSettings {
@@ -32,10 +32,9 @@ export function init_settings() {
 
         settings.set(response);
         settings.subscribe((value) => {
-            invoke("update_settings", { settings: value });
+            invoke("update_settings", {settings: value});
         });
 
     });
-
 
 }

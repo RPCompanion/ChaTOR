@@ -24,7 +24,6 @@ CREATE TABLE IF NOT EXISTS CustomEmoteCategory
 
 CREATE TABLE IF NOT EXISTS Settings
 (
-    settings_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    settings TEXT VARCHAR NOT NULL,
-    CHECK(settings_id = 1)
+    settings_id INTEGER UNIQUE,
+    settings TEXT VARCHAR NOT NULL
 );
