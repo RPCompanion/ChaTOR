@@ -22,6 +22,11 @@
         name: "Custom Emotes",
         link: "/custom_emotes"
     };
+    
+    const SETTINGS_SECTION: INavbarSection = {
+        name: "Settings",
+        link: "/settings"
+    };
 
 </script>
 
@@ -30,8 +35,8 @@
         <NavbarSection section={CHAT_SECTION}/>
         <NavbarSection section={EMOTE_SECTION}/>
     </div>
-    <div>
-
+    <div class="flex flex-row-reverse">
+        <NavbarSection section={SETTINGS_SECTION}/>
     </div>
 </div>
 
