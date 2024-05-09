@@ -17,6 +17,11 @@ pub fn get_connection() -> Connection {
 pub fn init() {
 
     let conn = get_connection();
-    conn.execute(TABLES, params![]).unwrap();
+    match conn.execute_batch(TABLES) {
+        Ok(_) => {},
+        Err(e) => {
+            eprintln!("Error creating tables: {}", e);
+        }
+    }
 
 }
