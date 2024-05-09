@@ -15,7 +15,7 @@
 
     function on_submit() {
         submit_post(messages);
-        dispatch("cancel");
+        dispatch("submitted");
     }
 
 </script>

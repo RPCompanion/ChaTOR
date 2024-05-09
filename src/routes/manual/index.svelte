@@ -4,6 +4,7 @@
     import { settings } from "../../lib/network/settings";
     import { onMount } from "svelte";
     import { toast } from "@zerodevx/svelte-toast";
+    import XButton from "../../lib/buttons/XButton.svelte";
     import ConfirmationModal from "../../lib/ConfirmationModal.svelte";
     import Checkbox from "../../lib/Checkbox.svelte";
     import { valid_messages, truncate_messages } from "../utils";
@@ -121,9 +122,11 @@
     <form>
         {#each messages as message, idx}
             <div class="relative">
-                <textarea class="w-full min-h-24 outline-none p-1 resize-none rounded-md border-2" class:border-yellow-400={message.length >= 200 && message.length <= 255} class:border-red-500={message.length > 255} bind:value={message}/>
+                <textarea class="w-full min-h-24 outline-none p-1 resize-none rounded-md border-2 border-slate-500" class:border-yellow-400={message.length >= 200 && message.length <= 255} class:border-red-500={message.length > 255} bind:value={message}/>
                 {#if idx != 0}
-                    <button class="absolute bg-slate-700 px-2 -right-2 -top-3 text-white text-xl" style="border-radius: 50%" on:click={() => { delete_message(idx); }}>X</button>
+                    <div class="absolute -right-2 -top-3">
+                        <XButton on:click={() => { delete_message(idx); }}/>
+                    </div>
                 {/if}
                 <div class="absolute bottom-1 right-0">{message.length}/255</div>
                 {#if !automated_posting}
@@ -135,7 +138,6 @@
     <div class="w-full h-6 flex flex-row-reverse">
         <button type="button" class="bg-slate-800 text-white rounded-sm shadow-sm w-32 hover:text-gray-300" on:click={on_new_message}>New</button>
     </div>
-    <!--<StandardMenuButton text="New" on:click={on_new_message}/>-->
     {#if automated_posting}
         <StandardMenuButton text="Post all" on:click={enable_confirmation_modal}/>
     {/if}
