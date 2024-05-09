@@ -2,7 +2,6 @@
 <script lang="ts">
 
     import { settings } from "../../lib/network/settings";
-    import { onMount } from "svelte";
     import { toast } from "@zerodevx/svelte-toast";
     import XButton from "../../lib/buttons/XButton.svelte";
     import ConfirmationModal from "../../lib/ConfirmationModal.svelte";
@@ -33,33 +32,42 @@
         messages = messages;
     }
 
-    function enable_confirmation_modal() {
+    function on_post_all() {
 
         if (messages.length == 1 && messages[0].length == 0) {
             toast.push("You have no content to post.");
             return;
         }
 
-        messages = truncate_messages(messages);
+        messages = messages.map((message) => message.trim());
         let message_response = valid_messages(messages);
+        if (message_response.is_error()) {
+            toast.push(message_response.unwrap_error());
+            return;
+        }
 
-        if (message_response.is_ok()) {
+        if ($settings.chat.confirmation_before_posting) {
             show_modal = true;
         } else {
-            toast.push(message_response.unwrap_error());
+            submit_messages();
         }
 
     }
 
-    function on_yes_confirmation() {
+    function submit_messages() {
 
         show_modal = false;
-        let resposne = submit_post(messages);
+        let response = submit_post(messages);
 
-        if (resposne.is_error()) {
-            toast.push(resposne.unwrap_error());
+        if (response.is_error()) {
+            toast.push(response.unwrap_error());
+            return;
         }
-        
+
+        if ($settings.chat.clear_chat_after_posting) {
+            clear_chat();
+        }
+
     }
 
     function on_no_confirmation() {
@@ -81,34 +89,6 @@
 
     function on_checked(event: any) {
         automated_posting = event.detail;
-    }
-
-    /*
-    onMount(() => {
-
-        function on_key_up(event: KeyboardEvent) {
-
-            if (!$settings.chat.enter_to_send) {
-                return;
-            }
-
-            if (event.key == "Enter" && !event.shiftKey) {
-                enable_confirmation_modal();
-            }
-
-        }
-
-        window.addEventListener("keyup", on_key_up);
-        return () => {
-            window.removeEventListener("keyup", on_key_up);
-        }
-
-    });
-    */
-
-    function on_submit(event: Event) {
-        event.preventDefault();
-        console.log("here")
     }
 
 </script>
@@ -139,12 +119,12 @@
         <button type="button" class="bg-slate-800 text-white rounded-sm shadow-sm w-32 hover:text-gray-300" on:click={on_new_message}>New</button>
     </div>
     {#if automated_posting}
-        <StandardMenuButton text="Post all" on:click={enable_confirmation_modal}/>
+        <StandardMenuButton text="Post all" on:click={on_post_all}/>
     {/if}
     <div class="h-6"></div>
     <CustomEmotesList/>
 </div>
-<ConfirmationModal {show_modal} on:no={on_no_confirmation} on:yes={on_yes_confirmation}>
+<ConfirmationModal {show_modal} on:no={on_no_confirmation} on:yes={submit_messages}>
     Are you sure you want to post?
 </ConfirmationModal>
 

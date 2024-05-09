@@ -25,25 +25,15 @@ export function valid_messages(messages: string[]): Result<[], string> {
 
 export function truncate_messages(messages: string[]): string[] {
 
-    for (let i = 0; i < messages.length; i++) {
-        messages[i] = messages[i].trim()
-    }
-
-    for (let i = messages.length - 1; i >= 0; i--) {
-            
-        if (messages[i].length === 0) {
-            messages.splice(i, 1)
-        }
-
-    }
-
     return messages
+        .map((message) => message.trim())
+        .filter((message) => message.length > 0);
 
 }
 
 function remove_starting_pronouns(message: string): string {
 
-    const pronouns = ["i", "you", "he", "she", "it", "we", "they"];
+    const pronouns = ["i", "you", "he", "her", "she", "it", "we", "they"];
     for (let pronoun of pronouns) {
 
         if (message.toLocaleLowerCase().startsWith(pronoun + " ")) {
