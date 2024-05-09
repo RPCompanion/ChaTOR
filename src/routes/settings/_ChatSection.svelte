@@ -14,7 +14,7 @@
         <SettingsToggle bind:checked={$settings.chat.confirmation_before_posting}></SettingsToggle>
     </Setting>
 
-    <Setting setting="Press enter to send">
+    <Setting setting="Press enter to post">
         <SettingsToggle bind:checked={$settings.chat.enter_to_post}></SettingsToggle>
     </Setting>
 

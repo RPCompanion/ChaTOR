@@ -3,6 +3,7 @@
 
     import { settings } from "../../lib/network/settings";
     import { toast } from "@zerodevx/svelte-toast";
+    import { submit_post } from "../../lib/network";
     import StandardMenuButton from "../../lib/buttons/StandardMenuButton.svelte";
     import { auto_message_split } from "../utils";
     import AutomaticConfirmation from "./_AutomaticConfirmation.svelte";
@@ -17,9 +18,9 @@
     }
 
     function on_submitted() {
-        
-        show_modal = false;
 
+        show_modal = false;
+        submit_post(messages);
         if ($settings.chat.clear_chat_after_posting) {
             message = "";
         }
@@ -59,7 +60,6 @@
 
 </script>
 
-
 <div class="flex flex-col gap-2 w-full p-10 relative">
     <div class="text-white text-center bg-slate-700 text-2xl">Automatic Formatting Mode</div>
     <div class="relative h-6">
@@ -73,4 +73,4 @@
     <div class="h-6"></div>
     <CustomEmotesList/>
 </div>
-<AutomaticConfirmation {messages} {show_modal} on:cancel={() => { show_modal = false; }} on:submitted={on_submitted}/>
+<AutomaticConfirmation bind:messages={messages} {show_modal} on:cancel={() => { show_modal = false; }} on:submitted={on_submitted}/>

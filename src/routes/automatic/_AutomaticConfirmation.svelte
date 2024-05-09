@@ -3,7 +3,6 @@
     
     import { fly } from "svelte/transition";
     import { createEventDispatcher } from "svelte";
-    import { submit_post } from "../../lib/network";
 
     export let messages: string[];
     export let show_modal: boolean = false;
@@ -14,7 +13,6 @@
     }
 
     function on_submit() {
-        submit_post(messages);
         dispatch("submitted");
     }
 
