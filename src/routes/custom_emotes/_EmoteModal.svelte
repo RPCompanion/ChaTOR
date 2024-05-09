@@ -53,7 +53,7 @@
         }
 
         create_custom_emote(emote_name, emote);
-        dispatch("cancel");
+        on_cancel();
 
     }
 
@@ -63,10 +63,11 @@
     <div class="w-2/3 bg-slate-800 h-32 rounded-md modal shadow-md" transition:fly|local={{ duration: 500, y: -500 }}>
         <div class="h-8"></div>
         <div class="flex flex-col w-full gap-2 justify-center items-center">
-            <div class="flex flex-row gap-2 w-4/5">
-                <input type="text" placeholder="Emote Name" class="w-1/2 px-1 text-xl outline-none" bind:value={emote_name}/>
-                <input type="text" placeholder="Emote" class="w-1/2 px-1 text-xl outline-none" class:outline-red-500={emote.length > GAME_MESSAGE_MAXIMUM} bind:value={emote}/>
-            </div>
+            <form class="flex flex-row gap-2 w-4/5" on:submit|preventDefault={on_save}>
+                <input type="text" name="EmoteName" autocomplete="off" placeholder="Emote Name" class="w-1/2 px-1 text-xl outline-none" bind:value={emote_name}/>
+                <input type="text" name="UniqueEmote" autocomplete="off" placeholder="Emote" class="w-1/2 px-1 text-xl outline-none" class:outline-red-500={emote.length > GAME_MESSAGE_MAXIMUM} bind:value={emote}/>
+                <button type="submit" class="hidden">Submit</button>
+            </form>
             <div class="flex flex-row gap-2">
                 <button type="button" class="bg-slate-700 text-white text-xl px-2 rounded-md" on:click={on_save}>Save</button>
                 <button type="button" class="bg-slate-700 text-white text-xl px-2 rounded-md" on:click={on_cancel}>Cancel</button>
