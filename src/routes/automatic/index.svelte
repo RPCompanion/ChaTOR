@@ -1,6 +1,7 @@
 
 <script lang="ts">
-   
+
+    import { settings } from "../../lib/network/settings";
     import { toast } from "@zerodevx/svelte-toast";
     import StandardMenuButton from "../../lib/buttons/StandardMenuButton.svelte";
     import { auto_message_split } from "../utils";

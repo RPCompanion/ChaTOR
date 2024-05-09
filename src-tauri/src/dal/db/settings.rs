@@ -7,8 +7,28 @@ use super::get_connection;
 
 #[derive(Deserialize, Serialize)]
 pub struct ChatSettings {
+
+    #[serde(default = "default_confirmation_before_posting")]
     pub confirmation_before_posting: bool,
-    pub enter_to_send: bool
+
+    #[serde(default = "default_enter_to_post")]
+    pub enter_to_post: bool,
+
+    #[serde(default = "default_clear_chat_after_posting")]
+    pub clear_chat_after_posting: bool
+    
+}
+
+pub fn default_confirmation_before_posting() -> bool {
+    true
+}
+
+pub fn default_enter_to_post() -> bool {
+    false
+}
+
+pub fn default_clear_chat_after_posting() -> bool {
+    false
 }
 
 impl ChatSettings {
@@ -17,7 +37,8 @@ impl ChatSettings {
 
         ChatSettings {
             confirmation_before_posting: true,
-            enter_to_send: false
+            enter_to_post: false,
+            clear_chat_after_posting: false
         }
 
     }

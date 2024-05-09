@@ -4,7 +4,8 @@ import { invoke } from "@tauri-apps/api";
 
 export interface IChatSettings {
     confirmation_before_posting: boolean;
-    enter_to_send: boolean;
+    enter_to_post: boolean;
+    clear_chat_after_posting: boolean;
 }
 
 export interface ISettings {
@@ -17,7 +18,8 @@ function default_settings(): ISettings {
 
         chat: {
             confirmation_before_posting: true,
-            enter_to_send: false
+            enter_to_post: false,
+            clear_chat_after_posting: false
         }
 
     }

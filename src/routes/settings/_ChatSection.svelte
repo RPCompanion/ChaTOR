@@ -15,7 +15,11 @@
     </Setting>
 
     <Setting setting="Press enter to send">
-        <SettingsToggle bind:checked={$settings.chat.enter_to_send}></SettingsToggle>
+        <SettingsToggle bind:checked={$settings.chat.enter_to_post}></SettingsToggle>
+    </Setting>
+
+    <Setting setting="Clear chat after posting">
+        <SettingsToggle bind:checked={$settings.chat.clear_chat_after_posting}></SettingsToggle>
     </Setting>
 
 </SettingSection>
