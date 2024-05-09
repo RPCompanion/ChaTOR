@@ -1,4 +1,5 @@
 
+import { toast } from "@zerodevx/svelte-toast";
 import { writable } from "svelte/store";
 import { invoke } from "@tauri-apps/api";
 
@@ -64,6 +65,9 @@ export function update_custom_emote(custom_emote: ICustomEmote) {
 
         });
 
+    }).catch((error: string) => {
+        toast.push(error);
+        init_custom_emotes();
     });
 
 }

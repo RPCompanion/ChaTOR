@@ -109,7 +109,7 @@ impl CustomEmote {
 
     }
 
-    pub fn save(&self) {
+    pub fn save(&self) -> Result<(), String> {
             
         let conn = db::get_connection();
         const UPDATE_QUERY: &str = 
@@ -122,7 +122,15 @@ impl CustomEmote {
                 custom_emote_id = ?3;
         ";
 
-        conn.execute(UPDATE_QUERY, params![&self.emote_name, &self.emote, self.custom_emote_id]).unwrap();
+        match conn.execute(UPDATE_QUERY, params![&self.emote_name, &self.emote, self.custom_emote_id]) {
+            Ok(_) => {},
+            Err(e) => {
+                println!("{:?}", e);
+                return Err(e.to_string());
+            }
+        };
+
+        return Ok(())
     
     }
 
@@ -150,7 +158,7 @@ pub fn delete_custom_emote(custom_emote_id: i32) {
 }
 
 #[tauri::command]
-pub fn update_custom_emote(custom_emote: CustomEmote) {
+pub fn update_custom_emote(custom_emote: CustomEmote) -> Result<(), String> {
 
     custom_emote.save()
 
