@@ -4,9 +4,9 @@
 </script>
 
 <div class="w-full">
-    <div class="text-xl"><b>{section}</b></div>
+    <div class="text-xl text-white"><b>{section}</b></div>
     <div class="w-full pl-6">
         <slot/>
     </div>
-    <div class="border border-slate-600"></div>
+    <div class="border border-gray-200"></div>
 </div>

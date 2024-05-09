@@ -5,7 +5,7 @@
 
 <div class="grid grid-cols-2 w-full">
     <div>
-        <div class="text-xl">{setting}</div>
+        <div class="text-xl text-white">{setting}</div>
     </div>
     <div>
         <slot></slot>
