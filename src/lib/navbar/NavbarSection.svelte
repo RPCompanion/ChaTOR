@@ -3,7 +3,7 @@
 
     import { slide } from "svelte/transition";
     import { goto } from "@roxi/routify";
-    import { type INavbarSection } from "./navbar";
+    import { type INavbarSection, add_navbar_callback, trigger_navbar_callbacks } from "./navbar";
 
     export let section: INavbarSection;
 
@@ -13,7 +13,7 @@
     }
 
     function goto_link(link: string) {
-        show_dropdown = false;
+        trigger_navbar_callbacks();
         $goto(link);
     }
 
@@ -27,6 +27,10 @@
         toggle_dropdown();
 
     }
+
+    add_navbar_callback(section.name, () => {
+        show_dropdown = false;
+    });
 
 </script>
 
