@@ -168,7 +168,16 @@ pub fn submit_actual_post(character_message: NewCharacterMessage) {
 
     thread::spawn(move || {
 
-        //post_message(WM_KEYDOWN, ESC_KEY, 250);
+        for _ in 0..255 {
+            send_message(WM_KEYDOWN, BACKSPACE_KEY, 2);
+        }
+
+        post_message(WM_KEYDOWN, SHIFT_KEY, 0);
+        post_message(WM_KEYDOWN, ENTER_KEY, 50);
+
+        post_message(WM_KEYUP, ENTER_KEY, 0);
+        post_message(WM_KEYUP, SHIFT_KEY, 250);
+
         for message in character_message.messages {        
 
             let post = message
