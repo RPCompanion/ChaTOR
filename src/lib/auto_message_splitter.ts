@@ -62,7 +62,7 @@ export class AutoMessageSplitter {
 
         for (let i = 0; i < array.length; i++) {
 
-            if (array[i].length > GAME_MESSAGE_MAXIMUM) {
+            if (array[i].length + " ".length > GAME_MESSAGE_MAXIMUM) {
                 return Result.error("Sentence too long. -> " + array[i] + " <- Unable to auto format");
             }
 
