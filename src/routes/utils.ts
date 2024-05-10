@@ -1,5 +1,7 @@
 
 import { Result } from "../lib/result";
+import { get } from "svelte/store";
+import { settings } from "../lib/network/settings";
 
 export const GAME_MESSAGE_MINIMUM = 1;
 export const GAME_MESSAGE_MAXIMUM = 255;
@@ -32,6 +34,10 @@ export function truncate_messages(messages: string[]): string[] {
 }
 
 function remove_starting_pronouns(message: string): string {
+
+    if (!get(settings).chat.remove_starting_pronouns) {
+        return message;
+    }
 
     const pronouns = ["i", "you", "he", "her", "she", "it", "we", "they"];
     for (let pronoun of pronouns) {

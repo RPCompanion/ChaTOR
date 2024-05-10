@@ -15,7 +15,13 @@ pub struct ChatSettings {
     pub enter_to_post: bool,
 
     #[serde(default = "default_clear_chat_after_posting")]
-    pub clear_chat_after_posting: bool
+    pub clear_chat_after_posting: bool,
+
+    #[serde(default = "default_remove_starting_pronouns")]
+    pub remove_starting_pronouns: bool,
+
+    #[serde(default = "default_starting_characters_are_lowercase")]
+    pub starting_characters_are_lowercase: bool
     
 }
 
@@ -31,6 +37,14 @@ pub fn default_clear_chat_after_posting() -> bool {
     false
 }
 
+pub fn default_remove_starting_pronouns() -> bool {
+    false
+}
+
+pub fn default_starting_characters_are_lowercase() -> bool {
+    true
+}
+
 impl ChatSettings {
 
     pub fn default() -> ChatSettings {
@@ -38,7 +52,9 @@ impl ChatSettings {
         ChatSettings {
             confirmation_before_posting: true,
             enter_to_post: false,
-            clear_chat_after_posting: false
+            clear_chat_after_posting: false,
+            remove_starting_pronouns: false,
+            starting_characters_are_lowercase: true
         }
 
     }
