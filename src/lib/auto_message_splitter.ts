@@ -69,6 +69,7 @@ export class AutoMessageSplitter {
             let temp = array[i].trim();
             if (buffer.length == 0) {
                 temp   = this.remove_starting_pronouns(temp);
+                temp   = this.lower_case_starting_character(temp);
                 buffer = this.get_prefix(temp);
             }
 
@@ -92,7 +93,7 @@ export class AutoMessageSplitter {
 
     private remove_starting_pronouns(message: string): string {
 
-        if (this.settings.chat.remove_starting_pronouns) {
+        if (!this.settings.chat.remove_starting_pronouns) {
             return message;
         }
 
@@ -106,6 +107,16 @@ export class AutoMessageSplitter {
         }
 
         return message;
+
+    }
+
+    private lower_case_starting_character(message: string): string {
+
+        if (!this.settings.chat.starting_characters_are_lowercase) {
+            return message;
+        }
+
+        return message.charAt(0).toLocaleLowerCase() + message.substring(1);
 
     }
 

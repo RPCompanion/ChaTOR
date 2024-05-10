@@ -50,13 +50,12 @@ test("auto_message_split single paragraph string", () => {
         It was a perfect snapshot of urban life, a reminder of the beauty and vibrancy that could be found in even the most ordinary of moments.
     `;
 
-    // pronouns get removed automatically at the start of each sentence
     const expected = {
         ok: [
-            "/e The sun was setting over the city skyline, casting a warm golden glow across the bustling streets. People hurried about their evening routines, some heading home from work, others meeting friends for dinner or drinks.",
-            "/e Amidst the chaos, a street musician played a gentle melody on his guitar, his soulful voice rising above the din of traffic. A young couple stopped to listen, hand in hand, lost in the moment.",
-            "/e The aroma of freshly baked bread wafted from a nearby bakery, mingling with the scent of blooming flowers from the corner florist.", 
-            "/e was a perfect snapshot of urban life, a reminder of the beauty and vibrancy that could be found in even the most ordinary of moments."
+            "/e the sun was setting over the city skyline, casting a warm golden glow across the bustling streets. People hurried about their evening routines, some heading home from work, others meeting friends for dinner or drinks.",
+            "/e amidst the chaos, a street musician played a gentle melody on his guitar, his soulful voice rising above the din of traffic. A young couple stopped to listen, hand in hand, lost in the moment.",
+            "/e the aroma of freshly baked bread wafted from a nearby bakery, mingling with the scent of blooming flowers from the corner florist.", 
+            "/e it was a perfect snapshot of urban life, a reminder of the beauty and vibrancy that could be found in even the most ordinary of moments."
         ],
         error: null
     };
@@ -102,8 +101,8 @@ test("auto_message_split multiple question marks in a quote", () => {
     const expected = {
         ok: [
             "/e had a faint smile grace her lips, a fleeting acknowledgement of the Sith's words that hinted at a measure of approval.",
-            "/e Though she refrained from voicing her thoughts on the matter, there was a sense that she found him to be a 'good Sith,' or at least as close to one as the Empire would allow.",
-            `/e Straightening her posture, Elizala met his gaze, her brows furrowing slightly as a question formed on her tongue. "If I may inquire, my lord," she began, "who will serve as my commanding officer in this new role? Or shall I be reporting to you?"`
+            "/e though she refrained from voicing her thoughts on the matter, there was a sense that she found him to be a 'good Sith,' or at least as close to one as the Empire would allow.",
+            `/e straightening her posture, Elizala met his gaze, her brows furrowing slightly as a question formed on her tongue. "If I may inquire, my lord," she began, "who will serve as my commanding officer in this new role? Or shall I be reporting to you?"`
         ],
         error: null
     }
