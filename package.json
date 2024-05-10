@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@roxi/routify": "^3.0.0-next.224",
-    "@tauri-apps/api": "^1.5.4"
+    "@tauri-apps/api": "^1.5.4",
+    "compromise": "^14.13.0"
   }
 }

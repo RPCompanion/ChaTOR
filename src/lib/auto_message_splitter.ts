@@ -3,6 +3,8 @@ import { get } from "svelte/store";
 import { settings, type ISettings } from "./network/settings";
 import { Result } from "./result";
 
+import nlp from "compromise";
+
 import { GAME_MESSAGE_MAXIMUM, GAME_MESSAGE_MINIMUM } from "./messages";
 
 export class AutoMessageSplitter {
@@ -43,8 +45,7 @@ export class AutoMessageSplitter {
 
     private get_multi_message_array(): Result<string[], string> {
 
-        const reg    = new RegExp(/(?:[^.!?]+[.!?]|\b[^.!?]+\b[.!?]{3}|"[^"]*")(?=\s|$)/g);
-        let array    = this.message.match(reg);
+        let array: string[] = nlp(this.message).sentences().out('array');
 
         if (array == null) {
             return Result.error("No valid sentences found.");
