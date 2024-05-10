@@ -68,7 +68,7 @@ export class AutoMessageSplitter {
             let temp = array[i].trim();
             if (buffer.length == 0) {
                 temp   = this.remove_starting_pronouns(temp);
-                buffer = this.get_prefix(temp) + " "
+                buffer = this.get_prefix(temp);
             }
 
             if (buffer.length + temp.length + " ".length > GAME_MESSAGE_MAXIMUM) {

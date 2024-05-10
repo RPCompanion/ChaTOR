@@ -14,7 +14,7 @@ export interface ISettings {
     chat: IChatSettings;
 }
 
-function default_settings(): ISettings {
+export function default_settings(): ISettings {
 
     return {
 
