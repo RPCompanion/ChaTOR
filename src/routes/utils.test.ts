@@ -70,3 +70,28 @@ test("auto_message_split ellipsis", () => {
     expect(auto_message_split(input)).toEqual(expected);
 
 })
+
+test("auto_message_split multiple question marks in a quote", () => {
+
+    /*
+        Might be a little too complicated to capture.
+    */
+    const input = `
+        /e had a faint smile grace her lips, a fleeting acknowledgement of the Sith's words that hinted at a measure of approval. 
+        Though she refrained from voicing her thoughts on the matter, there was a sense that she found him to be a 'good Sith,' or at least as close to one as the Empire would allow. 
+        Straightening her posture, Elizala met his gaze, her brows furrowing slightly as a question formed on her tongue. 
+        "If I may inquire, my lord," she began, "who will serve as my commanding officer in this new role? Or shall I be reporting to you?"
+    `;
+
+    const expected = {
+        ok: [
+            "/e had a faint smile grace her lips, a fleeting acknowledgement of the Sith's words that hinted at a measure of approval.",
+            "/e Though she refrained from voicing her thoughts on the matter, there was a sense that she found him to be a 'good Sith,' or at least as close to one as the Empire would allow.",
+            `/e Straightening her posture, Elizala met his gaze, her brows furrowing slightly as a question formed on her tongue. "If I may inquire, my lord," she began, "who will serve as my commanding officer in this new role? Or shall I be reporting to you?"`
+        ],
+        error: null
+    }
+
+    expect(auto_message_split(input)).toEqual(expected);
+
+})
