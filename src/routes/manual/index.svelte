@@ -6,7 +6,7 @@
     import XButton from "../../lib/buttons/XButton.svelte";
     import ConfirmationModal from "../../lib/ConfirmationModal.svelte";
     import Checkbox from "../../lib/Checkbox.svelte";
-    import { valid_messages, truncate_messages } from "../utils";
+    import { valid_messages } from "../utils";
     import { submit_post } from "../../lib/network";
     import StandardMenuButton from "../../lib/buttons/StandardMenuButton.svelte";
     import CustomEmotesList from "../../lib/_CustomEmotesList.svelte";

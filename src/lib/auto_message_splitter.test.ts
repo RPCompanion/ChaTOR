@@ -1,28 +1,40 @@
 
 
+
 import { expect, test } from 'vitest';
-import { auto_message_split } from './utils';
+import { AutoMessageSplitter } from './auto_message_splitter';
 
 // Context, this splits on sentences, so it should split on periods, exclamation points, question marks and quotes.
 
 test("auto_message_split simple string", () => {
 
+    const input  = "Hello, my name is Liza.";
     let expected = { ok: ["/e Hello, my name is Liza."], error: null }
-    expect(auto_message_split("Hello, my name is Liza.")).toEqual(expected);
+
+    let splitter = new AutoMessageSplitter(input);
+
+    expect(splitter.split()).toEqual(expected);
 
 })
 
 test("auto_message_split long string", () => {
 
+    const input  = "Hello, my name is Liza. I am a software engineer.";
     let expected = { ok: ["/e Hello, my name is Liza. I am a software engineer."], error: null }
-    expect(auto_message_split("Hello, my name is Liza. I am a software engineer.")).toEqual(expected)
+
+    let splitter = new AutoMessageSplitter(input);
+
+    expect(splitter.split()).toEqual(expected)
 
 })
 
 test("auto_message_split long string with quotes", () => {
 
+    const input  = "\"Hello, my name is Liza.\" she said.";
     let expected = { ok: ["/say \"Hello, my name is Liza.\" she said."], error: null }
-    expect(auto_message_split("\"Hello, my name is Liza.\" she said.")).toEqual(expected)
+
+    let splitter = new AutoMessageSplitter(input);
+    expect(splitter.split()).toEqual(expected)
 
 })
 
@@ -48,8 +60,9 @@ test("auto_message_split single paragraph string", () => {
         error: null
     };
 
-    let result = auto_message_split(input);
-    expect(result).toEqual(expected);
+    let splitter = new AutoMessageSplitter(input);
+
+    expect(splitter.split()).toEqual(expected);
 
 });
 
@@ -67,7 +80,9 @@ test("auto_message_split ellipsis", () => {
         ],
         error: null
     }
-    expect(auto_message_split(input)).toEqual(expected);
+
+    let splitter = new AutoMessageSplitter(input);
+    expect(splitter.split()).toEqual(expected);
 
 })
 
@@ -92,6 +107,7 @@ test("auto_message_split multiple question marks in a quote", () => {
         error: null
     }
 
-    expect(auto_message_split(input)).toEqual(expected);
+    let splitter = new AutoMessageSplitter(input);
+    expect(splitter.split()).toEqual(expected);
 
 })

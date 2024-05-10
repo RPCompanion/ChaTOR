@@ -5,7 +5,7 @@
     import { toast } from "@zerodevx/svelte-toast";
     import { submit_post } from "../../lib/network";
     import StandardMenuButton from "../../lib/buttons/StandardMenuButton.svelte";
-    import { auto_message_split } from "../utils";
+    import { AutoMessageSplitter } from "../../lib/auto_message_splitter";
     import AutomaticConfirmation from "./_AutomaticConfirmation.svelte";
     import CustomEmotesList from "../../lib/_CustomEmotesList.svelte";
 
@@ -34,7 +34,7 @@
             return;
         }
 
-        let response = auto_message_split(message);
+        let response = new AutoMessageSplitter(message).split();
         if (response.is_error()) {
             toast.push("Error: " + response.unwrap_error());
             return;

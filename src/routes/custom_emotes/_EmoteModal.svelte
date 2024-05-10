@@ -4,7 +4,7 @@
     import { createEventDispatcher } from "svelte";
     import { fly } from "svelte/transition";
     import { toast } from "@zerodevx/svelte-toast";
-    import { GAME_MESSAGE_MAXIMUM } from "../utils";
+    import { GAME_MESSAGE_MAXIMUM } from "../../lib/messages";
     import { Result } from "../../lib/result";
 
     import { create_custom_emote } from "../../lib/network/custom_emote";
