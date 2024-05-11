@@ -168,7 +168,7 @@ pub fn submit_actual_post(character_message: NewCharacterMessage) {
 
     thread::spawn(move || {
 
-        for _ in 0..255 {
+        for _ in 0..64 {
             send_message(WM_KEYDOWN, BACKSPACE_KEY, 2);
         }
 
@@ -176,7 +176,7 @@ pub fn submit_actual_post(character_message: NewCharacterMessage) {
         post_message(WM_KEYDOWN, ENTER_KEY, 50);
 
         post_message(WM_KEYUP, ENTER_KEY, 0);
-        post_message(WM_KEYUP, SHIFT_KEY, 250);
+        post_message(WM_KEYUP, SHIFT_KEY, 50);
 
         for message in character_message.messages {        
 
