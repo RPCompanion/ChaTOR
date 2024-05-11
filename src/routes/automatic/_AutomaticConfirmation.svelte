@@ -3,6 +3,7 @@
     
     import { fly } from "svelte/transition";
     import { createEventDispatcher } from "svelte";
+    import { GAME_MESSAGE_MAXIMUM } from "../../lib/messages";
 
     export let messages: string[];
     export let show_modal: boolean = false;
@@ -23,7 +24,7 @@
         <div class="flex flex-col gap-2 absolute w-3/4 bg-slate-700 rounded-md container-position border-black border-2" transition:fly={{duration: 400, y: -500}}>
             <div class="text-white text-2xl text-center">Auto format - Final edits</div>
             {#each messages as message, idx}
-                <textarea class="w-full outline-none p-1 rounded-md border-2 resize-none" bind:value={messages[idx]}/>
+                <textarea class="w-full outline-none p-1 rounded-md border-2 resize-none" maxlength={GAME_MESSAGE_MAXIMUM} bind:value={messages[idx]}/>
             {/each}
             <div class="flex flex-row gap-2">
                 <button type="button" class="bg-slate-800 text-white w-1/2" on:click={on_submit}>Submit</button>
