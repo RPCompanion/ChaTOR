@@ -28,8 +28,9 @@ fn main() {
             dal::db::custom_emote::update_custom_emote,
             dal::db::settings::get_settings,
             dal::db::settings::update_settings,
+            dal::characters::get_all_characters,
             capture_injector::start_injecting_capture,
-            capture_injector::stop_injecting_capture
+            capture_injector::stop_injecting_capture,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

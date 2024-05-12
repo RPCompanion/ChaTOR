@@ -137,3 +137,8 @@ impl Character {
     }
 
 }
+
+#[tauri::command]
+pub fn get_all_characters() -> Result<Vec<Character>, &'static str> {
+    Character::get_all_characters()
+}
