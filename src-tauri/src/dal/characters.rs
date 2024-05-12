@@ -120,4 +120,20 @@ impl Character {
 
     }
 
+    pub fn get_emote_channel_color(&self) -> Option<&Color> {
+        self.channel_colors.get(3)
+    }
+
+    pub fn get_yell_channel_color(&self) -> Option<&Color> {
+        self.channel_colors.get(2)
+    }
+
+    pub fn get_say_channel_color(&self) -> Option<&Color> {
+        self.channel_colors.get(1)
+    }
+
+    pub fn get_whisper_channel_color(&self) -> Option<&Color> {
+        self.channel_colors.get(4)
+    }
+
 }
