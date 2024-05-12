@@ -1,15 +1,25 @@
 [package]
-name = "SWTOR-Chat"
+name = "swtor_chat"
 version = "0.1.0"
 description = "A Chat system for Star Wars: The Old Republic."
 authors = ["you"]
 license = ""
 repository = ""
-default-run = "SWTOR-Chat"
+default-run = "swtor_chat"
 edition = "2021"
 rust-version = "1.60"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "swtor_chat_capture"
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[[bin]]
+name = "swtor_chat"
+path = "src/main.rs"
+
 
 [build-dependencies]
 tauri-build = { version = "1.5.1", features = [] }
@@ -23,7 +33,10 @@ rusqlite = { version = "0.31.0", features = ["bundled"] }
 
 lazy_static = "1.4.0"
 clipboard-win = "5.0.0"
-windows = { version = "0.52", features = ["Data_Xml_Dom", "Win32_Foundation", "Win32_Security", "Win32_System_Threading", "Win32_System_LibraryLoader", "Win32_UI_WindowsAndMessaging", "Win32_UI_Input_KeyboardAndMouse", "Win32_System_ProcessStatus"] }
+retour = { version = "0.3", features = ["static-detour"] }
+dll-syringe = "0.15.2"
+ctor = "0.2.8"
+windows = { version = "0.52", features = ["Data_Xml_Dom", "Win32_Foundation", "Win32_Security", "Win32_System_Threading", "Win32_System_LibraryLoader", "Win32_UI_WindowsAndMessaging", "Win32_UI_Input_KeyboardAndMouse", "Win32_System_ProcessStatus", "Win32_UI_WindowsAndMessaging"] }
 em-libs = { git = "https://github.com/Davenport-Physics/EmLibs"}
 
 [features]

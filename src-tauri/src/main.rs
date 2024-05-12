@@ -8,6 +8,7 @@ extern crate lazy_static;
 
 mod swtor_hook;
 mod dal;
+mod capture_injecter;
 
 fn main() {
 
@@ -24,7 +25,9 @@ fn main() {
             dal::db::custom_emote::delete_custom_emote,
             dal::db::custom_emote::update_custom_emote,
             dal::db::settings::get_settings,
-            dal::db::settings::update_settings
+            dal::db::settings::update_settings,
+            capture_injecter::start_injecting_capture,
+            capture_injecter::stop_injecting_capture
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

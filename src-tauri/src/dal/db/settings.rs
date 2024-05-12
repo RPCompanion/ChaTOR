@@ -21,7 +21,10 @@ pub struct ChatSettings {
     pub remove_starting_pronouns: bool,
 
     #[serde(default = "default_starting_characters_are_lowercase")]
-    pub starting_characters_are_lowercase: bool
+    pub starting_characters_are_lowercase: bool,
+
+    #[serde(default = "default_capture_chat_log")]
+    pub capture_chat_log: bool
     
 }
 
@@ -45,6 +48,10 @@ pub fn default_starting_characters_are_lowercase() -> bool {
     true
 }
 
+pub fn default_capture_chat_log() -> bool {
+    false
+}
+
 impl ChatSettings {
 
     pub fn default() -> ChatSettings {
@@ -54,7 +61,8 @@ impl ChatSettings {
             enter_to_post: false,
             clear_chat_after_posting: false,
             remove_starting_pronouns: false,
-            starting_characters_are_lowercase: true
+            starting_characters_are_lowercase: true,
+            capture_chat_log: false
         }
 
     }
