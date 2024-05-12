@@ -2930,6 +2930,7 @@ version = "0.1.0"
 dependencies = [
  "clipboard-win",
  "ctor",
+ "directories",
  "dll-syringe",
  "em-libs",
  "lazy_static",
@@ -2938,6 +2939,7 @@ dependencies = [
  "rusqlite",
  "serde",
  "serde_json",
+ "sha2",
  "tauri",
  "tauri-build",
  "windows 0.52.0",

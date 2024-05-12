@@ -1,77 +1,25 @@
 
 use rusqlite::params;
 use serde::{Deserialize, Serialize};
-use crate::dal::db;
 
 use super::get_connection;
 
-#[derive(Deserialize, Serialize)]
-pub struct ChatSettings {
+pub mod chat_settings;
+pub mod chat_log;
 
-    #[serde(default = "default_confirmation_before_posting")]
-    pub confirmation_before_posting: bool,
+use chat_settings::ChatSettings;
+use chat_log::ChatLogSettings;
 
-    #[serde(default = "default_enter_to_post")]
-    pub enter_to_post: bool,
-
-    #[serde(default = "default_clear_chat_after_posting")]
-    pub clear_chat_after_posting: bool,
-
-    #[serde(default = "default_remove_starting_pronouns")]
-    pub remove_starting_pronouns: bool,
-
-    #[serde(default = "default_starting_characters_are_lowercase")]
-    pub starting_characters_are_lowercase: bool,
-
-    #[serde(default = "default_capture_chat_log")]
-    pub capture_chat_log: bool
-    
-}
-
-pub fn default_confirmation_before_posting() -> bool {
-    true
-}
-
-pub fn default_enter_to_post() -> bool {
-    false
-}
-
-pub fn default_clear_chat_after_posting() -> bool {
-    false
-}
-
-pub fn default_remove_starting_pronouns() -> bool {
-    false
-}
-
-pub fn default_starting_characters_are_lowercase() -> bool {
-    true
-}
-
-pub fn default_capture_chat_log() -> bool {
-    false
-}
-
-impl ChatSettings {
-
-    pub fn default() -> ChatSettings {
-
-        ChatSettings {
-            confirmation_before_posting: true,
-            enter_to_post: false,
-            clear_chat_after_posting: false,
-            remove_starting_pronouns: false,
-            starting_characters_are_lowercase: true,
-            capture_chat_log: false
-        }
-
-    }
-
-}
 
 #[derive(Deserialize, Serialize)]
 pub struct Settings {
-    pub chat: ChatSettings
+    pub chat: ChatSettings,
+    #[serde(default = "default_chat_log_settings")]
+    pub chat_log: ChatLogSettings
+}
+
+fn default_chat_log_settings() -> ChatLogSettings {
+    ChatLogSettings::default()
 }
 
 impl Settings {
@@ -79,7 +27,8 @@ impl Settings {
     pub fn default() -> Settings {
 
         Settings {
-            chat: ChatSettings::default()
+            chat: ChatSettings::default(),
+            chat_log: ChatLogSettings::default()
         }
 
     }
@@ -89,10 +38,8 @@ impl Settings {
         let conn = get_connection();
         let response = conn.query_row("SELECT settings FROM Settings LIMIT 1", params![], |row| {
 
-            let chat: ChatSettings = serde_json::from_str(&row.get::<_, String>(0).unwrap()).unwrap();
-            Ok(Settings {
-                chat
-            })
+            let settings: Settings = serde_json::from_str(&row.get::<_, String>(0).unwrap()).unwrap();
+            Ok(settings)
 
         });
 

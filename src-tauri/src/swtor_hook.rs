@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::process::Child;
 use std::sync::{Mutex, Arc};
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::thread::{self, JoinHandle};
+use std::thread;
 use std::time::Duration;
 
 use tauri::Window;
@@ -26,6 +26,7 @@ use clipboard_win::{formats::Unicode, set_clipboard};
 
 lazy_static! {
     static ref SWTOR_HWND: Arc<Mutex<Option<HWND>>> = Arc::new(Mutex::new(None));
+    static ref SWTOR_PID: Arc<Mutex<Option<u32>>> = Arc::new(Mutex::new(None));
     static ref WRITING: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
 }
 
@@ -41,20 +42,6 @@ const A_KEY: usize         = 0x41;
 const V_KEY: usize         = 0x56;
 const CONTROL_KEY: usize   = 0x11;
 const SHIFT_KEY: usize     = 0x10;
-
-unsafe extern "system" fn enum_windows_proc(hwnd: HWND, param1: LPARAM) -> BOOL {
-
-    let mut process_id: u32 = 0;
-    GetWindowThreadProcessId(hwnd, Some(&mut process_id as *mut u32));
-
-    if process_id == param1.0 as u32 {
-        SWTOR_HWND.lock().unwrap().replace(hwnd);
-        return BOOL(0);
-    }
-
-    return BOOL(1);
-
-}
 
 unsafe extern "system" fn enum_windows_existing_proc(hwnd: HWND, _param1: LPARAM) -> BOOL {
 
@@ -72,24 +59,18 @@ unsafe extern "system" fn enum_windows_existing_proc(hwnd: HWND, _param1: LPARAM
     }
 
     if window_text == "Star Wars™: The Old Republic™" {
+
+        let mut process_id: u32 = 0;
+        GetWindowThreadProcessId(hwnd, Some(&mut process_id as *mut u32));
+
+        SWTOR_PID.lock().unwrap().replace(process_id);
         SWTOR_HWND.lock().unwrap().replace(hwnd);
+
         return BOOL(0);
+
     }
 
     return BOOL(1);
-
-}
-
-pub fn hook_into_process(child: Child) {
-
-    unsafe {
-
-        match EnumWindows(Some(enum_windows_proc), LPARAM(child.id() as isize)) {
-            Ok(_) => {},
-            Err(_) => {}
-        }
-
-    }
 
 }
 
@@ -101,6 +82,7 @@ pub fn hook_into_existing() {
             Ok(_) => {
                 //Enumerated every window and wasn't able to find ConanSandbox
                 SWTOR_HWND.lock().unwrap().take();
+                SWTOR_PID.lock().unwrap().take();
             },
             Err(_) => {}
         }
@@ -198,6 +180,12 @@ pub fn submit_actual_post(character_message: NewCharacterMessage) {
         WRITING.store(false, Ordering::Relaxed);
 
     });    
+
+}
+
+pub fn get_pid() -> Option<u32> {
+
+    SWTOR_PID.lock().unwrap().clone()
 
 }
 
