@@ -5,10 +5,8 @@ use std::fs::DirEntry;
 use serde::{Serialize, Deserialize};
 use directories::ProjectDirs;
 
-use ini::Ini;
 
-
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Color {
     pub r: u8,
     pub g: u8,

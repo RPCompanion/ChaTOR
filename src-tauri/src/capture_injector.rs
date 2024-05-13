@@ -7,13 +7,13 @@ use std::thread;
 
 use dll_syringe::{process::OwnedProcess, Syringe};
 
-use crate::{share::Message, swtor_hook};
+use crate::{dal::db, swtor_hook};
 
-use self::message_container::MessageContainer;
+use self::{message_container::MessageContainer, swtor_message::SwtorMessage};
 
 pub mod message_container;
 pub mod player_gui_state;
-pub mod message_parser;
+pub mod swtor_message;
 
 lazy_static! {
     static ref INJECTED: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
@@ -29,7 +29,7 @@ pub enum CaptureError {
 }
 
 #[tauri::command]
-pub fn start_injecting_capture() -> Result<(), CaptureError> {
+pub fn start_injecting_capture(window: tauri::Window) -> Result<(), CaptureError> {
 
     if INJECTED.load(Ordering::Relaxed) {
         return Err(CaptureError::AlreadyInjected);
@@ -66,6 +66,8 @@ pub fn start_injecting_capture() -> Result<(), CaptureError> {
         INJECTED.store(false, Ordering::Relaxed);
 
     });
+    start_logging_propagation(window);
+
     return Ok(());
 
 }
@@ -98,6 +100,41 @@ fn start_tcp_listener_loop() {
 
     if let Ok(mut stream) = TcpStream::connect("127.0.0.1:4393") {
         stream.write(b"stop").unwrap();
+    }
+
+}
+
+fn start_logging_propagation(window: tauri::Window) {
+
+    let messages = Arc::clone(&MESSAGE_CONTAINER);
+    thread::spawn(move || {
+
+        while CONTINUE_LOGGING.load(Ordering::Relaxed) || !messages.lock().unwrap().unstored_messages.is_empty() {
+
+            let unstored_messages = messages.lock().unwrap().drain_unstored();
+            save_messages_to_database(unstored_messages.clone());
+            thread::sleep(Duration::from_secs(1));
+
+        }
+
+    });
+
+}
+
+fn save_messages_to_database(messages: Vec<SwtorMessage>) {
+
+    const INSERT_MESSAGE: &str = 
+    "
+        INSERT INTO 
+            ChatLog (message)
+        VALUES
+        (?);
+    ";
+
+    let conn = db::get_connection();
+    let mut stmt = conn.prepare(INSERT_MESSAGE).unwrap();
+    for message in messages {
+        stmt.execute(&[&message.message]).unwrap();
     }
 
 }

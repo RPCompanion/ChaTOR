@@ -2,9 +2,11 @@
 use crate::share::*;
 use crate::utils::StringUtils;
 
+use crate::capture_injector::swtor_message::SwtorMessage;
+
 pub struct MessageContainer {
     pub hashes: Vec<u64>,
-    pub unstored_messages: Vec<String>
+    pub unstored_messages: Vec<SwtorMessage>
 }
 
 impl MessageContainer {
@@ -30,16 +32,17 @@ impl MessageContainer {
             return;
         }
 
-        if self.relevant_message(&message) {
-
-            self.hashes.push(hash);
-            self.unstored_messages.push(message.message);
-
+        match SwtorMessage::from(message.message) {
+            Ok(swtor_message) => {
+                self.hashes.push(hash);
+                self.unstored_messages.push(swtor_message);
+            },
+            Err(_) => {}
         }
 
     }
 
-    pub fn drain_unstored(&mut self) -> Vec<String> {
+    pub fn drain_unstored(&mut self) -> Vec<SwtorMessage> {
 
         self.unstored_messages.drain(..).collect()
 
@@ -48,12 +51,6 @@ impl MessageContainer {
     fn unique(&self, hash: u64) -> bool {
 
         !self.hashes.contains(&hash)
-
-    }
-
-    fn relevant_message(&self, message: &Message) -> bool {
-
-        todo!("Need to determine how this message is relevant");
 
     }
 
