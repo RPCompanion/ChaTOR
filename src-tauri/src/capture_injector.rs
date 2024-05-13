@@ -9,6 +9,7 @@ use crate::swtor_hook;
 
 pub mod message_container;
 pub mod player_gui_state;
+pub mod message_parser;
 
 lazy_static! {
     static ref INJECTED: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));

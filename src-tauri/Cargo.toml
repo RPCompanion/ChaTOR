@@ -32,6 +32,8 @@ open = "5.1"
 rusqlite = { version = "0.31.0", features = ["bundled"] }
 sha2 = "0.10"
 rust-ini = "0.21"
+regex = "1.10"
+chrono = {version = "0.4", features = ["serde"]}
 
 lazy_static = "1.4.0"
 clipboard-win = "5.0.0"

@@ -324,8 +324,10 @@ checksum = "a21f936df1771bf62b77f047b726c4625ff2e8aa607c01ec06e5a05bd8463401"
 dependencies = [
  "android-tzdata",
  "iana-time-zone",
+ "js-sys",
  "num-traits",
  "serde",
+ "wasm-bindgen",
  "windows-targets 0.52.5",
 ]
 
@@ -2984,6 +2986,7 @@ checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
 name = "swtor_chat"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "clipboard-win",
  "ctor",
  "directories",
@@ -2991,6 +2994,7 @@ dependencies = [
  "em-libs",
  "lazy_static",
  "open",
+ "regex",
  "retour",
  "rusqlite",
  "rust-ini",
