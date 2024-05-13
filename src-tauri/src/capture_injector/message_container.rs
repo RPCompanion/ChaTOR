@@ -20,7 +20,7 @@ impl MessageContainer {
 
     }
 
-    pub fn push(&mut self, message: Message) {
+    pub fn push(&mut self, message: RawSwtorMessage) {
 
         match message.message_type {
             MessageType::Info => { return; },
