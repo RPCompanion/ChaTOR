@@ -83,24 +83,16 @@ impl Character {
             return None;
         }
 
-        let character_name = file_name.split("_").collect::<Vec<&str>>()[1];
-
-        let ini = Ini::load_from_file(e_path).unwrap();
-        if let Some(chat_colors) = ini.get_from::<String>(None, "ChatColors") {
-
-            let colors: Vec<Color> = chat_colors.split(";").collect::<Vec<&str>>().into_iter().map(|color| {
-                Color::from_hex(color)
-            }).collect();
-
-        }
-
-        return None;
+        let character_name = file_name.split("_").nth(1).unwrap();
+        let channel_colors = Character::get_gui_colors(e_path.to_str().unwrap()).unwrap();
+        return Some(Character { character_name: character_name.to_string(), channel_colors });
 
     }
 
     fn get_gui_colors(path: &str) -> Result<Vec<Color>, &'static str> {
 
-        let content = fs::read_to_string(path).unwrap();
+        let temp    = fs::read(path).unwrap();
+        let content = String::from_utf8_lossy(&temp);
         let lines = content.split("\n").collect::<Vec<&str>>();
 
         if let Some(line) = lines.into_iter().find(|line| line.contains("ChatColors")) {
