@@ -8,11 +8,16 @@
     import { get_all_characters, type ICharacter } from "../../lib/network/characters";
     import ValidSetting from "./_ValidSetting.svelte";
 
-    const sub_text: string = "Chat logging uses DLL injection, which is against the TOS of SWTOR and may result in a ban. Use at your own risk.";
-    const EMOTE_COLOR_INDEX: number = 3;
-    const SAY_COLOR_INDEX: number = 2;
-    const YELL_COLOR_INDEX: number = 1;
-    const WHISPER_COLOR_INDEX: number = 4;
+    const SECTION_SUB_TEXT: string     = "Chat logging uses DLL injection, which is against the TOS of SWTOR and may result in a ban. Use at your own risk.";
+    const UNIQUE_COLOR_SUBTEXT: string = `
+        Our chat logging system is dependent upon chat channels having unique colors. To change a color, go in game, right click on a chat tab, select channel settings, 
+        select a problematic channel and change the color, even slightly. Don't forget to click apply!
+        `.trim();
+
+    const EMOTE_COLOR_INDEX: number   = 2;
+    const SAY_COLOR_INDEX: number     = 1;
+    const YELL_COLOR_INDEX: number    = 0;
+    const WHISPER_COLOR_INDEX: number = 3;
 
 
     let characters: ICharacter[] = [];
@@ -58,12 +63,12 @@
 
 </script>
 
-<SettingSection section="Chat Logging" {sub_text}>
+<SettingSection section="Chat Logging" sub_text={SECTION_SUB_TEXT}>
     <Setting setting="Select active character">
         <SettingsDropdown options={characters.map((c) => c.character_name)} bind:choosen_option={$settings.chat_log.character_ini_to_pull_from}></SettingsDropdown>
     </Setting>
     {#if $settings.chat_log.character_ini_to_pull_from}
-        <Setting setting="Chat Colors are Unique">
+        <Setting setting="Are chat colors unique?" sub_text={UNIQUE_COLOR_SUBTEXT}>
             <ValidSetting setting="/emote" valid={valid_emote_color}></ValidSetting>
             <ValidSetting setting="/say" valid={valid_say_color}></ValidSetting>
             <ValidSetting setting="/yell" valid={valid_yell_color}></ValidSetting>
