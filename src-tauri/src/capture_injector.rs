@@ -75,13 +75,14 @@ pub fn start_injecting_capture(window: tauri::Window) -> Result<(), CaptureError
             }
         }
 
+        let injected_payload = injected_payload.unwrap();
+
         tcp_thread.join().unwrap();
 
-        if is_hooked_in() {
-
-            syringe.eject(injected_payload.unwrap()).unwrap();
+        if let Err(err) = syringe.eject(injected_payload) {
+            println!("Error ejecting payload: {:?}", err);
+        } else {
             println!("Payload ejected");
-
         }
         INJECTED.store(false, Ordering::Relaxed);
 
@@ -123,14 +124,9 @@ fn start_tcp_listener_loop() {
     }
     println!("Stopped listening for messages");
 
-    if is_hooked_in() {
-
-        if let Ok(mut stream) = TcpStream::connect("127.0.0.1:4593") {
-            stream.write(b"stop").unwrap();
-        }
-
+    if let Ok(mut stream) = TcpStream::connect("127.0.0.1:4593") {
+        stream.write(b"stop").unwrap();
     }
-
 
 }
 
