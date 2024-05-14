@@ -2,7 +2,7 @@
 use serde::{Deserialize, Serialize};
 use serde_json::{Deserializer, Value};
 
-use std::{io::Write, net::{TcpListener, TcpStream}, sync::{atomic::{AtomicBool, Ordering}, Arc, Mutex}, time::Duration};
+use std::{io::{Read, Write}, net::{TcpListener, TcpStream}, sync::{atomic::{AtomicBool, Ordering}, Arc, Mutex}, time::Duration};
 use std::thread;
 
 use dll_syringe::{process::OwnedProcess, Syringe};
@@ -94,9 +94,11 @@ fn start_tcp_listener_loop() {
     let mut stream = listener.accept().unwrap().0;
 
     println!("Listening for messages");
+    let mut buffer: [u8; 2048] = [0; 2048];
     while CONTINUE_LOGGING.load(Ordering::Relaxed) {
 
-        Deserializer::from_reader(&mut stream).into_iter::<Value>().for_each(|value| {
+        stream.read(&mut buffer).unwrap();
+        Deserializer::from_slice(&buffer).into_iter::<Value>().for_each(|value| {
 
             if let Ok(value) = value {
 
@@ -111,6 +113,7 @@ fn start_tcp_listener_loop() {
             }
 
         });
+        buffer = [0; 2048];
         thread::sleep(Duration::from_millis(100));
     }
     println!("Stopped listening for messages");
