@@ -1,6 +1,7 @@
 
-import { writable } from "svelte/store";
+import { writable, get } from "svelte/store";
 import { invoke } from "@tauri-apps/api";
+import { toast } from "@zerodevx/svelte-toast";
 
 export interface IChatSettings {
     confirmation_before_posting: boolean;
@@ -41,6 +42,7 @@ export function default_settings(): ISettings {
 }
 
 export const settings = writable<ISettings>(default_settings());
+export const chat_log_active = writable<boolean>(false);
 
 export function init_settings() {
 
@@ -50,6 +52,34 @@ export function init_settings() {
         settings.subscribe((value) => {
             invoke("update_settings", {settings: value});
         });
+        chat_log_subscriber();
+
+    });
+
+}
+
+function chat_log_subscriber() {
+
+    settings.subscribe((value) => {
+
+        let t_chat_log_active = get(chat_log_active);
+        if (value.chat_log.capture_chat_log && !t_chat_log_active) {
+
+            invoke("start_injecting_capture")
+                .then(() => {
+                    toast.push("Chat logging active");
+                    chat_log_active.set(true);
+                })
+                .catch((e) => {
+                    toast.push("Failed to start chat log capture: " + e);  
+                });
+
+        } else {
+
+            invoke("stop_injecting_capture");
+            chat_log_active.set(false);
+
+        }
 
     });
 

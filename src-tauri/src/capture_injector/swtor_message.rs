@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::dal::characters::Color;
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct SwtorMessage {
     pub player_id: Option<String>,
     pub timestamp: Option<NaiveTime>,
@@ -36,8 +36,7 @@ impl SwtorMessage {
             return Some(NaiveTime::parse_from_str(&timestamp, "%I:%M:%S %P").unwrap())
 
         }
-
-        todo!();
+        None
 
     }
 
@@ -68,10 +67,22 @@ impl SwtorMessage {
             
         let re = Regex::new(r#"<hl lid="BBB.{4}[^"]+" >(.+?)<\/font>"#).unwrap();
         if let Some(captures) = re.captures(message) {
-            return Ok(captures.get(1).unwrap().as_str().trim().to_string());
+            let temp = captures.get(1).unwrap().as_str()
+                .replace("] whispers:", "")
+                .replace("] says:", "")
+                .replace("] yells:", "")
+                .replace("]:", "")
+                .trim()
+                .to_string();
+            
+            return Ok(temp);
         }
         return Err("No message found");
     
+    }
+
+    pub fn as_json_str(&self) -> String {
+        serde_json::to_string(self).unwrap()
     }
 
 }

@@ -2,7 +2,6 @@
 mod share;
 
 use std::io::prelude::*;
-use std::net::SocketAddr;
 use std::net::TcpListener;
 use std::net::TcpStream;
 use std::sync::atomic::AtomicBool;
@@ -43,9 +42,7 @@ fn detour_init() {
 
     match start_tcp_messager() {
         Ok(_) => {},
-        Err(e) => {
-            return;
-        }
+        Err(_) => { return; }
     }
 
     start_quit_listener();
@@ -55,12 +52,11 @@ fn detour_init() {
 
 fn start_tcp_messager() -> Result<(), &'static str> {
 
-    let messages = Arc::clone(&MESSAGES);
-    let mut stream = TcpStream::connect_timeout(&"127.0.0.1:4392".parse().unwrap(), Duration::from_secs(5))
-        .map_err(|_| "Failed to connect to chat client")?;
+    let mut stream = TcpStream::connect("127.0.0.1:4592").unwrap();
 
     thread::spawn(move || {
 
+        let messages = Arc::clone(&MESSAGES);
         loop {
 
             if QUIT.load(Ordering::Relaxed) {
@@ -89,7 +85,7 @@ fn start_quit_listener() {
 
     thread::spawn(|| {
 
-        let listener = TcpListener::bind("127.0.0.1:4393").unwrap();
+        let listener = TcpListener::bind("127.0.0.1:4593").unwrap();
         listener.accept().unwrap();
 
         QUIT.store(true, Ordering::Relaxed);

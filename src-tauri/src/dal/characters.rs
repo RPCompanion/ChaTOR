@@ -6,7 +6,7 @@ use serde::{Serialize, Deserialize};
 use directories::ProjectDirs;
 
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Color {
     pub r: u8,
     pub g: u8,

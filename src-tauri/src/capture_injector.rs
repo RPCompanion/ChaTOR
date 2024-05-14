@@ -35,10 +35,6 @@ pub fn start_injecting_capture(window: tauri::Window) -> Result<(), CaptureError
         return Err(CaptureError::AlreadyInjected);
     }
 
-    if !player_gui_state::user_has_valid_settings() {
-        return Err(CaptureError::WrongGuiSettings);
-    }
-
     let swtor_pid = swtor_hook::get_pid();
     if swtor_pid.is_none() {
         return Err(CaptureError::SwtorNotRunning);
@@ -53,20 +49,39 @@ pub fn start_injecting_capture(window: tauri::Window) -> Result<(), CaptureError
         let target_process = OwnedProcess::from_pid(swtor_pid).unwrap();
         let syringe = Syringe::for_process(target_process);
 
+        let tcp_thread = thread::spawn(|| {
+            start_tcp_listener_loop();
+        });
+        thread::sleep(Duration::from_secs(1));
+        start_logging_propagation(window);
+
         let injected_payload = if cfg!(debug_assertions) {
-            syringe.inject("./target/debug/swtor_chat_capture.dll").unwrap()
+            syringe.inject("./target/debug/swtor_chat_capture.dll")
         } else {
-            syringe.inject("./swtor_chat_capture.dll").unwrap()
+            syringe.inject("./swtor_chat_capture.dll")
         };
 
-        start_tcp_listener_loop();
+        match injected_payload {
+            Ok(_) => {    
+                println!("Payload injected");
+            },
+            Err(err) => {
 
-        thread::sleep(Duration::from_secs(5));
-        syringe.eject(injected_payload).unwrap();
+                println!("Error injecting payload: {:?}", err);
+                INJECTED.store(false, Ordering::Relaxed);
+                CONTINUE_LOGGING.store(false, Ordering::Relaxed);
+                return;
+
+            }
+        }
+
+        tcp_thread.join().unwrap();
+        syringe.eject(injected_payload.unwrap()).unwrap();
         INJECTED.store(false, Ordering::Relaxed);
+        println!("Payload ejected");
 
     });
-    start_logging_propagation(window);
+    
 
     return Ok(());
 
@@ -75,9 +90,10 @@ pub fn start_injecting_capture(window: tauri::Window) -> Result<(), CaptureError
 fn start_tcp_listener_loop() {
 
     let msg_container = Arc::clone(&MESSAGE_CONTAINER);
-    let listener = TcpListener::bind("127.0.0.1:4392").unwrap();
+    let listener = TcpListener::bind("127.0.0.1:4592").unwrap();
     let mut stream = listener.accept().unwrap().0;
 
+    println!("Listening for messages");
     while CONTINUE_LOGGING.load(Ordering::Relaxed) {
 
         Deserializer::from_reader(&mut stream).into_iter::<Value>().for_each(|value| {
@@ -95,10 +111,11 @@ fn start_tcp_listener_loop() {
             }
 
         });
-
+        thread::sleep(Duration::from_millis(100));
     }
+    println!("Stopped listening for messages");
 
-    if let Ok(mut stream) = TcpStream::connect("127.0.0.1:4393") {
+    if let Ok(mut stream) = TcpStream::connect("127.0.0.1:4593") {
         stream.write(b"stop").unwrap();
     }
 
@@ -134,7 +151,7 @@ fn save_messages_to_database(messages: Vec<SwtorMessage>) {
     let conn = db::get_connection();
     let mut stmt = conn.prepare(INSERT_MESSAGE).unwrap();
     for message in messages {
-        stmt.execute(&[&message.message]).unwrap();
+        stmt.execute(&[&message.as_json_str()]).unwrap();
     }
 
 }

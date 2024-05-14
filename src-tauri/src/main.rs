@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use open;
+use tauri::WindowEvent;
 
 #[macro_use]
 extern crate lazy_static;
@@ -17,6 +18,16 @@ fn main() {
     dal::init();
 
     tauri::Builder::default()
+        .on_window_event(|event| {
+
+            match event.event() {
+                WindowEvent::Destroyed => {
+                    capture_injector::stop_injecting_capture();
+                },
+                _ => {}
+            }
+            
+        })
         .invoke_handler(tauri::generate_handler![
             swtor_hook::start_swtor_hook,
             swtor_hook::is_hooked_in,
