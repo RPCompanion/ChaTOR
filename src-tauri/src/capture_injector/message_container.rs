@@ -44,7 +44,10 @@ impl MessageContainer {
 
     pub fn drain_unstored(&mut self) -> Vec<SwtorMessage> {
 
-        self.unstored_messages.drain(..).collect()
+        self.unstored_messages
+            .drain(..)
+            .rev()
+            .collect()
 
     }
 
