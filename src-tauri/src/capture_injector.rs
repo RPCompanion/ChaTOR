@@ -7,13 +7,17 @@ use std::thread;
 
 use dll_syringe::{process::OwnedProcess, Syringe};
 
-use crate::{dal::db, swtor_hook::{self, is_hooked_in}};
+use crate::{dal::db, swtor_hook::{self}};
 
 use self::{message_container::MessageContainer, swtor_message::SwtorMessage};
 
 pub mod message_container;
 pub mod player_gui_state;
 pub mod swtor_message;
+
+const SUPPORTED_SWTOR_CHECKSUM: [u8; 32] = [
+    195, 10, 27, 178, 67, 204, 136, 119, 181, 218, 101, 80, 230, 144, 3, 234, 9, 3, 76, 241, 245, 106, 37, 79, 182, 217, 30, 17, 78, 245, 231, 182
+];
 
 lazy_static! {
     static ref INJECTED: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
@@ -25,7 +29,8 @@ lazy_static! {
 pub enum CaptureError {
     AlreadyInjected,
     SwtorNotRunning,
-    WrongGuiSettings
+    WrongGuiSettings,
+    UnsupportedVersion
 }
 
 #[tauri::command]
@@ -40,6 +45,10 @@ pub fn start_injecting_capture(window: tauri::Window) -> Result<(), CaptureError
         return Err(CaptureError::SwtorNotRunning);
     }
     let swtor_pid = swtor_pid.unwrap();
+
+    if !swtor_hook::checksum_match(&SUPPORTED_SWTOR_CHECKSUM) {
+        return Err(CaptureError::UnsupportedVersion);
+    }
 
     thread::spawn(move || {
 

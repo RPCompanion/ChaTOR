@@ -1,14 +1,19 @@
 
+use std::fs;
+use std::path::Path;
+
+use sha2::{Sha256, Digest};
 use serde::{Deserialize, Serialize};
-use std::process::Child;
-use std::sync::{Mutex, Arc};
+use windows::core::PWSTR;
+use windows::Win32::System::Threading::{OpenProcess, QueryFullProcessImageNameA, QueryFullProcessImageNameW, PROCESS_NAME_FORMAT, PROCESS_QUERY_INFORMATION, PROCESS_VM_READ};
+use std::sync::{Arc, Mutex, OnceLock};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::time::Duration;
 
 use tauri::Window;
 use serde_json::json;
-use windows::Win32::Foundation::{HWND, LPARAM, BOOL, WPARAM};
+use windows::Win32::Foundation::{BOOL, HWND, LPARAM, MAX_PATH, WPARAM};
 use windows::Win32::UI::WindowsAndMessaging::{
     EnumWindows, 
     GetWindowThreadProcessId,
@@ -30,6 +35,8 @@ lazy_static! {
     static ref WRITING: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
 }
 
+static PROCESS_CHECKSUM: OnceLock<Vec<u8>> = OnceLock::new();
+
 #[derive(Deserialize, Serialize)]
 pub struct NewCharacterMessage {
     pub messages: Vec<String>
@@ -43,6 +50,36 @@ const V_KEY: usize         = 0x56;
 const CONTROL_KEY: usize   = 0x11;
 const SHIFT_KEY: usize     = 0x10;
 
+unsafe fn set_process_checksum() {
+
+    if PROCESS_CHECKSUM.get().is_some() {
+        return;
+    }
+
+    let pid = SWTOR_PID.lock().unwrap().clone().unwrap();
+
+    let handle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, false, pid);
+    if handle.is_err() {
+        return;
+    }
+
+    let mut buffer: [u16; MAX_PATH as usize + 1] = [0; MAX_PATH as usize + 1];
+    let mut size = buffer.len() as u32;
+
+    if let Ok(_) = QueryFullProcessImageNameW(handle.unwrap(), PROCESS_NAME_FORMAT(0), PWSTR(&mut buffer as *mut _), &mut size) {
+
+        let path_str = String::from_utf16(&buffer).unwrap().replace("\0", "");
+        let path = Path::new(&path_str);
+
+        let program_bytes = fs::read(path).unwrap();
+        let mut hasher = Sha256::new();
+        hasher.update(program_bytes);
+        PROCESS_CHECKSUM.set(hasher.finalize().as_slice().to_vec()).unwrap();
+
+    }
+
+}
+
 unsafe extern "system" fn enum_windows_existing_proc(hwnd: HWND, _param1: LPARAM) -> BOOL {
 
     let mut text: [u16; 256] = [0; 256];
@@ -54,6 +91,7 @@ unsafe extern "system" fn enum_windows_existing_proc(hwnd: HWND, _param1: LPARAM
             window_text = text.replace("\0", "");
         },
         Err(_) => {
+
             return BOOL(1);
         }
     }
@@ -65,6 +103,7 @@ unsafe extern "system" fn enum_windows_existing_proc(hwnd: HWND, _param1: LPARAM
 
         SWTOR_PID.lock().unwrap().replace(process_id);
         SWTOR_HWND.lock().unwrap().replace(hwnd);
+        set_process_checksum();
 
         return BOOL(0);
 
@@ -186,6 +225,16 @@ pub fn submit_actual_post(character_message: NewCharacterMessage) {
 pub fn get_pid() -> Option<u32> {
 
     SWTOR_PID.lock().unwrap().clone()
+
+}
+
+pub fn checksum_match(checksum: &[u8; 32]) -> bool {
+
+    if let Some(process_checksum) = PROCESS_CHECKSUM.get() {
+        return process_checksum == checksum;
+    }
+
+    false
 
 }
 
