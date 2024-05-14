@@ -2,6 +2,7 @@
 import { writable, get } from "svelte/store";
 import { invoke } from "@tauri-apps/api";
 import { toast } from "@zerodevx/svelte-toast";
+import { hooked_in } from "../network";
 
 export interface IChatSettings {
     confirmation_before_posting: boolean;
@@ -79,6 +80,22 @@ function chat_log_subscriber() {
             invoke("stop_injecting_capture");
             chat_log_active.set(false);
 
+        }
+
+    });
+
+    hooked_in.subscribe((t_hooked_in) => {
+
+        let t_chat_log_active = get(chat_log_active);
+        let t_settings = get(settings);
+        
+        if (t_hooked_in && t_chat_log_active) { 
+            return;
+        } else if (t_hooked_in && !t_chat_log_active && t_settings.chat_log.capture_chat_log) {
+            invoke("start_injecting_capture").catch(() => {});
+        } else if (!t_hooked_in && t_chat_log_active) {
+            invoke("stop_injecting_capture").catch(() => {});
+            chat_log_active.set(false);
         }
 
     });
