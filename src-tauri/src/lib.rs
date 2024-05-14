@@ -88,10 +88,11 @@ fn start_quit_listener() {
         let listener = TcpListener::bind("127.0.0.1:4593").unwrap();
         listener.accept().unwrap();
 
-        QUIT.store(true, Ordering::Relaxed);
         unsafe {
             ChatHook.disable().unwrap();
         }
+
+        QUIT.store(true, Ordering::Relaxed);
 
     });
 

@@ -7,7 +7,7 @@ use std::thread;
 
 use dll_syringe::{process::OwnedProcess, Syringe};
 
-use crate::{dal::db, swtor_hook};
+use crate::{dal::db, swtor_hook::{self, is_hooked_in}};
 
 use self::{message_container::MessageContainer, swtor_message::SwtorMessage};
 
@@ -76,9 +76,14 @@ pub fn start_injecting_capture(window: tauri::Window) -> Result<(), CaptureError
         }
 
         tcp_thread.join().unwrap();
-        syringe.eject(injected_payload.unwrap()).unwrap();
+
+        if is_hooked_in() {
+
+            syringe.eject(injected_payload.unwrap()).unwrap();
+            println!("Payload ejected");
+
+        }
         INJECTED.store(false, Ordering::Relaxed);
-        println!("Payload ejected");
 
     });
     
@@ -118,9 +123,14 @@ fn start_tcp_listener_loop() {
     }
     println!("Stopped listening for messages");
 
-    if let Ok(mut stream) = TcpStream::connect("127.0.0.1:4593") {
-        stream.write(b"stop").unwrap();
+    if is_hooked_in() {
+
+        if let Ok(mut stream) = TcpStream::connect("127.0.0.1:4593") {
+            stream.write(b"stop").unwrap();
+        }
+
     }
+
 
 }
 
@@ -143,18 +153,47 @@ fn start_logging_propagation(window: tauri::Window) {
 
 fn save_messages_to_database(messages: Vec<SwtorMessage>) {
 
+    let conn = db::get_connection();
+
+    const INSERT_PLAYER: &str = 
+    "
+        INSERT OR IGNORE INTO 
+            Players (player_name)
+        VALUES
+            (?1);
+    ";
+
+    let mut stmt = conn.prepare(INSERT_PLAYER).unwrap();
+    for message in messages.iter() {
+
+        match stmt.execute(&[&message.player_id]) {
+            Ok(_) => {},
+            Err(_err) => {}
+        }
+
+    }
+
     const INSERT_MESSAGE: &str = 
     "
         INSERT INTO 
-            ChatLog (message)
-        VALUES
-        (?);
+            ChatLog (player_id, message)
+        SELECT
+            P.player_id,
+            ?2
+        FROM
+            Players P
+        WHERE
+            ?2->>'player_name' = P.player_name;
     ";
-
-    let conn = db::get_connection();
+    
     let mut stmt = conn.prepare(INSERT_MESSAGE).unwrap();
-    for message in messages {
-        stmt.execute(&[&message.as_json_str()]).unwrap();
+    for message in messages.iter() {
+
+        match stmt.execute(&[&message.as_json_str()]) {
+            Ok(_) => {},
+            Err(_err) => {}
+        }
+
     }
 
 }
