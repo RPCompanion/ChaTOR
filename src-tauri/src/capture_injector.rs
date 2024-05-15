@@ -139,6 +139,7 @@ fn start_tcp_listener_loop() {
     if let Ok(mut stream) = TcpStream::connect("127.0.0.1:4593") {
         stream.write(b"stop").unwrap();
     }
+    thread::sleep(Duration::from_secs(1));
 
 }
 
@@ -212,5 +213,8 @@ fn save_messages_to_database(messages: Vec<SwtorMessage>) {
 pub fn stop_injecting_capture() {
 
     CONTINUE_LOGGING.store(false, Ordering::Relaxed);
+    while INJECTED.load(Ordering::Relaxed) {
+        thread::sleep(Duration::from_secs(1));
+    }
 
 }
