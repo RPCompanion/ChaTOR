@@ -20,7 +20,10 @@ pub struct ChatSettings {
     pub starting_characters_are_lowercase: bool,
 
     #[serde(default = "default_capture_chat_log")]
-    pub capture_chat_log: bool
+    pub capture_chat_log: bool,
+
+    #[serde(default = "default_show_chat_log_window")]
+    pub show_chat_log_window: bool
     
 }
 
@@ -48,6 +51,11 @@ pub fn default_capture_chat_log() -> bool {
     false
 }
 
+pub fn default_show_chat_log_window() -> bool {
+    false
+}
+
+
 impl ChatSettings {
 
     pub fn default() -> ChatSettings {
@@ -58,7 +66,8 @@ impl ChatSettings {
             clear_chat_after_posting: false,
             remove_starting_pronouns: false,
             starting_characters_are_lowercase: true,
-            capture_chat_log: false
+            capture_chat_log: false,
+            show_chat_log_window: false
         }
 
     }

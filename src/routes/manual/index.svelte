@@ -1,7 +1,7 @@
 
 <script lang="ts">
 
-    import { settings } from "../../lib/network/settings";
+    import { chat_log_active, settings } from "../../lib/network/settings";
     import { toast } from "@zerodevx/svelte-toast";
     import XButton from "../../lib/buttons/XButton.svelte";
     import ConfirmationModal from "../../lib/ConfirmationModal.svelte";
@@ -10,6 +10,7 @@
     import { submit_post } from "../../lib/network";
     import StandardMenuButton from "../../lib/buttons/StandardMenuButton.svelte";
     import CustomEmotesList from "../../lib/_CustomEmotesList.svelte";
+    import ChatLogWindow from "../../lib/_ChatLogWindow.svelte";
 
     let messages: string[] = [""];
 
@@ -94,6 +95,9 @@
 </script>
 
 <div class="flex flex-col gap-2 w-full p-10 relative">
+    {#if $settings.chat_log.capture_chat_log && $settings.chat.show_chat_log_window}
+        <ChatLogWindow/>
+    {/if}
     <div class="text-white text-center bg-slate-700 text-2xl">Manual Formatting Mode</div>
     <div class="relative h-6">
         <Checkbox on:checked={on_checked} checked={automated_posting} size="small">Automated posting</Checkbox>
