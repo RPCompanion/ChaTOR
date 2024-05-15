@@ -47,7 +47,7 @@ export function default_settings(): ISettings {
 export const settings = writable<ISettings>(default_settings());
 export const chat_log_active = writable<boolean>(false);
 
-export function init_settings() {
+export function init_settings(dependent_callback: () => void) {
 
     invoke("get_settings").then((response: any) => {
 
@@ -56,6 +56,7 @@ export function init_settings() {
             invoke("update_settings", {settings: value});
         });
         chat_log_subscriber();
+        dependent_callback();
 
     });
 

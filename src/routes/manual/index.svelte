@@ -95,10 +95,11 @@
 </script>
 
 <div class="flex flex-col gap-2 w-full p-10 relative">
+
+    <div class="text-white text-center bg-slate-700 text-2xl">Manual Formatting Mode</div>
     {#if $settings.chat_log.capture_chat_log && $settings.chat.show_chat_log_window}
         <ChatLogWindow/>
     {/if}
-    <div class="text-white text-center bg-slate-700 text-2xl">Manual Formatting Mode</div>
     <div class="relative h-6">
         <Checkbox on:checked={on_checked} checked={automated_posting} size="small">Automated posting</Checkbox>
         <button type="button" class="bg-slate-800 text-white rounded-sm shadow-sm w-32 absolute right-0 hover:text-gray-300" on:click={clear_chat}>Clear chat</button>

@@ -12,7 +12,9 @@
         SAY_COLOR_INDEX, 
         YELL_COLOR_INDEX, 
         WHISPER_COLOR_INDEX,
-        active_character 
+        active_character, 
+        Character
+
     } from "../../lib/network/characters";
     import ValidSetting from "./_ValidSetting.svelte";
 
@@ -59,11 +61,26 @@
 
     }
 
-    $: if ($settings.chat_log.character_ini_to_pull_from) {
+    function set_active_character() {
 
-        $active_character = characters.find((c) => c.character_name == $settings.chat_log.character_ini_to_pull_from)!;
+        if (characters.length == 0) {
+            return;
+        }
+
+        let temp = characters.find((c) => c.character_name == $settings.chat_log.character_ini_to_pull_from);
+        if (temp != undefined) {
+            $active_character = new Character(temp);
+        } else {
+            console.log(`Could not find character with name: ${$settings.chat_log.character_ini_to_pull_from}`);
+        }
+
+    }
+
+    $: if ($settings.chat_log.character_ini_to_pull_from != undefined) {
+
+
         decide_if_colors_are_unique();
-        
+
     }
 
 </script>

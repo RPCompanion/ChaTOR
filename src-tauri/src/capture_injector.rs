@@ -150,8 +150,16 @@ fn start_logging_propagation(window: tauri::Window) {
 
         while CONTINUE_LOGGING.load(Ordering::Relaxed) || !messages.lock().unwrap().unstored_messages.is_empty() {
 
-            let unstored_messages = messages.lock().unwrap().drain_unstored();
-            save_messages_to_database(unstored_messages.clone());
+            let unstored_messages = messages
+                .lock()
+                .unwrap()
+                .drain_unstored();
+
+            if !unstored_messages.is_empty() {
+                save_messages_to_database(unstored_messages.clone());
+                window.emit("swtor_messages", unstored_messages).unwrap();
+            }
+
             thread::sleep(Duration::from_secs(1));
 
         }

@@ -13,11 +13,13 @@ export const hooked_in = writable<boolean>(false);
 
 export function init_network() {
 
+    init_settings(() => {
+        init_active_character();
+    });
+
     init_hook();
     init_swtor_message_listener();
-    init_active_character();
     init_custom_emotes();
-    init_settings();
 
 }
 

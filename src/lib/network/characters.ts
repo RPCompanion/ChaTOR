@@ -21,6 +21,33 @@ export class Color {
 
 }
 
+export class Character {
+    
+    public character_name: string;
+    public channel_colors: Color[];
+
+    constructor(character: ICharacter) {
+        this.character_name = character.character_name;
+        this.channel_colors = character.channel_colors;
+    }
+
+    public relevant_channel_color(color: Color): boolean {
+
+        for (let i = 0; i < 4; i++) {
+
+            if (this.channel_colors[i].equals(color)) {
+                return true;
+            }
+
+        }
+
+        return false;
+
+    }
+
+    
+}
+
 export interface IColor {
     r: number;
     g: number;
@@ -37,7 +64,7 @@ export const EMOTE_COLOR_INDEX: number   = 2;
 export const SAY_COLOR_INDEX: number     = 1;
 export const YELL_COLOR_INDEX: number    = 0;
 
-export const active_character = writable<ICharacter | undefined>(undefined);
+export const active_character = writable<Character | undefined>(undefined);
 
 export function get_all_characters(callback: (characters: ICharacter[]) => void) {
 
@@ -66,7 +93,11 @@ export function init_active_character() {
         }
 
         let character = characters.find((c: ICharacter) => c.character_name === character_name);
-        active_character.set(character);
+        if (character == undefined) {
+            return;
+        }
+
+        active_character.set(new Character(character));
 
     });
 
