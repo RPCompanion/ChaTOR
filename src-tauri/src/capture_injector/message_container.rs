@@ -32,9 +32,10 @@ impl MessageContainer {
             return;
         }
 
+        self.hashes.push(hash);
+
         match SwtorMessage::from(message.message) {
             Ok(swtor_message) => {
-                self.hashes.push(hash);
                 self.unstored_messages.push(swtor_message);
             },
             Err(_) => {}
