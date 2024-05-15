@@ -6,13 +6,19 @@ import { writable, get } from "svelte/store";
 import { Result } from "./result";
 import { init_custom_emotes } from "./network/custom_emote";
 import { init_settings } from "./network/settings";
+import { init_swtor_message_listener } from "./network/swtor_message";
+import { init_active_character } from "./network/characters";
 
 export const hooked_in = writable<boolean>(false);
 
 export function init_network() {
+
     init_hook();
+    init_swtor_message_listener();
+    init_active_character();
     init_custom_emotes();
     init_settings();
+
 }
 
 function init_hook() {

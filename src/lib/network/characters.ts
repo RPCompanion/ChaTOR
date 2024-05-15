@@ -1,5 +1,7 @@
 
 import { invoke } from "@tauri-apps/api";
+import { writable, get } from "svelte/store";
+import { settings } from "./settings";
 
 export class Color {
 
@@ -19,7 +21,7 @@ export class Color {
 
 }
 
-interface IColor {
+export interface IColor {
     r: number;
     g: number;
     b: number;
@@ -29,6 +31,13 @@ export interface ICharacter {
     character_name: string;
     channel_colors: Color[];
 }
+
+export const WHISPER_COLOR_INDEX: number = 3;
+export const EMOTE_COLOR_INDEX: number   = 2;
+export const SAY_COLOR_INDEX: number     = 1;
+export const YELL_COLOR_INDEX: number    = 0;
+
+export const active_character = writable<ICharacter | undefined>(undefined);
 
 export function get_all_characters(callback: (characters: ICharacter[]) => void) {
 
@@ -43,5 +52,22 @@ export function get_all_characters(callback: (characters: ICharacter[]) => void)
         callback(temp);
 
     })
+
+}
+
+export function init_active_character() {
+
+    get_all_characters((characters: ICharacter[]) => {
+
+        let character_name = get(settings).chat_log.character_ini_to_pull_from;
+
+        if (character_name == undefined) {
+            return;
+        }
+
+        let character = characters.find((c: ICharacter) => c.character_name === character_name);
+        active_character.set(character);
+
+    });
 
 }

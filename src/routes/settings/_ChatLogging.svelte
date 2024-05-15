@@ -5,7 +5,15 @@
     import SettingsToggle from "./_SettingsToggle.svelte";
     import SettingsDropdown from "./_SettingsDropdown.svelte";
     import Setting from "./_Setting.svelte";
-    import { get_all_characters, type ICharacter } from "../../lib/network/characters";
+    import { 
+        get_all_characters, 
+        type ICharacter, 
+        EMOTE_COLOR_INDEX, 
+        SAY_COLOR_INDEX, 
+        YELL_COLOR_INDEX, 
+        WHISPER_COLOR_INDEX,
+        active_character 
+    } from "../../lib/network/characters";
     import ValidSetting from "./_ValidSetting.svelte";
 
     const SECTION_SUB_TEXT: string     = "Chat logging uses DLL injection, which is against the TOS of SWTOR and may result in a ban. Use at your own risk.";
@@ -13,12 +21,6 @@
         Our chat logging system is dependent upon chat channels having unique colors. To change a color, go in game, right click on a chat tab, select channel settings, 
         select a problematic channel and change the color, even slightly. Don't forget to click apply!
         `.trim();
-
-    const EMOTE_COLOR_INDEX: number   = 2;
-    const SAY_COLOR_INDEX: number     = 1;
-    const YELL_COLOR_INDEX: number    = 0;
-    const WHISPER_COLOR_INDEX: number = 3;
-
 
     let characters: ICharacter[] = [];
     get_all_characters((temp: ICharacter[]) => {
@@ -58,7 +60,10 @@
     }
 
     $: if ($settings.chat_log.character_ini_to_pull_from) {
+
+        $active_character = characters.find((c) => c.character_name == $settings.chat_log.character_ini_to_pull_from)!;
         decide_if_colors_are_unique();
+        
     }
 
 </script>
