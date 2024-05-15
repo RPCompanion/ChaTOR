@@ -112,7 +112,10 @@ fn start_tcp_listener_loop() {
     let mut buffer: [u8; 2048] = [0; 2048];
     while CONTINUE_LOGGING.load(Ordering::Relaxed) {
 
-        stream.read(&mut buffer).unwrap();
+        if let Err(_err) = stream.read(&mut buffer) {
+            break;
+        }
+
         Deserializer::from_slice(&buffer).into_iter::<Value>().for_each(|value| {
 
             if let Ok(value) = value {
@@ -184,11 +187,11 @@ fn save_messages_to_database(messages: Vec<SwtorMessage>) {
             ChatLog (player_id, message)
         SELECT
             P.player_id,
-            ?2
+            ?1
         FROM
             Players P
         WHERE
-            ?2->>'player_name' = P.player_name;
+            ?1->>'player_id' = P.player_name;
     ";
     
     let mut stmt = conn.prepare(INSERT_MESSAGE).unwrap();
@@ -196,7 +199,9 @@ fn save_messages_to_database(messages: Vec<SwtorMessage>) {
 
         match stmt.execute(&[&message.as_json_str()]) {
             Ok(_) => {},
-            Err(_err) => {}
+            Err(_err) => {
+                println!("Error inserting message {}", _err);
+            }
         }
 
     }
