@@ -74,7 +74,9 @@ function chat_log_subscriber() {
                     chat_log_active.set(true);
                 })
                 .catch((e) => {
-                    toast.push("Failed to start chat log capture: " + e);  
+                    if (e != "AlreadyInjected") {
+                        toast.push("Failed to start chat log capture: " + e);
+                    }
                 });
 
         } else {
