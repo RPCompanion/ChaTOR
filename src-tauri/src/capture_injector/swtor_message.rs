@@ -7,7 +7,7 @@ use crate::dal::characters::Color;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct SwtorMessage {
-    pub player_id: Option<String>,
+    pub character_name: String,
     pub timestamp: Option<NaiveTime>,
     pub color: Color,
     pub message: String
@@ -18,7 +18,7 @@ impl SwtorMessage {
     pub fn from(message: String) -> Result<SwtorMessage, &'static str> {
 
         Ok(SwtorMessage {
-            player_id: SwtorMessage::get_player_id(&message),
+            character_name: SwtorMessage::get_character_name(&message)?,
             timestamp: SwtorMessage::get_timestamp(&message),
             color: SwtorMessage::get_color(&message)?,
             message: SwtorMessage::get_message(&message)?
@@ -53,13 +53,13 @@ impl SwtorMessage {
 
     }
 
-    fn get_player_id(message: &str) -> Option<String> {
+    fn get_character_name(message: &str) -> Result<String, &'static str> {
 
         let re = Regex::new(r"BBB.\s*([\w']+(?:\s+[\w']+)*)").unwrap();
         if let Some(captures) = re.captures(message) {
-            return Some(captures.get(1).unwrap().as_str().to_string());
+            return Ok(captures.get(1).unwrap().as_str().to_string());
         }
-        None
+        return Err("No character name found");
 
     }
 
@@ -110,16 +110,16 @@ fn test_color_parser() {
 }
 
 #[test]
-fn test_player_id_with_apostraphe() {
+fn test_character_name_with_apostraphe() {
     const PLAYER_ID_STRING: &str = "<font color='#ff8022'>[3:56:03 PM] <hl lid=\"BBBJNiufi'ren\" > holds out the datapad back to Nistra.</font>";
-    let player_id = SwtorMessage::get_player_id(PLAYER_ID_STRING).unwrap();
+    let player_id = SwtorMessage::get_character_name(PLAYER_ID_STRING).unwrap();
     assert_eq!(player_id, "Niufi'ren");
 }
 
 #[test]
-fn test_player_id() {
+fn test_character_name() {
     const PLAYER_ID_STRING: &str = "<font color='#ff8022'>[3:44:14 PM] <hl lid=\"BBBIShiatara\" > nods to Keleeni: &quot;Bye.&quot;</font>";
-    let player_id = SwtorMessage::get_player_id(PLAYER_ID_STRING).unwrap();
+    let player_id = SwtorMessage::get_character_name(PLAYER_ID_STRING).unwrap();
     assert_eq!(player_id, "Shiatara");
 }
 

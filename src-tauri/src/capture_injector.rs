@@ -167,7 +167,7 @@ fn save_messages_to_database(messages: Vec<SwtorMessage>) {
     const INSERT_PLAYER: &str = 
     "
         INSERT OR IGNORE INTO 
-            Players (player_name)
+            Characters (character_name)
         VALUES
             (?1);
     ";
@@ -175,7 +175,7 @@ fn save_messages_to_database(messages: Vec<SwtorMessage>) {
     let mut stmt = conn.prepare(INSERT_PLAYER).unwrap();
     for message in messages.iter() {
 
-        match stmt.execute(&[&message.player_id]) {
+        match stmt.execute(&[&message.character_name]) {
             Ok(_) => {},
             Err(_err) => {}
         }
@@ -185,14 +185,14 @@ fn save_messages_to_database(messages: Vec<SwtorMessage>) {
     const INSERT_MESSAGE: &str = 
     "
         INSERT INTO 
-            ChatLog (player_id, message)
+            ChatLog (character_id, message)
         SELECT
-            P.player_id,
+            C.character_id,
             ?1
         FROM
-            Players P
+            Characters C
         WHERE
-            ?1->>'player_id' = P.player_name;
+            ?1->>'character_name' = C.character_name;
     ";
     
     let mut stmt = conn.prepare(INSERT_MESSAGE).unwrap();
