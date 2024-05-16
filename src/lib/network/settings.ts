@@ -23,6 +23,8 @@ export interface ISettings {
     chat_log: IChatLogSettings;
 }
 
+type CaptureError = "AlreadyInjected" | "SwtorNotRunning" | "WrongGuiSettings" | "UnsupportedVersion" | "NotYetFullyReady";
+
 export function default_settings(): ISettings {
 
     return {
@@ -74,10 +76,12 @@ function chat_log_subscriber() {
                     toast.push("Chat logging active");
                     chat_log_active.set(true);
                 })
-                .catch((e) => {
-                    if (e != "AlreadyInjected") {
+                .catch((e: CaptureError) => {
+
+                    if (e != "AlreadyInjected" && e != "NotYetFullyReady") {
                         toast.push("Failed to start chat log capture: " + e);
                     }
+
                 });
 
         } else {

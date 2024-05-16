@@ -228,13 +228,12 @@ pub fn get_pid() -> Option<u32> {
 
 }
 
-pub fn checksum_match(checksum: &[u8; 32]) -> bool {
+pub fn checksum_match(checksum: &[u8; 32]) -> Result<bool, &'static str> {
 
     if let Some(process_checksum) = PROCESS_CHECKSUM.get() {
-        return process_checksum == checksum;
+        return Ok(process_checksum == checksum);
     }
-
-    false
+    return Err("PROCESS_CHECKSUM not yet initialized");
 
 }
 

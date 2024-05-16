@@ -31,7 +31,8 @@ pub enum CaptureError {
     AlreadyInjected,
     SwtorNotRunning,
     WrongGuiSettings,
-    UnsupportedVersion
+    UnsupportedVersion,
+    NotYetFullyReady
 }
 
 #[tauri::command]
@@ -47,9 +48,18 @@ pub fn start_injecting_capture(window: tauri::Window) -> Result<(), CaptureError
     }
     let swtor_pid = swtor_pid.unwrap();
 
-    if !swtor_hook::checksum_match(&SUPPORTED_SWTOR_CHECKSUM) {
-        return Err(CaptureError::UnsupportedVersion);
+    match swtor_hook::checksum_match(&SUPPORTED_SWTOR_CHECKSUM) {
+        Ok(true) => {},
+        Ok(false) => return Err(CaptureError::UnsupportedVersion),
+        Err(_) => return Err(CaptureError::NotYetFullyReady)
     }
+
+    start_injecting_thread(swtor_pid, window);
+    return Ok(());
+
+}
+
+fn start_injecting_thread(swtor_pid: u32, window: tauri::Window) {
 
     thread::spawn(move || {
 
@@ -97,9 +107,6 @@ pub fn start_injecting_capture(window: tauri::Window) -> Result<(), CaptureError
         INJECTED.store(false, Ordering::Relaxed);
 
     });
-    
-
-    return Ok(());
 
 }
 
