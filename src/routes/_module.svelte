@@ -7,8 +7,7 @@
 
 </script>
 
-<img src={watercolor} alt="background-watercolor" class="absolute inset-0 w-full h-full object-fill z-0"/>
-<div class="flex flex-col min-h-screen">
+<div class="flex flex-col min-h-screen bg-cover bg-no-repeat" style="background-image: url({watercolor})">
     <div class="flex-grow">
         <Navbar/>
         <slot></slot>
