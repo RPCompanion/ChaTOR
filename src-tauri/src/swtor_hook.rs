@@ -58,7 +58,7 @@ unsafe fn set_process_checksum() {
 
     let pid = SWTOR_PID.lock().unwrap().clone().unwrap();
 
-    let handle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, false, pid);
+    let handle = OpenProcess(PROCESS_QUERY_INFORMATION, false, pid);
     if handle.is_err() {
         return;
     }

@@ -184,8 +184,9 @@ fn save_messages_to_database(messages: Vec<SwtorMessage>) {
     "
         INSERT OR IGNORE INTO 
             Characters (character_name)
-        VALUES
-            (?1);
+        SELECT
+            ?1
+        WHERE NOT EXISTS ( SELECT 1 FROM Characters WHERE character_name = ?1);
     ";
 
     let mut stmt = conn.prepare(INSERT_PLAYER).unwrap();
