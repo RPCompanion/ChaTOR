@@ -2,6 +2,7 @@
 use chrono::prelude::*;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
+use crate::utils::StringUtils;
 
 use crate::dal::characters::Color;
 
@@ -83,6 +84,10 @@ impl SwtorMessage {
 
     pub fn as_json_str(&self) -> String {
         serde_json::to_string(self).unwrap()
+    }
+
+    pub fn as_u64_hash(&self) -> u64 {
+        self.as_json_str().as_u64_hash()
     }
 
 }

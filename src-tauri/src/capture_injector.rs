@@ -1,4 +1,5 @@
 
+use rusqlite::params;
 use serde::{Deserialize, Serialize};
 use serde_json::{Deserializer, Value};
 
@@ -192,21 +193,22 @@ fn save_messages_to_database(messages: Vec<SwtorMessage>) {
 
     const INSERT_MESSAGE: &str = 
     "
-        INSERT INTO 
-            ChatLog (character_id, message)
+        INSERT OR IGNORE INTO 
+            ChatLog (chat_hash, character_id, message)
         SELECT
+            ?1,
             C.character_id,
-            ?1
+            ?2
         FROM
             Characters C
         WHERE
-            ?1->>'character_name' = C.character_name;
+            ?2->>'character_name' = C.character_name;
     ";
     
     let mut stmt = conn.prepare(INSERT_MESSAGE).unwrap();
     for message in messages.iter() {
 
-        match stmt.execute(&[&message.as_json_str()]) {
+        match stmt.execute(params![message.as_u64_hash() as i64, &message.as_json_str()]) {
             Ok(_) => {},
             Err(_err) => {
                 println!("Error inserting message {}", _err);
