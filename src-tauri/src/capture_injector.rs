@@ -23,7 +23,7 @@ const SUPPORTED_SWTOR_CHECKSUM: [u8; 32] = [
 lazy_static! {
     static ref INJECTED: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
     static ref CONTINUE_LOGGING: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
-    static ref MESSAGE_CONTAINER: Arc<Mutex<MessageContainer>> = Arc::new(Mutex::new(MessageContainer::new()));
+    static ref MESSAGE_CONTAINER: Arc<Mutex<Option<MessageContainer>>> = Arc::new(Mutex::new(None));
 }
 
 #[derive(Deserialize, Serialize)]
@@ -53,6 +53,9 @@ pub fn start_injecting_capture(window: tauri::Window) -> Result<(), CaptureError
         Ok(false) => return Err(CaptureError::UnsupportedVersion),
         Err(_) => return Err(CaptureError::NotYetFullyReady)
     }
+
+    let mut msg_container = MESSAGE_CONTAINER.lock().unwrap();
+    *msg_container = Some(MessageContainer::default());
 
     start_injecting_thread(swtor_pid, window);
     return Ok(());
@@ -132,6 +135,8 @@ fn start_tcp_listener_loop() {
 
                     msg_container.lock()
                         .unwrap()
+                        .as_mut()
+                        .unwrap()
                         .push(message)
 
                 }
@@ -156,10 +161,12 @@ fn start_logging_propagation(window: tauri::Window) {
     let messages = Arc::clone(&MESSAGE_CONTAINER);
     thread::spawn(move || {
 
-        while CONTINUE_LOGGING.load(Ordering::Relaxed) || !messages.lock().unwrap().unstored_messages.is_empty() {
+        while CONTINUE_LOGGING.load(Ordering::Relaxed) || !messages.lock().unwrap().as_ref().unwrap().unstored_messages.is_empty() {
 
             let unstored_messages = messages
                 .lock()
+                .unwrap()
+                .as_mut()
                 .unwrap()
                 .drain_unstored();
 

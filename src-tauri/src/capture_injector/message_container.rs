@@ -1,4 +1,7 @@
 
+use rusqlite::Error;
+
+use crate::dal::db;
 use crate::share::*;
 use crate::utils::StringUtils;
 
@@ -15,6 +18,32 @@ impl MessageContainer {
 
         MessageContainer {
             hashes: Vec::new(),
+            unstored_messages: Vec::new()
+        }
+
+    }
+
+    pub fn default() -> MessageContainer {
+
+        let conn = db::get_connection();
+        const SELECT_MESSAGES: &str = 
+        "
+            SELECT
+                chat_hash
+            FROM
+                ChatLog
+            WHERE
+                date(timestamp, 'localtime') = date('now', 'localtime');
+        ";
+
+        let mut stmt = conn.prepare(SELECT_MESSAGES).unwrap();
+        let message_iter = stmt.query_map([], |row| {
+            Ok(row.get(0)?)
+        });
+
+        let hashes: Vec<u64> = message_iter.unwrap().map(|m: Result<i64, Error>| m.unwrap() as u64 ).collect();
+        MessageContainer {
+            hashes: hashes,
             unstored_messages: Vec::new()
         }
 
