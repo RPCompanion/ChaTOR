@@ -7,6 +7,7 @@ const TABLES: &str = include_str!("../../sql/tables.sql");
 pub mod custom_emote;
 pub mod settings;
 pub mod chat_log;
+pub mod user_character_messages;
 
 pub fn get_connection() -> Connection {
 

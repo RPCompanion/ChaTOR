@@ -25,7 +25,7 @@ impl ChatLog {
             SELECT
                 chat_log_id,
                 character_id,
-                timestamp,
+                datetime(timestamp, 'localtime'),
                 message
             FROM
                 ChatLog
@@ -56,7 +56,7 @@ impl ChatLog {
             SELECT
                 chat_log_id,
                 character_id,
-                timestamp,
+                datetime(timestamp, 'localtime'),
                 message
             FROM
                 ChatLog

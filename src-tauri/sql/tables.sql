@@ -43,3 +43,18 @@ CREATE TABLE IF NOT EXISTS ChatLog
     timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     message VARCHAR(1024) NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS UsersChatLog
+(
+    my_chat_log_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    chat_hash INTEGER UNIQUE NOT NULL,
+    timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    message VARCHAR(1024) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS UsersChatLogCharacter
+(
+    my_chat_log_character_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    my_chat_log_id INTEGER NOT NULL REFERENCES UsersChatLog(my_chat_log_id),
+    character_id INTEGER NOT NULL REFERENCES Characters(character_id)
+);
