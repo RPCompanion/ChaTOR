@@ -7,6 +7,7 @@
 
     let auto_scroll: boolean = true;
     let container: HTMLElement | undefined = undefined;
+    let last_message: HTMLElement | undefined = undefined;
     const dispatch = createEventDispatcher();
 
     function on_character_click(character_name: string) {
@@ -15,7 +16,7 @@
 
     function scroll_container() {
 
-        if (container == undefined) {
+        if (last_message == undefined) {
             return;
         }
 
@@ -23,7 +24,7 @@
             return;
         }
 
-        container.scrollIntoView({ behavior: "smooth", block: "end" });
+        last_message.scrollIntoView({ behavior: "smooth", block: "end" });
 
     }
 
@@ -39,7 +40,7 @@
 <div bind:this={container} class="flex flex-col h-44  rounded-md border-2 border-slate-700 overflow-y-auto chat-container-background">
     {#each $swtor_messages as message}
 
-        <div class="w-full opacity-100">
+        <div bind:this={last_message} class="w-full opacity-100">
 
             {#if message.timestamp != null}
                 <span class="text-white">[{message.timestamp}]</span>
