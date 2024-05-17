@@ -40,6 +40,8 @@ fn main() {
             dal::db::settings::get_settings,
             dal::db::settings::update_settings,
             dal::characters::get_all_characters,
+            dal::db::chat_log::get_chat_log_from_date,
+            dal::db::chat_log::get_distinct_dates,
             capture_injector::start_injecting_capture,
             capture_injector::stop_injecting_capture,
         ])
