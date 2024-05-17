@@ -11,14 +11,36 @@ export class AutoMessageSplitter {
 
     private message: string;
     private settings: ISettings;
+    private is_whisper: boolean;
+    private character_to_whisper?: string;
+    private constructor_error?: string;
+
     constructor(message: string, local_settings?: ISettings) {
 
-        this.message  = message.trim();
-        this.settings = local_settings || get(settings);
+        this.message    = message.trim();
+        this.is_whisper = this.message.startsWith("/w") || this.message.startsWith("/whisper");
+
+        if (this.is_whisper) {
+
+            let split = this.message.split(":");
+
+            if (split.length < 2) {
+                this.constructor_error = "Whisper message malformed";
+            }
+
+            this.character_to_whisper = split[0].replace("/w", "").replace("/whisper", "").trim();
+
+        }
+
+        this.settings   = local_settings || get(settings);
 
     }
 
     public split(): Result<string[], string> {
+
+        if (this.constructor_error) {
+            return Result.error(this.constructor_error);
+        }
 
         if (this.message.length === 0) {
             return Result.error("No messages to submit");
@@ -135,8 +157,12 @@ export class AutoMessageSplitter {
     // Assumes string has already been trimmed.
     private get_prefix(message: string): string {
 
-        if (message.startsWith("/say") || message.startsWith("/e")) {
+        if (message.startsWith("/")) {
             return "";
+        }
+
+        if (this.is_whisper) {
+            return "/w " + this.character_to_whisper! + ":";
         }
 
         if (message.startsWith("\"")) {
