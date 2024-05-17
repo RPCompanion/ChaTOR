@@ -3,9 +3,12 @@
     import { createEventDispatcher } from "svelte";
     import { swtor_messages } from "./network/swtor_message";
     import { afterUpdate } from "svelte";
+    import Checkbox from "./Checkbox.svelte";
 
+    let auto_scroll: boolean = true;
     let container: HTMLElement | undefined = undefined;
     const dispatch = createEventDispatcher();
+
     function on_character_click(character_name: string) {
         dispatch("whisper", { character_name: character_name });
     }
@@ -15,6 +18,11 @@
         if (container == undefined) {
             return;
         }
+
+        if (!auto_scroll) {
+            return;
+        }
+
         container.scrollIntoView({ behavior: "smooth", block: "end" });
 
     }
@@ -25,6 +33,9 @@
 
 </script>
 
+<div class="w-full">
+    <Checkbox bind:checked={auto_scroll} size="small">Auto scroll</Checkbox>
+</div>
 <div bind:this={container} class="flex flex-col h-44 bg-white rounded-md border-2 border-slate-500 overflow-y-auto">
     {#each $swtor_messages as message}
 
