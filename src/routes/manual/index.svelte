@@ -58,7 +58,7 @@
     function submit_messages() {
 
         show_modal = false;
-        let response = submit_post("ChatEmote", messages);
+        let response = submit_post("ChatMessage", messages);
 
         if (response.is_error()) {
             toast.push(response.unwrap_error());
@@ -77,7 +77,7 @@
 
     function on_single_post(idx: number) {
 
-        let response = submit_post("ChatEmote", [messages[idx]]);
+        let response = submit_post("ChatMessage", [messages[idx]]);
         if (response.is_error()) {
             toast.push(response.unwrap_error());
         }

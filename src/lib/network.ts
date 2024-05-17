@@ -9,7 +9,7 @@ import { init_settings } from "./network/settings";
 import { init_swtor_message_listener } from "./network/swtor_message";
 import { init_active_character } from "./network/characters";
 
-export type MessageType = "ButtonEmote" | "ChatEmote";
+export type MessageType = "ButtonEmote" | "ChatMessage";
 
 interface UserCharacterMessages {
     message_type: MessageType;

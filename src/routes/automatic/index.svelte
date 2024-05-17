@@ -20,7 +20,7 @@
     function on_submitted() {
 
         show_modal = false;
-        submit_post(messages);
+        submit_post("ChatMessage", messages);
         if ($settings.chat.clear_chat_after_posting) {
             message = "";
         }
