@@ -6,7 +6,7 @@
 
     function on_emote_click(emote: ICustomEmote) {
 
-        let response = submit_post([emote.emote]);
+        let response = submit_post("ButtonEmote", [emote.emote]);
         if (response.is_error()) {
             toast.push(response.unwrap_error());
         }

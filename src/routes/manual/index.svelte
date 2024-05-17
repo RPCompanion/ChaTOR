@@ -7,7 +7,7 @@
     import ConfirmationModal from "../../lib/ConfirmationModal.svelte";
     import Checkbox from "../../lib/Checkbox.svelte";
     import { valid_messages } from "../utils";
-    import { submit_post } from "../../lib/network";
+    import { submit_post, type MessageType } from "../../lib/network";
     import StandardMenuButton from "../../lib/buttons/StandardMenuButton.svelte";
     import CustomEmotesList from "../../lib/_CustomEmotesList.svelte";
     import ChatLogWindow from "../../lib/_ChatLogWindow.svelte";
@@ -58,7 +58,7 @@
     function submit_messages() {
 
         show_modal = false;
-        let response = submit_post(messages);
+        let response = submit_post("ChatEmote", messages);
 
         if (response.is_error()) {
             toast.push(response.unwrap_error());
@@ -77,7 +77,7 @@
 
     function on_single_post(idx: number) {
 
-        let response = submit_post([messages[idx]]);
+        let response = submit_post("ChatEmote", [messages[idx]]);
         if (response.is_error()) {
             toast.push(response.unwrap_error());
         }

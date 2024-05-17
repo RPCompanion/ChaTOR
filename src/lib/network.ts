@@ -9,6 +9,14 @@ import { init_settings } from "./network/settings";
 import { init_swtor_message_listener } from "./network/swtor_message";
 import { init_active_character } from "./network/characters";
 
+export type MessageType = "ButtonEmote" | "ChatEmote";
+
+interface UserCharacterMessages {
+    message_type: MessageType;
+    character_id?: number;
+    messages: string[];
+}
+
 export const hooked_in = writable<boolean>(false);
 
 export function init_network() {
@@ -32,7 +40,7 @@ function init_hook() {
 
 }
 
-export function submit_post(messages: string[]): Result<[], string> {
+export function submit_post(message_type: MessageType, messages: string[]): Result<[], string> {
 
     if (!get(hooked_in)) {
         return Result.error("SWTOR not hooked in. Have you launched the game?");
@@ -50,11 +58,9 @@ export function submit_post(messages: string[]): Result<[], string> {
 
     }
 
-    interface NewCharacterMessage {
-        messages: string[];
-    }
-
-    let character_message: NewCharacterMessage = {
+    let character_message: UserCharacterMessages = {
+        message_type: message_type,
+        character_id: undefined,
         messages: messages
     };
 

@@ -3,6 +3,7 @@
 use rusqlite::params;
 use serde::{Deserialize, Serialize};
 use crate::dal::db;
+use crate::dal::db::log::log_error;
 use crate::utils::StringUtils;
 
 #[derive(Deserialize, Serialize)]
@@ -27,7 +28,7 @@ impl UserCharacterMessages {
         "
             INSERT INTO 
                 UsersChatLog (chat_hash, message)
-            VALUES (?1)
+            VALUES (?1, ?2)
             RETURNING my_chat_log_id;
         ";
 
@@ -46,6 +47,11 @@ impl UserCharacterMessages {
                 Ok(my_chat_log_id)
 
             });
+
+            if response.is_err() {
+                log_error(format!("UserCharacterMessages::new() - Error inserting message {:?}", response.err()).as_str());
+                continue;
+            }
 
             if self.character_id.is_none() {
                 continue;

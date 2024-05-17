@@ -3,9 +3,8 @@ use std::fs;
 use std::path::Path;
 
 use sha2::{Sha256, Digest};
-use serde::{Deserialize, Serialize};
 use windows::core::PWSTR;
-use windows::Win32::System::Threading::{OpenProcess, QueryFullProcessImageNameA, QueryFullProcessImageNameW, PROCESS_NAME_FORMAT, PROCESS_QUERY_INFORMATION, PROCESS_VM_READ};
+use windows::Win32::System::Threading::{OpenProcess, QueryFullProcessImageNameW, PROCESS_NAME_FORMAT, PROCESS_QUERY_INFORMATION};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
@@ -29,6 +28,8 @@ use windows::Win32::UI::WindowsAndMessaging::{
 
 use clipboard_win::{formats::Unicode, set_clipboard};
 
+use crate::dal::db::user_character_messages::UserCharacterMessages;
+
 lazy_static! {
     static ref SWTOR_HWND: Arc<Mutex<Option<HWND>>> = Arc::new(Mutex::new(None));
     static ref SWTOR_PID: Arc<Mutex<Option<u32>>> = Arc::new(Mutex::new(None));
@@ -36,11 +37,6 @@ lazy_static! {
 }
 
 static PROCESS_CHECKSUM: OnceLock<Vec<u8>> = OnceLock::new();
-
-#[derive(Deserialize, Serialize)]
-pub struct NewCharacterMessage {
-    pub messages: Vec<String>
-}
 
 const ENTER_KEY: usize     = 0x0D;
 const ESC_KEY: usize       = 0x1B;
@@ -179,7 +175,7 @@ fn window_in_focus() -> bool {
 }
 
 #[tauri::command]
-pub fn submit_actual_post(character_message: NewCharacterMessage) {
+pub fn submit_actual_post(character_message: UserCharacterMessages) {
 
     if WRITING.load(Ordering::Relaxed) {
         return;
@@ -188,6 +184,8 @@ pub fn submit_actual_post(character_message: NewCharacterMessage) {
     WRITING.store(true, Ordering::Relaxed);
 
     thread::spawn(move || {
+
+        character_message.store();
 
         for _ in 0..64 {
             send_message(WM_KEYDOWN, BACKSPACE_KEY, 2);
