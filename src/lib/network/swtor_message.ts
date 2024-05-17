@@ -26,6 +26,10 @@ export function init_swtor_message_listener() {
 
         let f_payload: ISwtorMessage[] = (payload as ISwtorMessage[])
             .filter((message) => t_active_character!.relevant_channel_color(message.color));
+    
+        f_payload.forEach((message) => {
+            message.message = message.message.replaceAll("&quot;", "\"");
+        })
 
         swtor_messages.set(temp.concat(f_payload));
 
