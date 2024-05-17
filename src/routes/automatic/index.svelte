@@ -75,8 +75,8 @@
         <button type="button" class="bg-slate-800 text-white rounded-sm shadow-sm w-32 absolute right-0" on:click={clear_chat}>Clear chat</button>
     </div>
     <div class="relative">
-        <textarea class="w-full min-h-36 outline-none p-1 rounded-md border-2 resize-none border-slate-500" bind:value={message} on:keydown={on_key_down}/>
-        <div class="absolute bottom-1 right-2">{message.length}</div>
+        <textarea class="w-full min-h-36 outline-none p-1 rounded-md border-2 resize-none border-slate-700 chat-container-background text-white" bind:value={message} on:keydown={on_key_down}/>
+        <div class="absolute bottom-1 right-2 text-white">{message.length}</div>
     </div>
     <StandardMenuButton text="Post" on:click={enable_confirmation_modal}/>
     <div class="h-6"></div>

@@ -36,21 +36,25 @@
 <div class="w-full">
     <Checkbox bind:checked={auto_scroll} size="small">Auto scroll</Checkbox>
 </div>
-<div bind:this={container} class="flex flex-col h-44 bg-white rounded-md border-2 border-slate-500 overflow-y-auto">
+<div bind:this={container} class="flex flex-col h-44  rounded-md border-2 border-slate-700 overflow-y-auto chat-container-background">
     {#each $swtor_messages as message}
 
-        <div class="w-full">
+        <div class="w-full opacity-100">
 
             {#if message.timestamp != null}
-                <span class="">[{message.timestamp}]</span>
+                <span class="text-white">[{message.timestamp}]</span>
             {/if}
 
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <span class="text-slate-500 cursor-pointer" on:click={() => {on_character_click(message.character_name)}}>{message.character_name}:</span>
+            <span class="text-slate-200 cursor-pointer" on:click={() => {on_character_click(message.character_name)}}>{message.character_name}:</span>
 
             <span class="" style="color: rgb({message.color.r}, {message.color.g}, {message.color.b})">{message.message}</span>
         </div>
 
     {/each}
 </div>
+
+<style>
+
+</style>

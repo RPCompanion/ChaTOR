@@ -111,13 +111,13 @@
     <form>
         {#each messages as message, idx}
             <div class="relative">
-                <textarea class="w-full min-h-24 outline-none p-1 resize-none rounded-md border-2 border-slate-500" class:border-yellow-400={message.length >= 200 && message.length <= 255} class:border-red-500={message.length > 255} bind:value={message}/>
+                <textarea class="w-full min-h-24 outline-none p-1 resize-none rounded-md border-2 border-slate-700 chat-container-background text-white" class:border-yellow-400={message.length >= 200 && message.length <= 255} class:border-red-500={message.length > 255} bind:value={message}/>
                 {#if idx != 0}
                     <div class="absolute -right-2 -top-3">
                         <XButton on:click={() => { delete_message(idx); }}/>
                     </div>
                 {/if}
-                <div class="absolute bottom-1 right-0">{message.length}/255</div>
+                <div class="absolute bottom-1 right-0 text-white">{message.length}/255</div>
                 {#if !automated_posting}
                     <button type="button" class="bg-slate-700 text-white rounded-sm shadow-sm px-2 absolute top-1/3 -right-8 hover:text-gray-300" on:click={() => { on_single_post(idx); }}>Post</button>
                 {/if}
