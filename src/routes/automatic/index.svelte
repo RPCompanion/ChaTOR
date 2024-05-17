@@ -8,6 +8,7 @@
     import { AutoMessageSplitter } from "../../lib/auto_message_splitter";
     import AutomaticConfirmation from "./_AutomaticConfirmation.svelte";
     import CustomEmotesList from "../../lib/_CustomEmotesList.svelte";
+    import ChatLogWindow from "../../lib/_ChatLogWindow.svelte";
 
     let message: string     = "";
     let messages: string[]  = [];
@@ -58,10 +59,18 @@
 
     }
 
+    function on_whisper(event: any) {
+        message = "/whisper " + event.detail.character_name + ": ";
+    }
+
 </script>
+
 
 <div class="flex flex-col gap-2 w-full p-10 relative">
     <div class="text-white text-center bg-slate-700 text-2xl">Automatic Formatting Mode</div>
+    {#if $settings.chat_log.capture_chat_log && $settings.chat.show_chat_log_window}
+        <ChatLogWindow on:whisper={on_whisper}/>
+    {/if}
     <div class="relative h-6">
         <button type="button" class="bg-slate-800 text-white rounded-sm shadow-sm w-32 absolute right-0" on:click={clear_chat}>Clear chat</button>
     </div>
