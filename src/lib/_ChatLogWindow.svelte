@@ -37,7 +37,7 @@
 <div class="w-full">
     <Checkbox bind:checked={auto_scroll} size="small">Auto scroll</Checkbox>
 </div>
-<div bind:this={container} class="flex flex-col h-44  rounded-md border-2 border-slate-700 overflow-y-auto chat-container-background">
+<div bind:this={container} class="flex flex-col h-44 max-h-96 resize-y  rounded-md border-2 border-slate-700 overflow-y-auto chat-container-background">
     {#each $swtor_messages as message}
 
         <div bind:this={last_message} class="w-full opacity-100">
