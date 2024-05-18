@@ -1,7 +1,7 @@
 
 use serde::{Deserialize, Serialize};
 use crate::dal::db;
-use rusqlite::params;
+use rusqlite::{params, Error};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Message {
@@ -78,6 +78,28 @@ impl ChatLog {
         ChatLog {
             messages: message_iter.unwrap().map(|m| m.unwrap()).collect()
         }
+
+    }
+
+    pub fn get_todays_hashes() -> Vec<u64> {
+
+        let conn = db::get_connection();
+        const SELECT_MESSAGES: &str = 
+        "
+            SELECT
+                chat_hash
+            FROM
+                ChatLog
+            WHERE
+                date(timestamp, 'localtime') = date('now', 'localtime');
+        ";
+
+        let mut stmt = conn.prepare(SELECT_MESSAGES).unwrap();
+        let message_iter = stmt.query_map([], |row| {
+            Ok(row.get(0)?)
+        });
+
+        message_iter.unwrap().map(|m: Result<i64, Error>| m.unwrap() as u64).collect()
 
     }
 

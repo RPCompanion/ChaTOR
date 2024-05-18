@@ -6,6 +6,7 @@ use crate::share::*;
 use crate::utils::StringUtils;
 
 use crate::capture_injector::swtor_message::SwtorMessage;
+use crate::dal::db::chat_log::ChatLog;
 
 pub struct MessageContainer {
     pub hashes: Vec<u64>,
@@ -25,25 +26,8 @@ impl MessageContainer {
 
     pub fn default() -> MessageContainer {
 
-        let conn = db::get_connection();
-        const SELECT_MESSAGES: &str = 
-        "
-            SELECT
-                chat_hash
-            FROM
-                ChatLog
-            WHERE
-                date(timestamp, 'localtime') = date('now', 'localtime');
-        ";
-
-        let mut stmt = conn.prepare(SELECT_MESSAGES).unwrap();
-        let message_iter = stmt.query_map([], |row| {
-            Ok(row.get(0)?)
-        });
-
-        let hashes: Vec<u64> = message_iter.unwrap().map(|m: Result<i64, Error>| m.unwrap() as u64 ).collect();
         MessageContainer {
-            hashes: hashes,
+            hashes: ChatLog::get_todays_hashes(),
             unstored_messages: Vec::new()
         }
 
