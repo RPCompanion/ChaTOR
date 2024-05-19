@@ -5,15 +5,21 @@
     import { SwtorMessage, swtor_messages } from "./network/swtor_message";
     import { afterUpdate } from "svelte";
     import Checkbox from "./Checkbox.svelte";
-    import { ChannelType } from "./network/swtor_channel";
+    import { Channel, ChannelType } from "./network/swtor_channel";
 
     let auto_scroll: boolean = true;
     let container: HTMLElement | undefined = undefined;
     let last_message: HTMLElement | undefined = undefined;
     const dispatch = createEventDispatcher();
 
-    function on_character_click(character_name: string) {
-        dispatch("whisper", { character_name: character_name });
+    function on_character_click(message: SwtorMessage) {
+
+        if (message.channel.type == ChannelType.WHISPER && message.from == $active_character?.character_name) {
+            dispatch("whisper", { character_name: message.to });
+            return;
+        }
+
+        dispatch("whisper", { character_name: message.from });
     }
 
     function scroll_container() {
@@ -53,7 +59,13 @@
 
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <span class="text-slate-200 cursor-pointer" on:click={() => {on_character_click(message.from)}}>{message.from}:</span>
+            <span class="text-slate-200 cursor-pointer" on:click={() => {on_character_click(message)}}>
+                {#if message.from == $active_character?.character_name && message.channel.type == ChannelType.WHISPER}
+                    [to {message.to}]:
+                {:else}
+                    {message.from}:
+                {/if}
+            </span>
             <span class="" style="color: {$active_character?.get_channel_color(message.channel.type).to_hex()}">{message.message}</span>
         </div>
 
