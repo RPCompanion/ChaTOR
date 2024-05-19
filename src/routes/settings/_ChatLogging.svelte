@@ -1,5 +1,6 @@
 
 <script lang="ts">
+    import { ArrowClockwise } from "phosphor-svelte";
     import { settings } from "../../lib/network/settings";
     import SettingSection from "./_SettingSection.svelte";
     import SettingsToggle from "./_SettingsToggle.svelte";
@@ -12,9 +13,6 @@
         SAY_COLOR_INDEX, 
         YELL_COLOR_INDEX, 
         WHISPER_COLOR_INDEX,
-        active_character, 
-        Character
-
     } from "../../lib/network/characters";
     import ValidSetting from "./_ValidSetting.svelte";
 
@@ -25,12 +23,6 @@
         `.trim();
 
     let characters: ICharacter[] = [];
-    get_all_characters((temp: ICharacter[]) => {
-
-        characters = temp;
-        decide_if_colors_are_unique();
-
-    });
 
     let valid_emote_color: boolean   = false;
     let valid_say_color: boolean     = false;
@@ -61,26 +53,20 @@
 
     }
 
-    function set_active_character() {
+    function init_all_characters() {
 
-        if (characters.length == 0) {
-            return;
-        }
+        get_all_characters((temp: ICharacter[]) => {
 
-        let temp = characters.find((c) => c.character_name == $settings.chat_log.character_ini_to_pull_from);
-        if (temp != undefined) {
-            $active_character = new Character(temp);
-        } else {
-            console.log(`Could not find character with name: ${$settings.chat_log.character_ini_to_pull_from}`);
-        }
+            characters = temp;
+            decide_if_colors_are_unique();
 
+        });
+        
     }
 
+    init_all_characters();
     $: if ($settings.chat_log.character_ini_to_pull_from != undefined) {
-
-
         decide_if_colors_are_unique();
-
     }
 
 </script>
@@ -91,6 +77,12 @@
     </Setting>
     {#if $settings.chat_log.character_ini_to_pull_from}
         <Setting setting="Are chat colors unique?" sub_text={UNIQUE_COLOR_SUBTEXT}>
+            <div class="flex flex-row gap-1">
+                <p class="text-white">Refresh colors</p>
+                <button on:click={init_all_characters} class="hover:text-gray-400 text-white">
+                    <ArrowClockwise size={26} cursor="pointer"></ArrowClockwise>
+                </button>
+            </div>
             <ValidSetting setting="/emote" valid={valid_emote_color}></ValidSetting>
             <ValidSetting setting="/say" valid={valid_say_color}></ValidSetting>
             <ValidSetting setting="/yell" valid={valid_yell_color}></ValidSetting>

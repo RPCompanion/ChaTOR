@@ -61,8 +61,8 @@ export interface ICharacter {
 
 export const WHISPER_COLOR_INDEX: number = 3;
 export const EMOTE_COLOR_INDEX: number   = 2;
-export const SAY_COLOR_INDEX: number     = 1;
-export const YELL_COLOR_INDEX: number    = 0;
+export const YELL_COLOR_INDEX: number    = 1;
+export const SAY_COLOR_INDEX: number     = 0;
 
 export const active_character = writable<Character | undefined>(undefined);
 
