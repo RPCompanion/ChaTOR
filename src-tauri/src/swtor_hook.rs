@@ -16,17 +16,7 @@ use tauri::Window;
 use serde_json::json;
 use windows::Win32::Foundation::{BOOL, HWND, LPARAM, MAX_PATH, WPARAM};
 use windows::Win32::UI::WindowsAndMessaging::{
-    EnumWindows, 
-    GetForegroundWindow, 
-    GetWindowTextW, 
-    GetWindowThreadProcessId, 
-    PostMessageW, 
-    SendMessageW, 
-    SetForegroundWindow, 
-    WM_CHAR, 
-    WM_KEYDOWN, 
-    WM_KEYUP, 
-    WM_PASTE
+    EnumWindows, GetForegroundWindow, GetWindowTextW, GetWindowThreadProcessId, PostMessageW, SendMessageW, SetForegroundWindow, SetWindowsHookExW, WM_CHAR, WM_KEYDOWN, WM_KEYUP, WM_PASTE
 };
 
 use clipboard_win::{formats::Unicode, set_clipboard};
@@ -234,7 +224,7 @@ fn window_in_focus() -> bool {
 }
 
 #[tauri::command]
-pub fn submit_actual_post(character_message: UserCharacterMessages) {
+pub fn submit_actual_post(window: tauri::Window, character_message: UserCharacterMessages) {
 
     if WRITING.load(Ordering::Relaxed) {
         return;
@@ -265,7 +255,13 @@ pub fn submit_actual_post(character_message: UserCharacterMessages) {
             post_message(WM_KEYDOWN, ENTER_KEY, 250);
 
             for c in post.chars() {
+                
                 post_message(WM_CHAR, c as usize, 10);
+
+                if window_in_focus() {
+                    window.set_focus().unwrap();
+                }
+
             }
 
             post_message(WM_KEYDOWN, ENTER_KEY, 20);
