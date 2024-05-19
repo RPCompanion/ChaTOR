@@ -210,7 +210,7 @@ fn save_messages_to_database(messages: Vec<SwtorMessage>) {
         FROM
             Characters C
         WHERE
-            ?2->>'character_name' = C.character_name;
+            ?2->>'from' = C.character_name;
     ";
     
     let mut stmt = conn.prepare(INSERT_MESSAGE).unwrap();

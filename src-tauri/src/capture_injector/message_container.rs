@@ -42,7 +42,6 @@ impl MessageContainer {
 
         self.unstored_messages
             .drain(..)
-            .rev()
             .collect()
 
     }
