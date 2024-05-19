@@ -1,7 +1,4 @@
 
-use rusqlite::Error;
-
-use crate::dal::db;
 use crate::share::*;
 use crate::utils::StringUtils;
 
