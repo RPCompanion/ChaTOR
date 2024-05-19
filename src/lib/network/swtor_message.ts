@@ -28,7 +28,10 @@ export function init_swtor_message_listener() {
             .filter((message) => t_active_character!.relevant_channel_color(message.color));
     
         f_payload.forEach((message) => {
-            message.message = message.message.replaceAll("&quot;", "\"");
+            message.message = message.message
+                .replaceAll("&quot;", "\"")
+                .replaceAll("&gt;", ">")
+                .replaceAll("&lt;", "<");
         })
 
         swtor_messages.set(temp.concat(f_payload));
