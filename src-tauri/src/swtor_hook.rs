@@ -1,12 +1,10 @@
 
 use std::fs;
-use std::mem::size_of;
 use std::path::Path;
 
 use sha2::{Sha256, Digest};
 use windows::core::PWSTR;
 use windows::Win32::System::Threading::{OpenProcess, QueryFullProcessImageNameW, PROCESS_NAME_FORMAT, PROCESS_QUERY_INFORMATION};
-use windows::Win32::UI::Input::KeyboardAndMouse::{SendInput, INPUT, INPUT_0, INPUT_KEYBOARD, KEYBDINPUT, KEYBD_EVENT_FLAGS, VIRTUAL_KEY};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
@@ -16,10 +14,8 @@ use tauri::Window;
 use serde_json::json;
 use windows::Win32::Foundation::{BOOL, HWND, LPARAM, MAX_PATH, WPARAM};
 use windows::Win32::UI::WindowsAndMessaging::{
-    EnumWindows, GetForegroundWindow, GetWindowTextW, GetWindowThreadProcessId, PostMessageW, SendMessageW, SetForegroundWindow, SetWindowsHookExW, WM_CHAR, WM_KEYDOWN, WM_KEYUP, WM_PASTE
+    EnumWindows, GetForegroundWindow, GetWindowTextW, GetWindowThreadProcessId, PostMessageW, SendMessageW, WM_CHAR, WM_KEYDOWN, WM_KEYUP
 };
-
-use clipboard_win::{formats::Unicode, set_clipboard};
 
 use crate::dal::db::user_character_messages::UserCharacterMessages;
 
@@ -32,11 +28,7 @@ lazy_static! {
 static PROCESS_CHECKSUM: OnceLock<Vec<u8>> = OnceLock::new();
 
 const ENTER_KEY: usize     = 0x0D;
-const ESC_KEY: usize       = 0x1B;
 const BACKSPACE_KEY: usize = 0x08;
-const A_KEY: usize         = 0x41;
-const V_KEY: usize         = 0x56;
-const CONTROL_KEY: usize   = 0x11;
 const SHIFT_KEY: usize     = 0x10;
 
 unsafe fn set_process_checksum() {
@@ -153,62 +145,6 @@ fn send_message(msg_type: u32, wparam: usize, millis: u64) {
 
 }
 
-fn send_input(inputs: Vec<INPUT>) {
-
-    if let Some(_) = SWTOR_PID.lock().unwrap().as_ref() {
-
-        unsafe {
-            SendInput(&inputs, size_of::<INPUT>() as i32);
-        }
-
-    }
-
-}
-
-fn get_input(character: u16, key_down: bool) -> INPUT {
-
-    let mut input = INPUT {
-        r#type: INPUT_KEYBOARD,
-        Anonymous: INPUT_0 {
-            ki: KEYBDINPUT {
-                wVk: VIRTUAL_KEY(character),
-                wScan: 0,
-                dwFlags: KEYBD_EVENT_FLAGS(0),
-                time: 0,
-                dwExtraInfo: 0,
-            }
-        }
-    };
-
-    if key_down {
-        input.Anonymous.ki.dwFlags = KEYBD_EVENT_FLAGS(0);
-    } else {
-        input.Anonymous.ki.dwFlags = KEYBD_EVENT_FLAGS(2);
-    }
-
-    input
-
-}
-
-fn attempt_clipboard_paste(post: &str) {
-
-    set_clipboard(Unicode, &post).unwrap();
-    if let Some(hwnd) = SWTOR_HWND.lock().unwrap().as_ref() {
-        unsafe {
-            SetForegroundWindow(*hwnd);
-        }
-    }
-
-    let inputs = vec![
-        get_input(CONTROL_KEY as u16, true),
-        get_input(V_KEY  as u16, true),
-        get_input(V_KEY  as u16, false),
-        get_input(CONTROL_KEY  as u16, false),
-    ];
-    send_input(inputs);
-
-}
-
 fn window_in_focus() -> bool {
 
     if let Some(hwnd) = SWTOR_HWND.lock().unwrap().as_ref() {
@@ -255,7 +191,7 @@ pub fn submit_actual_post(window: tauri::Window, character_message: UserCharacte
             post_message(WM_KEYDOWN, ENTER_KEY, 250);
 
             for c in post.chars() {
-                
+
                 post_message(WM_CHAR, c as usize, 10);
 
                 if window_in_focus() {
