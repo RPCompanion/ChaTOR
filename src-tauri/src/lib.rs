@@ -16,6 +16,7 @@ use std::time::Duration;
 
 use retour::static_detour;
 
+use serde_json::json;
 use share::MessageType;
 use share::RawSwtorMessage;
 use std::mem;
@@ -24,7 +25,7 @@ use windows::Win32::System::LibraryLoader::GetModuleHandleA;
 use windows::core::PCSTR;
 
 static_detour! {
-    static ChatHook: extern "C" fn(*mut u64, *const i8);
+    static ChatHook: extern "C" fn(*mut u64, *const *const i8, *const *const i8, i32, *const *const i8) -> i64;
 }
 
 #[macro_use]
@@ -35,7 +36,7 @@ lazy_static! {
     static ref QUIT: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
 }
 
-const CHAT_RELATIVE_ADDRESS: isize = 0x0ccd360;
+const CHAT_RELATIVE_ADDRESS: isize = 0x03f3380;
 
 #[ctor::ctor]
 fn detour_init() {
@@ -122,7 +123,7 @@ fn begin_detour(address: isize) {
 
     unsafe {
 
-        let target: extern "C" fn(*mut u64, *const i8) = mem::transmute(address);
+        let target: extern "C" fn(*mut u64, *const *const i8, *const *const i8, i32, *const *const i8) -> i64 = mem::transmute(address);
         match ChatHook.initialize(target, my_detour) {
             Ok(_) => {
                 submit_message(MessageType::Info, "Detour initialized");
@@ -137,18 +138,22 @@ fn begin_detour(address: isize) {
 
 }
 
-fn my_detour(param_1: *mut u64, some_string: *const i8) {
+fn my_detour(param_1: *mut u64, from: *const *const i8, to: *const *const i8, channel_id: i32, chat_message: *const *const i8) -> i64 {
 
     unsafe {
 
-        let c_str: &CStr = CStr::from_ptr(some_string);
-        let str_slice: &str = c_str.to_str().unwrap();
+        let t_from         = CStr::from_ptr(*from).to_str().unwrap();
+        let t_to           = CStr::from_ptr(*to).to_str().unwrap();
+        let t_chat_message = CStr::from_ptr(*chat_message).to_str().unwrap();
 
-        if str_slice.to_lowercase().contains("</font>") {
-            submit_message(MessageType::Chat, str_slice);
-        }
+        submit_message(MessageType::Chat, &json!({
+            "from": t_from,
+            "to": t_to,
+            "channel": channel_id,
+            "message": t_chat_message
+        }).to_string());
 
-        ChatHook.call(param_1, some_string);
+        return ChatHook.call(param_1, from, to, channel_id, chat_message);
 
     }
 

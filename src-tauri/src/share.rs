@@ -16,7 +16,7 @@ pub struct RawSwtorMessage {
 impl RawSwtorMessage {
 
     pub fn new(message_type: MessageType, message: String) -> RawSwtorMessage {
-        RawSwtorMessage { message_type, message }
+        RawSwtorMessage { message_type, message}
     }
 
     pub fn as_json_str(&self) -> String {

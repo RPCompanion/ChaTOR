@@ -21,15 +21,6 @@ impl MessageContainer {
 
     }
 
-    pub fn default() -> MessageContainer {
-
-        MessageContainer {
-            hashes: ChatLog::get_todays_hashes(),
-            unstored_messages: Vec::new()
-        }
-
-    }
-
     pub fn push(&mut self, message: RawSwtorMessage) {
 
         match message.message_type {
@@ -43,13 +34,7 @@ impl MessageContainer {
         }
 
         self.hashes.push(hash);
-
-        match SwtorMessage::from(message.message) {
-            Ok(swtor_message) => {
-                self.unstored_messages.push(swtor_message);
-            },
-            Err(_) => {}
-        }
+        self.unstored_messages.push(serde_json::from_str(&message.message).unwrap());
 
     }
 

@@ -1,9 +1,11 @@
 
 <script lang="ts">
+    import { active_character } from "./network/characters";
     import { createEventDispatcher } from "svelte";
-    import { swtor_messages } from "./network/swtor_message";
+    import { SwtorMessage, swtor_messages } from "./network/swtor_message";
     import { afterUpdate } from "svelte";
     import Checkbox from "./Checkbox.svelte";
+    import { ChannelType } from "./network/swtor_channel";
 
     let auto_scroll: boolean = true;
     let container: HTMLElement | undefined = undefined;
@@ -32,6 +34,11 @@
         scroll_container();
     });
 
+    let relevant_messages: SwtorMessage[] = [];
+    $: relevant_messages = $swtor_messages.filter((message) => {
+        return message.channel.type == ChannelType.EMOTE || message.channel.type == ChannelType.SAY || message.channel.type == ChannelType.YELL || message.channel.type == ChannelType.WHISPER;
+    });
+
 </script>
 
 <div class="w-full">
@@ -42,15 +49,12 @@
 
         <div bind:this={last_message} class="w-full opacity-100">
 
-            {#if message.timestamp != null}
-                <span class="text-white">[{message.timestamp}]</span>
-            {/if}
+            <span class="text-white">[{message.timestamp}]</span>
 
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <span class="text-slate-200 cursor-pointer" on:click={() => {on_character_click(message.character_name)}}>{message.character_name}:</span>
-
-            <span class="" style="color: rgb({message.color.r}, {message.color.g}, {message.color.b})">{message.message}</span>
+            <span class="text-slate-200 cursor-pointer" on:click={() => {on_character_click(message.from)}}>{message.from}:</span>
+            <span class="" style="color: {$active_character?.get_channel_color(message.channel.type)}">{message.message}</span>
         </div>
 
     {/each}

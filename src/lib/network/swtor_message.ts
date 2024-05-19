@@ -1,40 +1,56 @@
 
 import { get, writable } from "svelte/store";
 import { listen } from "@tauri-apps/api/event";
-import { Color, active_character } from "./characters";
+import { Channel } from "./swtor_channel";
+
+export class SwtorMessage {
+
+    public readonly channel: Channel;
+    public readonly timestamp: string;
+    public readonly from: string;
+    public readonly to: string;
+    public readonly message: string;
+    
+    constructor(swtor_message: ISwtorMessage) {
+
+        this.channel   = new Channel(swtor_message.channel);
+        this.timestamp = swtor_message.timestamp;
+        this.from      = swtor_message.from;
+        this.to        = swtor_message.to;
+        this.message   = swtor_message.message;
+
+    }
+
+}
 
 export interface ISwtorMessage {
-    character_name: string;
-    timestamp?: string;
-    color: Color;
+    channel: number;
+    timestamp: string;
+    from: string;
+    to: string;
     message: string;
 }
 
-export const swtor_messages = writable<ISwtorMessage[]>([]);
+export const swtor_messages = writable<SwtorMessage[]>([]);
 
 export function init_swtor_message_listener() {
 
     listen("swtor_messages", (messages: any) => {
 
-        let t_active_character = get(active_character);
         let temp = get(swtor_messages);
+        let payload: ISwtorMessage[] = messages.payload;
 
-        let payload = messages.payload;
-        payload.forEach((message: any) => {
-            message.color = new Color(message.color.r, message.color.g, message.color.b);
-        });
+        payload.forEach((message) => {
 
-        let f_payload: ISwtorMessage[] = (payload as ISwtorMessage[])
-            .filter((message) => t_active_character!.relevant_channel_color(message.color));
-    
-        f_payload.forEach((message) => {
             message.message = message.message
                 .replaceAll("&quot;", "\"")
                 .replaceAll("&gt;", ">")
                 .replaceAll("&lt;", "<");
-        })
 
-        swtor_messages.set(temp.concat(f_payload));
+        });
+
+        let objs = payload.map((message) => new SwtorMessage(message));
+        swtor_messages.set(temp.concat(objs));
 
     });
 

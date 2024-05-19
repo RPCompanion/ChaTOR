@@ -2,6 +2,7 @@
 import { invoke } from "@tauri-apps/api";
 import { writable, get } from "svelte/store";
 import { settings } from "./settings";
+import { ChannelType } from "./swtor_channel";
 
 export class Color {
 
@@ -17,6 +18,10 @@ export class Color {
 
     public equals(other: Color): boolean {
         return this.r === other.r && this.g === other.g && this.b === other.b;
+    }
+
+    public to_hex(): string {
+        return "#" + this.r.toString(16) + this.g.toString(16) + this.b.toString(16);
     }
 
 }
@@ -42,6 +47,18 @@ export class Character {
         }
 
         return false;
+
+    }
+
+    public get_channel_color(channel: ChannelType): Color {
+
+        switch (channel) {
+            case ChannelType.SAY: return this.channel_colors[SAY_COLOR_INDEX];
+            case ChannelType.YELL: return this.channel_colors[YELL_COLOR_INDEX];
+            case ChannelType.EMOTE: return this.channel_colors[EMOTE_COLOR_INDEX];
+            case ChannelType.WHISPER: return this.channel_colors[WHISPER_COLOR_INDEX];
+            default: return this.channel_colors[SAY_COLOR_INDEX];
+        }
 
     }
 
