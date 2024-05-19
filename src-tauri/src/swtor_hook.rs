@@ -1,10 +1,12 @@
 
 use std::fs;
+use std::mem::size_of;
 use std::path::Path;
 
 use sha2::{Sha256, Digest};
 use windows::core::PWSTR;
 use windows::Win32::System::Threading::{OpenProcess, QueryFullProcessImageNameW, PROCESS_NAME_FORMAT, PROCESS_QUERY_INFORMATION};
+use windows::Win32::UI::Input::KeyboardAndMouse::{SendInput, INPUT, INPUT_0, INPUT_KEYBOARD, KEYBDINPUT, KEYBD_EVENT_FLAGS, VIRTUAL_KEY};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
@@ -15,15 +17,16 @@ use serde_json::json;
 use windows::Win32::Foundation::{BOOL, HWND, LPARAM, MAX_PATH, WPARAM};
 use windows::Win32::UI::WindowsAndMessaging::{
     EnumWindows, 
-    GetWindowThreadProcessId,
-    GetWindowTextW,
-    PostMessageW,
-    SendMessageW,
-    WM_KEYDOWN,
-    WM_PASTE,
-    WM_CHAR, 
     GetForegroundWindow, 
-    WM_KEYUP
+    GetWindowTextW, 
+    GetWindowThreadProcessId, 
+    PostMessageW, 
+    SendMessageW, 
+    SetForegroundWindow, 
+    WM_CHAR, 
+    WM_KEYDOWN, 
+    WM_KEYUP, 
+    WM_PASTE
 };
 
 use clipboard_win::{formats::Unicode, set_clipboard};
@@ -157,6 +160,62 @@ fn send_message(msg_type: u32, wparam: usize, millis: u64) {
         }
 
     }
+
+}
+
+fn send_input(inputs: Vec<INPUT>) {
+
+    if let Some(_) = SWTOR_PID.lock().unwrap().as_ref() {
+
+        unsafe {
+            SendInput(&inputs, size_of::<INPUT>() as i32);
+        }
+
+    }
+
+}
+
+fn get_input(character: u16, key_down: bool) -> INPUT {
+
+    let mut input = INPUT {
+        r#type: INPUT_KEYBOARD,
+        Anonymous: INPUT_0 {
+            ki: KEYBDINPUT {
+                wVk: VIRTUAL_KEY(character),
+                wScan: 0,
+                dwFlags: KEYBD_EVENT_FLAGS(0),
+                time: 0,
+                dwExtraInfo: 0,
+            }
+        }
+    };
+
+    if key_down {
+        input.Anonymous.ki.dwFlags = KEYBD_EVENT_FLAGS(0);
+    } else {
+        input.Anonymous.ki.dwFlags = KEYBD_EVENT_FLAGS(2);
+    }
+
+    input
+
+}
+
+fn attempt_clipboard_paste(post: &str) {
+
+    set_clipboard(Unicode, &post).unwrap();
+    if let Some(hwnd) = SWTOR_HWND.lock().unwrap().as_ref() {
+        unsafe {
+            SetForegroundWindow(*hwnd);
+        }
+    }
+
+    let inputs = vec![
+        get_input(CONTROL_KEY as u16, true),
+        get_input(V_KEY  as u16, true),
+        get_input(V_KEY  as u16, false),
+        get_input(CONTROL_KEY  as u16, false),
+    ];
+    send_input(inputs);
 
 }
 
