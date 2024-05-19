@@ -8,66 +8,23 @@
     import Setting from "./_Setting.svelte";
     import { 
         get_all_characters, 
-        type ICharacter, 
-        EMOTE_COLOR_INDEX, 
-        SAY_COLOR_INDEX, 
-        YELL_COLOR_INDEX, 
-        WHISPER_COLOR_INDEX,
+        type ICharacter
     } from "../../lib/network/characters";
-    import ValidSetting from "./_ValidSetting.svelte";
 
-    const SECTION_SUB_TEXT: string     = "Chat logging uses DLL injection, which is against the TOS of SWTOR and may result in a ban. Use at your own risk.";
-    const UNIQUE_COLOR_SUBTEXT: string = `
-        Our chat logging system is dependent upon chat channels having unique colors. To change a color, go in game, right click on a chat tab, select channel settings, 
-        select a problematic channel and change the color, even slightly. Don't forget to click apply!
-        `.trim();
+    const SECTION_SUB_TEXT: string = "Chat logging uses DLL injection, which is against the TOS of SWTOR and may result in a ban. Use at your own risk.";
 
     let characters: ICharacter[] = [];
 
-    let valid_emote_color: boolean   = false;
-    let valid_say_color: boolean     = false;
-    let valid_yell_color: boolean    = false;
-    let valid_whisper_color: boolean = false;
-    function decide_if_colors_are_unique() {
-
-        if ($settings.chat_log.character_ini_to_pull_from == undefined) {
-            return;
-        }
-
-        if (characters.length == 0) {
-            return;
-        }
-
-        valid_emote_color   = is_color_unique(EMOTE_COLOR_INDEX);
-        valid_say_color     = is_color_unique(SAY_COLOR_INDEX);
-        valid_yell_color    = is_color_unique(YELL_COLOR_INDEX);
-        valid_whisper_color = is_color_unique(WHISPER_COLOR_INDEX);
-
-    }
-
-    function is_color_unique(idx: number): boolean {
-
-        let character_name = $settings.chat_log.character_ini_to_pull_from!;
-        let character = characters.find((c) => c.character_name == character_name)!;
-        return character.channel_colors.filter((c) => c.equals(character.channel_colors[idx])).length == 1;
-
-    }
 
     function init_all_characters() {
 
         get_all_characters((temp: ICharacter[]) => {
-
             characters = temp;
-            decide_if_colors_are_unique();
-
         });
         
     }
 
     init_all_characters();
-    $: if ($settings.chat_log.character_ini_to_pull_from != undefined) {
-        decide_if_colors_are_unique();
-    }
 
 </script>
 
@@ -75,21 +32,7 @@
     <Setting setting="Select active character">
         <SettingsDropdown options={characters.map((c) => c.character_name)} bind:choosen_option={$settings.chat_log.character_ini_to_pull_from}></SettingsDropdown>
     </Setting>
-    {#if $settings.chat_log.character_ini_to_pull_from}
-        <Setting setting="Are chat colors unique?" sub_text={UNIQUE_COLOR_SUBTEXT}>
-            <div class="flex flex-row gap-1">
-                <p class="text-white">Refresh colors</p>
-                <button on:click={init_all_characters} class="hover:text-gray-400 text-white">
-                    <ArrowClockwise size={26} cursor="pointer"></ArrowClockwise>
-                </button>
-            </div>
-            <ValidSetting setting="/emote" valid={valid_emote_color}></ValidSetting>
-            <ValidSetting setting="/say" valid={valid_say_color}></ValidSetting>
-            <ValidSetting setting="/yell" valid={valid_yell_color}></ValidSetting>
-            <ValidSetting setting="/whisper" valid={valid_whisper_color}></ValidSetting>
-        </Setting>
-    {/if}
-    {#if valid_emote_color && valid_say_color && valid_yell_color && valid_whisper_color}
+    {#if $settings.chat_log.character_ini_to_pull_from != undefined}
         <Setting setting="Enable Chat Logging">
             <SettingsToggle bind:checked={$settings.chat_log.capture_chat_log}></SettingsToggle>
         </Setting>
