@@ -14,7 +14,7 @@ export class SwtorMessage {
     constructor(swtor_message: ISwtorMessage) {
 
         this.channel   = new Channel(swtor_message.channel);
-        this.timestamp = swtor_message.timestamp;
+        this.timestamp = new Date(swtor_message.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit"});
         this.from      = swtor_message.from;
         this.to        = swtor_message.to;
         this.message   = swtor_message.message;
