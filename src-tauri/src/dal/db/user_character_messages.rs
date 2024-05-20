@@ -66,4 +66,16 @@ impl UserCharacterMessages {
         
     }
 
+    pub fn prepare_messages(&mut self) {
+
+        self.messages.iter_mut().for_each(|message| {
+
+            *message = message
+                .replace("ChatGPT", "")
+                .replace("”", "\"");    
+
+        });
+
+    }
+
 }

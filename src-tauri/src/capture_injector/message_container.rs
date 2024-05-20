@@ -3,7 +3,6 @@ use crate::share::*;
 use crate::utils::StringUtils;
 
 use crate::capture_injector::swtor_message::SwtorMessage;
-use crate::dal::db::chat_log::ChatLog;
 
 pub struct MessageContainer {
     pub hashes: Vec<u64>,
@@ -28,7 +27,7 @@ impl MessageContainer {
             _ => {}
         }
 
-        let hash = message.message.as_str().as_u64_hash();
+        let hash = message.message.as_u64_hash();
         if !self.unique(hash) {
             return;
         }

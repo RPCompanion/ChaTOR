@@ -23,6 +23,7 @@ lazy_static! {
     static ref SWTOR_HWND: Arc<Mutex<Option<HWND>>> = Arc::new(Mutex::new(None));
     static ref SWTOR_PID: Arc<Mutex<Option<u32>>> = Arc::new(Mutex::new(None));
     static ref WRITING: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
+    static ref MESSAGE_HASHES: Arc<Mutex<Vec<u64>>> = Arc::new(Mutex::new(Vec::new()));
 }
 
 static PROCESS_CHECKSUM: OnceLock<Vec<u8>> = OnceLock::new();
@@ -100,7 +101,7 @@ pub fn hook_into_existing() {
             
         match EnumWindows(Some(enum_windows_existing_proc), LPARAM(0)) {
             Ok(_) => {
-                //Enumerated every window and wasn't able to find ConanSandbox
+                //Enumerated every window and wasn't able to find SWTOR Window
                 SWTOR_HWND.lock().unwrap().take();
                 SWTOR_PID.lock().unwrap().take();
             },
@@ -159,48 +160,84 @@ fn window_in_focus() -> bool {
 
 }
 
+fn prep_game_for_input() {
+
+    for _ in 0..64 {
+        send_message(WM_KEYDOWN, BACKSPACE_KEY, 2);
+    }
+
+    post_message(WM_KEYDOWN, SHIFT_KEY, 0);
+    post_message(WM_KEYDOWN, ENTER_KEY, 50);
+
+    post_message(WM_KEYUP, ENTER_KEY, 0);
+    post_message(WM_KEYUP, SHIFT_KEY, 50);
+
+}
+
+fn attempt_post_submission(window: &tauri::Window, message: &str) {
+
+    post_message(WM_KEYDOWN, ENTER_KEY, 250);
+
+    for c in message.chars() {
+
+        post_message(WM_CHAR, c as usize, 10);
+
+        if window_in_focus() {
+            window.set_focus().unwrap();
+        }
+
+    }
+
+    post_message(WM_KEYDOWN, ENTER_KEY, 20);
+
+}
+
+fn attempt_post_submission_with_rety(window: &tauri::Window, message: &str) -> bool {
+
+    let message_hashes = Arc::clone(&MESSAGE_HASHES);
+
+    let mut retries = 0;
+    while retries < 3 {
+
+        attempt_post_submission(window, message);
+        thread::sleep(Duration::from_millis(500));
+
+        retries += 1;
+
+    }
+
+    false
+
+}
+
 #[tauri::command]
-pub fn submit_actual_post(window: tauri::Window, character_message: UserCharacterMessages) {
+pub fn submit_actual_post(window: tauri::Window, mut character_message: UserCharacterMessages) {
 
     if WRITING.load(Ordering::Relaxed) {
         return;
     }
 
+    let retry = false;
+
     WRITING.store(true, Ordering::Relaxed);
+
+    let message_hashes = Arc::clone(&MESSAGE_HASHES);
+    message_hashes.lock().unwrap().clear();
 
     thread::spawn(move || {
 
+        character_message.prepare_messages();
         character_message.store();
-
-        for _ in 0..64 {
-            send_message(WM_KEYDOWN, BACKSPACE_KEY, 2);
-        }
-
-        post_message(WM_KEYDOWN, SHIFT_KEY, 0);
-        post_message(WM_KEYDOWN, ENTER_KEY, 50);
-
-        post_message(WM_KEYUP, ENTER_KEY, 0);
-        post_message(WM_KEYUP, SHIFT_KEY, 50);
+        prep_game_for_input();
 
         for message in character_message.messages {        
 
-            let post = message
-                .replace("ChatGPT", "")
-                .replace("”", "\"");
-
-            post_message(WM_KEYDOWN, ENTER_KEY, 250);
-
-            for c in post.chars() {
-
-                post_message(WM_CHAR, c as usize, 10);
-
-                if window_in_focus() {
-                    window.set_focus().unwrap();
-                }
-
+            if retry {
+                attempt_post_submission_with_rety(&window, &message);
+            } else {
+                attempt_post_submission(&window, &message);
             }
 
-            post_message(WM_KEYDOWN, ENTER_KEY, 20);
             thread::sleep(Duration::from_millis(250));
             
         }
