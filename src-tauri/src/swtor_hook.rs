@@ -194,6 +194,8 @@ fn attempt_post_submission(window: &tauri::Window, message: &str) {
 
 fn attempt_post_submission_with_rety(window: &tauri::Window, message: &str) -> bool {
 
+    todo!("Figure out where the parse out the message from the message (without the / commands) and check if it's in the message_hashes");
+
     let message_hashes = Arc::clone(&MESSAGE_HASHES);
 
     let mut retries = 0;
@@ -201,7 +203,7 @@ fn attempt_post_submission_with_rety(window: &tauri::Window, message: &str) -> b
 
         attempt_post_submission(window, message);
         thread::sleep(Duration::from_millis(500));
-
+        
         retries += 1;
 
     }
