@@ -1,6 +1,10 @@
 
 use serde::{Deserialize, Serialize};
 
+pub mod chat_tab;
+
+use self::chat_tab::ChatTab;
+
 #[derive(Deserialize, Serialize)]
 pub struct ChatSettings {
 
@@ -26,7 +30,10 @@ pub struct ChatSettings {
     pub show_chat_log_window: bool,
 
     #[serde(default = "default_retry_message_submission")]
-    pub retry_message_submission: bool
+    pub retry_message_submission: bool,
+
+    #[serde(default = "ChatTab::default_tabs")]
+    pub chat_tabs: Vec<ChatTab>
     
 }
 
@@ -75,7 +82,8 @@ impl ChatSettings {
             starting_characters_are_lowercase: true,
             capture_chat_log: false,
             show_chat_log_window: false,
-            retry_message_submission: false
+            retry_message_submission: false,
+            chat_tabs: ChatTab::default_tabs()
         }
 
     }

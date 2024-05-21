@@ -12,6 +12,7 @@ mod dal;
 mod capture_injector;
 mod share;
 mod utils;
+mod swtor;
 
 fn main() {
 
