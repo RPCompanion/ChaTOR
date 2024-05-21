@@ -19,10 +19,15 @@
         message = "";
     }
 
-    function on_submitted() {
+    async function on_submitted() {
 
         show_modal = false;
-        submit_post("ChatMessage", messages);
+        let resposne = await submit_post("ChatMessage", messages);
+
+        if (resposne.is_error()) {
+            return;
+        }
+
         if ($settings.chat.clear_chat_after_posting) {
             message = "";
         }

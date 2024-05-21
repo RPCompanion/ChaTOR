@@ -3,11 +3,13 @@ import { invoke } from "@tauri-apps/api";
 import { listen } from "@tauri-apps/api/event";
 import { writable, get } from "svelte/store";
 
+import { toast } from "@zerodevx/svelte-toast";
 import { Result } from "./result";
 import { init_custom_emotes } from "./network/custom_emote";
 import { init_settings } from "./network/settings";
 import { init_swtor_message_listener } from "./network/swtor_message";
 import { init_active_character } from "./network/characters";
+import { settings } from "./network/settings";
 
 export type MessageType = "ButtonEmote" | "ChatMessage";
 
@@ -27,6 +29,7 @@ export function init_network() {
 
     init_hook();
     init_swtor_message_listener();
+    init_post_writing_listener();
     init_custom_emotes();
 
 }
@@ -40,7 +43,15 @@ function init_hook() {
 
 }
 
-export function submit_post(message_type: MessageType, messages: string[]): Result<[], string> {
+function init_post_writing_listener() {
+
+    listen("post-writing-error", (response: any) => {
+        toast.push(response.payload, { theme: { '--toastBackground': 'red' } });
+    })
+
+}
+
+export async function submit_post(message_type: MessageType, messages: string[]): Promise<Result<[], string>> {
 
     if (!get(hooked_in)) {
         return Result.error("SWTOR not hooked in. Have you launched the game?");
@@ -64,8 +75,17 @@ export function submit_post(message_type: MessageType, messages: string[]): Resu
         messages: messages
     };
 
-    invoke("submit_actual_post", { characterMessage: character_message});
-    return Result.ok([]);
+    try {
+
+        await invoke("submit_actual_post", {retry: false, characterMessage: character_message})
+        return Result.ok([]);
+
+    } catch (error: any) {
+
+        toast.push(error, { theme: { '--toastBackground': 'red' } });
+        return Result.error(error);
+        
+    }
 
 }
 

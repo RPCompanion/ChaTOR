@@ -4,9 +4,9 @@
     import { custom_emotes, type ICustomEmote } from "./network/custom_emote";
     import { submit_post } from "./network";
 
-    function on_emote_click(emote: ICustomEmote) {
+    async function on_emote_click(emote: ICustomEmote) {
 
-        let response = submit_post("ButtonEmote", [emote.emote]);
+        let response = await submit_post("ButtonEmote", [emote.emote]);
         if (response.is_error()) {
             toast.push(response.unwrap_error());
         }
