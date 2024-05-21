@@ -17,7 +17,8 @@ use windows::Win32::UI::WindowsAndMessaging::{
     EnumWindows, GetForegroundWindow, GetWindowTextW, GetWindowThreadProcessId, PostMessageW, SendMessageW, WM_CHAR, WM_KEYDOWN, WM_KEYUP
 };
 
-use crate::dal::db::user_character_messages::UserCharacterMessages;
+use crate::dal::db::user_character_messages::{CommandMessage, UserCharacterMessages};
+use crate::utils::StringUtils;
 
 lazy_static! {
     static ref SWTOR_HWND: Arc<Mutex<Option<HWND>>> = Arc::new(Mutex::new(None));
@@ -192,17 +193,23 @@ fn attempt_post_submission(window: &tauri::Window, message: &str) {
 
 }
 
-fn attempt_post_submission_with_rety(window: &tauri::Window, message: &str) -> bool {
-
-    todo!("Figure out where the parse out the message from the message (without the / commands) and check if it's in the message_hashes");
+fn attempt_post_submission_with_rety(window: &tauri::Window, command_message: &CommandMessage) -> bool {
 
     let message_hashes = Arc::clone(&MESSAGE_HASHES);
+    let c_message      = command_message.concat();
+    let message_hash   = command_message.message.as_u64_hash();
 
     let mut retries = 0;
     while retries < 3 {
 
-        attempt_post_submission(window, message);
-        thread::sleep(Duration::from_millis(500));
+        attempt_post_submission(window, &c_message);
+
+        for _ in 0..4 {
+            thread::sleep(Duration::from_millis(250));
+            if message_hashes.lock().unwrap().contains(&message_hash) {
+                return true;
+            }
+        }
         
         retries += 1;
 
@@ -213,31 +220,48 @@ fn attempt_post_submission_with_rety(window: &tauri::Window, message: &str) -> b
 }
 
 #[tauri::command]
-pub fn submit_actual_post(window: tauri::Window, mut character_message: UserCharacterMessages) {
+pub fn submit_actual_post(window: tauri::Window, retry: bool, mut character_message: UserCharacterMessages) -> Result<(), &'static str> {
 
     if WRITING.load(Ordering::Relaxed) {
-        return;
+        return Err("Already writing");
     }
-
-    let retry = false;
 
     WRITING.store(true, Ordering::Relaxed);
 
-    let message_hashes = Arc::clone(&MESSAGE_HASHES);
-    message_hashes.lock().unwrap().clear();
+    character_message.prepare_messages();
+
+    let command_messages: Vec<CommandMessage>;
+    match character_message.get_all_command_message_splits() {
+        Ok(messages) => {
+            command_messages = messages;
+        },
+        Err(e) => {
+            WRITING.store(false, Ordering::Relaxed);
+            return Err(e);
+        }
+    }
 
     thread::spawn(move || {
 
-        character_message.prepare_messages();
+        let message_hashes = Arc::clone(&MESSAGE_HASHES);
+        message_hashes.lock().unwrap().clear();
+
         character_message.store();
         prep_game_for_input();
 
-        for message in character_message.messages {        
+        for command_message in command_messages {        
 
             if retry {
-                attempt_post_submission_with_rety(&window, &message);
+
+                if !attempt_post_submission_with_rety(&window, &command_message) {
+                    window.emit("post-writing-error", "The server did not respond seem to process the message. Please try again.").unwrap();
+                    break;
+                }
+
             } else {
-                attempt_post_submission(&window, &message);
+
+                attempt_post_submission(&window, &command_message.concat());
+
             }
 
             thread::sleep(Duration::from_millis(250));
@@ -246,8 +270,14 @@ pub fn submit_actual_post(window: tauri::Window, mut character_message: UserChar
 
         WRITING.store(false, Ordering::Relaxed);
 
-    });    
+    });
 
+    Ok(())
+
+}
+
+pub fn push_incoming_message_hash(hash: u64) {
+    MESSAGE_HASHES.lock().unwrap().push(hash);
 }
 
 pub fn get_pid() -> Option<u32> {

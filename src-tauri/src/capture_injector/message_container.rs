@@ -1,11 +1,11 @@
 
 use crate::share::*;
+use crate::swtor_hook::push_incoming_message_hash;
 use crate::utils::StringUtils;
 
 use crate::capture_injector::swtor_message::SwtorMessage;
 
 pub struct MessageContainer {
-    pub hashes: Vec<u64>,
     pub unstored_messages: Vec<SwtorMessage>
 }
 
@@ -14,7 +14,6 @@ impl MessageContainer {
     pub fn new() -> MessageContainer {
 
         MessageContainer {
-            hashes: Vec::new(),
             unstored_messages: Vec::new()
         }
 
@@ -27,13 +26,9 @@ impl MessageContainer {
             _ => {}
         }
 
-        let hash = message.message.as_u64_hash();
-        if !self.unique(hash) {
-            return;
-        }
-
-        self.hashes.push(hash);
-        self.unstored_messages.push(serde_json::from_str(&message.message).unwrap());
+        let swtor_message: SwtorMessage = serde_json::from_str(&message.message).unwrap();
+        push_incoming_message_hash(swtor_message.message.as_u64_hash());
+        self.unstored_messages.push(swtor_message);
 
     }
 
@@ -42,12 +37,6 @@ impl MessageContainer {
         self.unstored_messages
             .drain(..)
             .collect()
-
-    }
-
-    fn unique(&self, hash: u64) -> bool {
-
-        !self.hashes.contains(&hash)
 
     }
 

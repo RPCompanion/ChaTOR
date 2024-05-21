@@ -1,10 +1,39 @@
 
 
+use regex::Regex;
 use rusqlite::params;
 use serde::{Deserialize, Serialize};
 use crate::dal::db;
 use crate::dal::db::log::log_error;
 use crate::utils::StringUtils;
+
+pub struct CommandMessage {
+    pub command: Option<String>,
+    pub message: String
+}
+
+impl CommandMessage {
+    
+    pub fn new(command: Option<String>, message: String) -> Self {
+
+        Self {
+            command,
+            message
+        }
+
+    }
+
+    pub fn concat(&self) -> String {
+            
+        if self.command.is_none() {
+            return self.message.clone();
+        }
+
+        format!("{:?} {:?}", self.command.as_ref().unwrap(), self.message)
+        
+    }
+
+}
 
 #[derive(Deserialize, Serialize)]
 pub enum MessageType {
@@ -75,6 +104,46 @@ impl UserCharacterMessages {
                 .replace("”", "\"");    
 
         });
+
+    }
+
+    pub fn get_all_command_message_splits(&self) -> Result<Vec<CommandMessage>, &'static str> {
+
+        let mut c_and_m: Vec<CommandMessage> = Vec::new();
+
+        for message in self.messages.iter() {
+            c_and_m.push(self.get_command_message_split(message)?);
+        }
+    
+        Ok(c_and_m)
+
+    }
+
+    fn get_command_message_split(&self, message: &str) -> Result<CommandMessage, &'static str> {
+
+        if !message.starts_with("/") {
+            return Ok(CommandMessage::new(None, message.to_string()));
+        }
+
+        let whisper_re = Regex::new(r"(\/w\s+|\/whisper\s+)([^:]+):").unwrap();
+        let whispers: Vec<&str> = whisper_re.captures_iter(message).map(|c| c.get(0).unwrap().as_str()).collect();
+
+        if whispers.len() > 1 {
+
+            return Err("Must have one whisper in a message");
+
+        } else if whispers.len() == 1 {
+
+            let whisper = whispers[0];
+            return Ok(CommandMessage::new(Some(whisper.to_string()), message.replace(whisper, "").trim().to_string()));
+
+        }
+
+        // No whisper was captured, so it must be a simple command
+        let simple_re = Regex::new(r"^\/([a-z]+)\s").unwrap();
+        let simple_command = simple_re.captures(message).unwrap().get(0).unwrap().as_str();
+
+        return Ok(CommandMessage::new(Some(simple_command.to_string()), message.replace(simple_command, "").trim().to_string()));
 
     }
 
