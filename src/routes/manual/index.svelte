@@ -93,7 +93,7 @@
     }
 
     function on_whisper(event: any) {
-        messages[0] = "/whisper " + event.detail.character_name + ": ";
+        messages[0] = "/w " + event.detail.character_name + ": ";
     }
 
 </script>

@@ -28,7 +28,7 @@ export class AutoMessageSplitter {
                 this.constructor_error = "Whisper message malformed";
             }
 
-            this.character_to_whisper = split[0].replace("/w", "").replace("/whisper", "").trim();
+            this.character_to_whisper = split[0].replace("/whisper", "").replace("/w", "").trim();
 
         }
 

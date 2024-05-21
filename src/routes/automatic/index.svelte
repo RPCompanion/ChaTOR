@@ -66,7 +66,7 @@
     }
 
     function on_whisper(event: any) {
-        message = "/whisper " + event.detail.character_name + ": ";
+        message = "/w " + event.detail.character_name + ": ";
         textarea_elem!.focus();
     }
 
