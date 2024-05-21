@@ -271,8 +271,7 @@ pub async fn submit_actual_post(window: tauri::Window, retry: bool, mut characte
         for command_message in command_messages {        
 
             if !attempt_post_submission_with_rety(&window, &command_message).await {
-                window.emit("post-writing-error", "The server did not respond seem to process the message. Please try again.").unwrap();
-                break;
+                return Err("Failed to post message");
             }
 
             sleep(TokioDuration::from_millis(250)).await
@@ -289,8 +288,6 @@ pub async fn submit_actual_post(window: tauri::Window, retry: bool, mut characte
     }
 
     WRITING.store(false, Ordering::Relaxed);
-
-
     Ok(())
 
 }
