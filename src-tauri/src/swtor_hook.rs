@@ -9,6 +9,8 @@ use std::sync::{Arc, Mutex, OnceLock};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::time::Duration;
+use tokio::time::{sleep, Duration as TokioDuration};
+use tokio::task;
 
 use tauri::Window;
 use serde_json::json;
@@ -113,34 +115,50 @@ pub fn hook_into_existing() {
 
 }
 
-fn post_message(msg_type: u32, wparam: usize, millis: u64) {
+async fn post_message(msg_type: u32, wparam: usize, millis: u64) {
 
     let wparam = WPARAM(wparam);
 
-    if let Some(hwnd) = SWTOR_HWND.lock().unwrap().as_ref() {
+    let result: Option<HWND> = task::block_in_place(|| {
+
+        let t_hwnd = Arc::clone(&SWTOR_HWND);
+        let temp = t_hwnd.lock().unwrap().clone();
+        temp
+
+    });
+
+    if let Some(hwnd) = result {
 
         unsafe {
-            let _ = PostMessageW(*hwnd, msg_type, wparam, LPARAM(0));
+            let _ = PostMessageW(hwnd, msg_type, wparam, LPARAM(0));
         }
         if millis > 0 {
-            thread::sleep(Duration::from_millis(millis));
+            sleep(TokioDuration::from_millis(millis)).await;
         }
 
     }
 
 }
 
-fn send_message(msg_type: u32, wparam: usize, millis: u64) {
+async fn send_message(msg_type: u32, wparam: usize, millis: u64) {
 
     let wparam = WPARAM(wparam);
 
-    if let Some(hwnd) = SWTOR_HWND.lock().unwrap().as_ref() {
+    let result: Option<HWND> = task::block_in_place(|| {
+
+        let t_hwnd = Arc::clone(&SWTOR_HWND);
+        let temp = t_hwnd.lock().unwrap().clone();
+        temp
+
+    });
+
+    if let Some(hwnd) = result {
 
         unsafe {
-            let _ = SendMessageW(*hwnd, msg_type, wparam, LPARAM(0));
+            let _ = SendMessageW(hwnd, msg_type, wparam, LPARAM(0));
         }
         if millis > 0 {
-            thread::sleep(Duration::from_millis(millis));
+            sleep(TokioDuration::from_millis(millis)).await;
         }
 
     }
@@ -149,7 +167,8 @@ fn send_message(msg_type: u32, wparam: usize, millis: u64) {
 
 fn window_in_focus() -> bool {
 
-    if let Some(hwnd) = SWTOR_HWND.lock().unwrap().as_ref() {
+    let t_hwnd = Arc::clone(&SWTOR_HWND);
+    if let Some(hwnd) = t_hwnd.lock().unwrap().as_ref() {
 
         unsafe {
             return GetForegroundWindow() == *hwnd;
@@ -161,27 +180,27 @@ fn window_in_focus() -> bool {
 
 }
 
-fn prep_game_for_input() {
+async fn prep_game_for_input() {
 
     for _ in 0..64 {
-        send_message(WM_KEYDOWN, BACKSPACE_KEY, 2);
+        send_message(WM_KEYDOWN, BACKSPACE_KEY, 2).await;
     }
 
-    post_message(WM_KEYDOWN, SHIFT_KEY, 0);
-    post_message(WM_KEYDOWN, ENTER_KEY, 50);
+    post_message(WM_KEYDOWN, SHIFT_KEY, 0).await;
+    post_message(WM_KEYDOWN, ENTER_KEY, 50).await;
 
-    post_message(WM_KEYUP, ENTER_KEY, 0);
-    post_message(WM_KEYUP, SHIFT_KEY, 50);
+    post_message(WM_KEYUP, ENTER_KEY, 0).await;
+    post_message(WM_KEYUP, SHIFT_KEY, 50).await;
 
 }
 
-fn attempt_post_submission(window: &tauri::Window, message: &str) {
+async fn attempt_post_submission(window: &tauri::Window, message: &str) {
 
-    post_message(WM_KEYDOWN, ENTER_KEY, 250);
+    post_message(WM_KEYDOWN, ENTER_KEY, 250).await;
 
     for c in message.chars() {
 
-        post_message(WM_CHAR, c as usize, 10);
+        post_message(WM_CHAR, c as usize, 10).await;
 
         if window_in_focus() {
             window.set_focus().unwrap();
@@ -189,11 +208,11 @@ fn attempt_post_submission(window: &tauri::Window, message: &str) {
 
     }
 
-    post_message(WM_KEYDOWN, ENTER_KEY, 20);
+    post_message(WM_KEYDOWN, ENTER_KEY, 20).await;
 
 }
 
-fn attempt_post_submission_with_rety(window: &tauri::Window, command_message: &CommandMessage) -> bool {
+async fn attempt_post_submission_with_rety(window: &tauri::Window, command_message: &CommandMessage) -> bool {
 
     let message_hashes = Arc::clone(&MESSAGE_HASHES);
     let c_message      = command_message.concat();
@@ -202,7 +221,7 @@ fn attempt_post_submission_with_rety(window: &tauri::Window, command_message: &C
     let mut retries = 0;
     while retries < 3 {
 
-        attempt_post_submission(window, &c_message);
+        attempt_post_submission(window, &c_message).await;
 
         for _ in 0..4 {
             thread::sleep(Duration::from_millis(250));
@@ -220,7 +239,7 @@ fn attempt_post_submission_with_rety(window: &tauri::Window, command_message: &C
 }
 
 #[tauri::command]
-pub fn submit_actual_post(window: tauri::Window, retry: bool, mut character_message: UserCharacterMessages) -> Result<(), &'static str> {
+pub async fn submit_actual_post(window: tauri::Window, retry: bool, mut character_message: UserCharacterMessages) -> Result<(), &'static str> {
 
     if WRITING.load(Ordering::Relaxed) {
         return Err("Already writing");
@@ -241,39 +260,36 @@ pub fn submit_actual_post(window: tauri::Window, retry: bool, mut character_mess
         }
     }
 
-    thread::spawn(move || {
+    let message_hashes = Arc::clone(&MESSAGE_HASHES);
+    message_hashes.lock().unwrap().clear();
 
-        let message_hashes = Arc::clone(&MESSAGE_HASHES);
-        message_hashes.lock().unwrap().clear();
+    character_message.store();
+    prep_game_for_input().await;
 
-        character_message.store();
-        prep_game_for_input();
+    if retry {
 
-        if retry {
+        for command_message in command_messages {        
 
-            for command_message in command_messages {        
-
-                if !attempt_post_submission_with_rety(&window, &command_message) {
-                    window.emit("post-writing-error", "The server did not respond seem to process the message. Please try again.").unwrap();
-                    break;
-                }
-
-                thread::sleep(Duration::from_millis(250));
-                
+            if !attempt_post_submission_with_rety(&window, &command_message).await {
+                window.emit("post-writing-error", "The server did not respond seem to process the message. Please try again.").unwrap();
+                break;
             }
 
-        } else {
-
-            command_messages.into_iter().for_each(|command_message| {
-                attempt_post_submission(&window, &command_message.concat());
-                thread::sleep(Duration::from_millis(250));
-            });
-
+            sleep(TokioDuration::from_millis(250)).await
+            
         }
 
-        WRITING.store(false, Ordering::Relaxed);
+    } else {
 
-    });
+        for command_message in command_messages {
+            attempt_post_submission(&window, &command_message.concat()).await;
+            sleep(TokioDuration::from_millis(250)).await
+        };
+
+    }
+
+    WRITING.store(false, Ordering::Relaxed);
+
 
     Ok(())
 
