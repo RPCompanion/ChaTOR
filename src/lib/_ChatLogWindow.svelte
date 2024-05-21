@@ -6,7 +6,7 @@
     import { afterUpdate } from "svelte";
     import Checkbox from "./Checkbox.svelte";
     import { SwtorChannel } from "./network/swtor_channel";
-    import { active_chat_tab } from "./chat_log_window/chat_log_window_store";
+    import { active_chat_tab_index } from "./chat_log_window/chat_log_window_store";
     import ChatTabs from "./chat_log_window/_ChatTabs.svelte";
 
     let auto_scroll: boolean = true;
