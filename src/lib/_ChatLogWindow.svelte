@@ -5,7 +5,9 @@
     import { SwtorMessage, swtor_messages } from "./network/swtor_message";
     import { afterUpdate } from "svelte";
     import Checkbox from "./Checkbox.svelte";
-    import { Channel, SwtorChannel } from "./network/swtor_channel";
+    import { SwtorChannel } from "./network/swtor_channel";
+    import { active_chat_tab } from "./chat_log_window/chat_log_window_store";
+    import ChatTabs from "./chat_log_window/_ChatTabs.svelte";
 
     let auto_scroll: boolean = true;
     let container: HTMLElement | undefined = undefined;
@@ -50,26 +52,29 @@
 <div class="w-full">
     <Checkbox bind:checked={auto_scroll} size="small">Auto scroll</Checkbox>
 </div>
-<div bind:this={container} class="flex flex-col h-44 max-h-96 resize-y  rounded-md border-2 border-slate-700 overflow-y-auto chat-container-background">
-    {#each relevant_messages as message}
+<div>
+    <ChatTabs/>
+    <div bind:this={container} class="flex flex-col h-44 max-h-96 resize-y rounded-tr-md border-2 border-slate-700 overflow-y-auto chat-container-background">
+        {#each relevant_messages as message}
 
-        <div bind:this={last_message} class="w-full opacity-100">
+            <div bind:this={last_message} class="w-full opacity-100">
 
-            <span class="text-white">[{message.timestamp}]</span>
+                <span class="text-white">[{message.timestamp}]</span>
 
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <span class="text-slate-200 cursor-pointer" on:click={() => {on_character_click(message)}}>
-                {#if message.from == $active_character?.character_name && message.channel.type == SwtorChannel.WHISPER}
-                    [to {message.to}]:
-                {:else}
-                    {message.from}:
-                {/if}
-            </span>
-            <span class="" style="color: {$active_character?.get_channel_color(message.channel.type).to_hex()}">{message.message}</span>
-        </div>
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-no-static-element-interactions -->
+                <span class="text-slate-200 cursor-pointer" on:click={() => {on_character_click(message)}}>
+                    {#if message.from == $active_character?.character_name && message.channel.type == SwtorChannel.WHISPER}
+                        [to {message.to}]:
+                    {:else}
+                        {message.from}:
+                    {/if}
+                </span>
+                <span class="" style="color: {$active_character?.get_channel_color(message.channel.type).to_hex()}">{message.message}</span>
+            </div>
 
-    {/each}
+        {/each}
+    </div>
 </div>
 
 <style>
