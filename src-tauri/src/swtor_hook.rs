@@ -249,23 +249,26 @@ pub fn submit_actual_post(window: tauri::Window, retry: bool, mut character_mess
         character_message.store();
         prep_game_for_input();
 
-        for command_message in command_messages {        
+        if retry {
 
-            if retry {
+            for command_message in command_messages {        
 
                 if !attempt_post_submission_with_rety(&window, &command_message) {
                     window.emit("post-writing-error", "The server did not respond seem to process the message. Please try again.").unwrap();
                     break;
                 }
 
-            } else {
-
-                attempt_post_submission(&window, &command_message.concat());
-
+                thread::sleep(Duration::from_millis(250));
+                
             }
 
-            thread::sleep(Duration::from_millis(250));
-            
+        } else {
+
+            command_messages.into_iter().for_each(|command_message| {
+                attempt_post_submission(&window, &command_message.concat());
+                thread::sleep(Duration::from_millis(250));
+            });
+
         }
 
         WRITING.store(false, Ordering::Relaxed);
