@@ -11,6 +11,7 @@ export interface IChatSettings {
     remove_starting_pronouns: boolean;
     starting_characters_are_lowercase: boolean;
     show_chat_log_window: boolean;
+    retry_message_submission: boolean;
 }
 
 export interface IChatLogSettings {
@@ -35,7 +36,8 @@ export function default_settings(): ISettings {
             clear_chat_after_posting: false,
             remove_starting_pronouns: false,
             starting_characters_are_lowercase: true,
-            show_chat_log_window: false
+            show_chat_log_window: false,
+            retry_message_submission: false
         },
         chat_log: {
             capture_chat_log: false,

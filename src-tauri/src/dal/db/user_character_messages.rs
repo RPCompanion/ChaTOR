@@ -37,6 +37,10 @@ impl CommandMessage {
         
     }
 
+    pub fn is_command_only(&self) -> bool {
+        self.command.is_some() && self.message.len() == 0
+    }
+
 }
 
 #[derive(Deserialize, Serialize)]

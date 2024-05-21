@@ -17,6 +17,9 @@
         <Setting setting="Show chat log">
             <SettingsToggle bind:checked={$settings.chat.show_chat_log_window}></SettingsToggle>
         </Setting>
+        <Setting setting="Retry submitting unprocessed posts">
+            <SettingsToggle bind:checked={$settings.chat.retry_message_submission}></SettingsToggle>
+        </Setting>
     {/if}
     
 </SettingSection>

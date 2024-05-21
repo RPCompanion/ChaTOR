@@ -23,7 +23,10 @@ pub struct ChatSettings {
     pub capture_chat_log: bool,
 
     #[serde(default = "default_show_chat_log_window")]
-    pub show_chat_log_window: bool
+    pub show_chat_log_window: bool,
+
+    #[serde(default = "default_retry_message_submission")]
+    pub retry_message_submission: bool
     
 }
 
@@ -55,6 +58,10 @@ pub fn default_show_chat_log_window() -> bool {
     false
 }
 
+pub fn default_retry_message_submission() -> bool {
+    false
+}
+
 
 impl ChatSettings {
 
@@ -67,7 +74,8 @@ impl ChatSettings {
             remove_starting_pronouns: false,
             starting_characters_are_lowercase: true,
             capture_chat_log: false,
-            show_chat_log_window: false
+            show_chat_log_window: false,
+            retry_message_submission: false
         }
 
     }

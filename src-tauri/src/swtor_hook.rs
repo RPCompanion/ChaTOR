@@ -255,7 +255,9 @@ pub async fn submit_actual_post(window: tauri::Window, retry: bool, mut characte
 
             for command_message in command_messages {        
 
-                if !attempt_post_submission_with_retry(&window, &command_message) {
+                if command_message.is_command_only() {
+                    attempt_post_submission(&window, &command_message.concat());
+                } else if !attempt_post_submission_with_retry(&window, &command_message) {
                     return Err("Failed to post message");
                 }
 
@@ -267,7 +269,6 @@ pub async fn submit_actual_post(window: tauri::Window, retry: bool, mut characte
 
             for command_message in command_messages {
                 attempt_post_submission(&window, &command_message.concat());
-                
             };
 
         }

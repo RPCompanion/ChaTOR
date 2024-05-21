@@ -75,14 +75,16 @@ export async function submit_post(message_type: MessageType, messages: string[])
         messages: messages
     };
 
+    let t_settings = get(settings);
+    let retry: boolean = t_settings.chat.retry_message_submission && t_settings.chat_log.capture_chat_log;
+
     try {
 
-        await invoke("submit_actual_post", {retry: false, characterMessage: character_message})
+        await invoke("submit_actual_post", {retry: retry, characterMessage: character_message});
         return Result.ok([]);
 
     } catch (error: any) {
 
-        toast.push(error, { theme: { '--toastBackground': 'red' } });
         return Result.error(error);
         
     }
