@@ -3,7 +3,7 @@ use rusqlite::params;
 use serde::{Deserialize, Serialize};
 use serde_json::{Deserializer, Value};
 
-use std::{io::{Read, Write}, net::{TcpListener, TcpStream}, sync::{atomic::{AtomicBool, Ordering}, Arc, Mutex}, time::Duration};
+use std::{io::{ErrorKind, Read, Write}, net::{TcpListener, TcpStream}, sync::{atomic::{AtomicBool, Ordering}, Arc, Mutex}, time::Duration};
 use std::thread;
 
 use dll_syringe::{process::OwnedProcess, Syringe};
@@ -104,6 +104,7 @@ fn start_injecting_thread(swtor_pid: u32, window: tauri::Window) {
         } else {
             println!("Payload ejected");
         }
+        CONTINUE_LOGGING.store(false, Ordering::Relaxed);
         INJECTED.store(false, Ordering::Relaxed);
 
     });
@@ -116,12 +117,21 @@ fn start_tcp_listener_loop() {
     let listener = TcpListener::bind("127.0.0.1:4592").unwrap();
     let mut stream = listener.accept().unwrap().0;
 
+    stream.set_read_timeout(Some(Duration::from_millis(1000))).unwrap();
+
     println!("Listening for messages");
     let mut buffer: [u8; 2048] = [0; 2048];
     while CONTINUE_LOGGING.load(Ordering::Relaxed) {
 
-        if let Err(_err) = stream.read(&mut buffer) {
-            break;
+        match stream.read(&mut buffer) {
+            Ok(_) => {},
+            Err(ref e) if e.kind() == ErrorKind::TimedOut || e.kind() == ErrorKind::WouldBlock => {
+                continue;
+            },
+            Err(err) => {
+                println!("Error reading from stream: {:?}", err);
+                break;
+            }
         }
 
         Deserializer::from_slice(&buffer).into_iter::<Value>().for_each(|value| {
@@ -140,7 +150,6 @@ fn start_tcp_listener_loop() {
 
         });
         buffer = [0; 2048];
-        thread::sleep(Duration::from_millis(100));
     }
     println!("Stopped listening for messages");
 
@@ -230,6 +239,7 @@ fn save_messages_to_database(messages: Vec<SwtorMessage>) {
 #[tauri::command]
 pub fn stop_injecting_capture() {
 
+    println!("Stopping injection");
     CONTINUE_LOGGING.store(false, Ordering::Relaxed);
     while INJECTED.load(Ordering::Relaxed) {
         thread::sleep(Duration::from_secs(1));
