@@ -61,7 +61,7 @@
         let response = await submit_post("ChatMessage", messages);
 
         if (response.is_error()) {
-            toast.push(response.unwrap_error());
+            toast.push(response.unwrap_error(), { theme: { "--toastBackground": "red" } });
             return;
         }
 
@@ -79,7 +79,7 @@
 
         let response = await submit_post("ChatMessage", [messages[idx]]);
         if (response.is_error()) {
-            toast.push(response.unwrap_error());
+            toast.push(response.unwrap_error(), { theme: { "--toastBackground": "red" } });
         }
 
     }

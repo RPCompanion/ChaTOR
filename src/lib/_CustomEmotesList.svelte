@@ -8,7 +8,7 @@
 
         let response = await submit_post("ButtonEmote", [emote.emote]);
         if (response.is_error()) {
-            toast.push(response.unwrap_error());
+            toast.push(response.unwrap_error(), { theme: { "--toastBackground": "red" } });
         }
 
     }
