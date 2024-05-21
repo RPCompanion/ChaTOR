@@ -2,7 +2,7 @@
 import { invoke } from "@tauri-apps/api";
 import { writable, get } from "svelte/store";
 import { settings } from "./settings";
-import { ChannelType } from "./swtor_channel";
+import { SwtorChannel } from "./swtor_channel";
 
 export class Color {
 
@@ -50,13 +50,13 @@ export class Character {
 
     }
 
-    public get_channel_color(channel: ChannelType): Color {
+    public get_channel_color(channel: SwtorChannel): Color {
 
         switch (channel) {
-            case ChannelType.SAY: return this.channel_colors[SAY_COLOR_INDEX];
-            case ChannelType.YELL: return this.channel_colors[YELL_COLOR_INDEX];
-            case ChannelType.EMOTE: return this.channel_colors[EMOTE_COLOR_INDEX];
-            case ChannelType.WHISPER: return this.channel_colors[WHISPER_COLOR_INDEX];
+            case SwtorChannel.SAY: return this.channel_colors[SAY_COLOR_INDEX];
+            case SwtorChannel.YELL: return this.channel_colors[YELL_COLOR_INDEX];
+            case SwtorChannel.EMOTE: return this.channel_colors[EMOTE_COLOR_INDEX];
+            case SwtorChannel.WHISPER: return this.channel_colors[WHISPER_COLOR_INDEX];
             default: return this.channel_colors[SAY_COLOR_INDEX];
         }
 

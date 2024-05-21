@@ -1,5 +1,5 @@
 
-export enum ChannelType {
+export enum SwtorChannel {
     SAY = 1,
     YELL = 2,
     EMOTE = 3,
@@ -11,7 +11,7 @@ export enum ChannelType {
 
 export class Channel {
 
-    public readonly type: ChannelType;
+    public readonly type: SwtorChannel;
     constructor(channel: number) {
         this.type = channel;
     }

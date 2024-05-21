@@ -16,7 +16,12 @@ impl ChatTab {
         vec![
             ChatTab {
                 name: "Local".to_string(),
-                channels: vec![SwtorChannel::EMOTE as i32, SwtorChannel::SAY as i32, SwtorChannel::YELL as i32]
+                channels: vec![
+                    SwtorChannel::EMOTE as i32, 
+                    SwtorChannel::SAY as i32, 
+                    SwtorChannel::YELL as i32, 
+                    SwtorChannel::WHISPER as i32
+                ]
             }
         ]
 

@@ -3,6 +3,12 @@ import { writable, get } from "svelte/store";
 import { invoke } from "@tauri-apps/api";
 import { toast } from "@zerodevx/svelte-toast";
 import { hooked_in } from "../network";
+import { SwtorChannel } from "./swtor_channel";
+
+export interface IChatTab {
+    name: string;
+    channels: number[]
+}
 
 export interface IChatSettings {
     confirmation_before_posting: boolean;
@@ -12,6 +18,7 @@ export interface IChatSettings {
     starting_characters_are_lowercase: boolean;
     show_chat_log_window: boolean;
     retry_message_submission: boolean;
+    chat_tabs: IChatTab[];
 }
 
 export interface IChatLogSettings {
@@ -37,7 +44,13 @@ export function default_settings(): ISettings {
             remove_starting_pronouns: false,
             starting_characters_are_lowercase: true,
             show_chat_log_window: false,
-            retry_message_submission: false
+            retry_message_submission: false,
+            chat_tabs: [
+                {
+                    name: "Local",
+                    channels: [SwtorChannel.EMOTE, SwtorChannel.SAY, SwtorChannel.YELL, SwtorChannel.WHISPER]
+                }
+            ]
         },
         chat_log: {
             capture_chat_log: false,

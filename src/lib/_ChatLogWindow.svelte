@@ -5,7 +5,7 @@
     import { SwtorMessage, swtor_messages } from "./network/swtor_message";
     import { afterUpdate } from "svelte";
     import Checkbox from "./Checkbox.svelte";
-    import { Channel, ChannelType } from "./network/swtor_channel";
+    import { Channel, SwtorChannel } from "./network/swtor_channel";
 
     let auto_scroll: boolean = true;
     let container: HTMLElement | undefined = undefined;
@@ -14,7 +14,7 @@
 
     function on_character_click(message: SwtorMessage) {
 
-        if (message.channel.type == ChannelType.WHISPER && message.from == $active_character?.character_name) {
+        if (message.channel.type == SwtorChannel.WHISPER && message.from == $active_character?.character_name) {
             dispatch("whisper", { character_name: message.to });
             return;
         }
@@ -42,7 +42,7 @@
 
     let relevant_messages: SwtorMessage[] = [];
     $: relevant_messages = $swtor_messages.filter((message) => {
-        return message.channel.type == ChannelType.EMOTE || message.channel.type == ChannelType.SAY || message.channel.type == ChannelType.YELL || message.channel.type == ChannelType.WHISPER;
+        return message.channel.type == SwtorChannel.EMOTE || message.channel.type == SwtorChannel.SAY || message.channel.type == SwtorChannel.YELL || message.channel.type == SwtorChannel.WHISPER;
     });
 
 </script>
@@ -60,7 +60,7 @@
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <span class="text-slate-200 cursor-pointer" on:click={() => {on_character_click(message)}}>
-                {#if message.from == $active_character?.character_name && message.channel.type == ChannelType.WHISPER}
+                {#if message.from == $active_character?.character_name && message.channel.type == SwtorChannel.WHISPER}
                     [to {message.to}]:
                 {:else}
                     {message.from}:
