@@ -29,7 +29,6 @@ export function init_network() {
 
     init_hook();
     init_swtor_message_listener();
-    init_post_writing_listener();
     init_custom_emotes();
 
 }
@@ -40,14 +39,6 @@ function init_hook() {
     listen("swtor_hooked_in", (response: any) => {
         hooked_in.set(response.payload.hooked_in);
     });
-
-}
-
-function init_post_writing_listener() {
-
-    listen("post-writing-error", (response: any) => {
-        toast.push(response.payload, { theme: { '--toastBackground': 'red' } });
-    })
 
 }
 
