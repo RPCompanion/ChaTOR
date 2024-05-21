@@ -29,7 +29,11 @@ impl CommandMessage {
             return self.message.clone();
         }
 
-        format!("{:?} {:?}", self.command.as_ref().unwrap(), self.message)
+        if self.message.len() == 0 {
+            return self.command.as_ref().unwrap().clone();
+        }
+
+        format!("{} {}", self.command.as_ref().unwrap(), self.message)
         
     }
 
@@ -140,7 +144,7 @@ impl UserCharacterMessages {
         }
 
         // No whisper was captured, so it must be a simple command
-        let simple_re = Regex::new(r"^\/([a-z]+)\s").unwrap();
+        let simple_re = Regex::new(r"^\/([a-zA-Z0-9]+)").unwrap();
         let simple_command = simple_re.captures(message).unwrap().get(0).unwrap().as_str();
 
         return Ok(CommandMessage::new(Some(simple_command.to_string()), message.replace(simple_command, "").trim().to_string()));
