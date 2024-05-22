@@ -37,3 +37,11 @@ export class Result<Ok, Error> {
     }
 
 }
+
+export function Err<Ok, Error>(err: Error): Result<Ok, Error> {
+    return Result.error(err);
+}
+
+export function Ok<Ok, Error>(ok: Ok): Result<Ok, Error> {
+    return Result.ok(ok);
+}
