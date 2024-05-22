@@ -42,6 +42,10 @@
 
     }
 
+    function on_modal_save(event: any) {
+        console.log("TODO, save the event!!");
+    }
+
 </script>
 
 <div class="relative" use:click_outside_handler on:click_outside={click_outside}>
@@ -61,7 +65,7 @@
             {/if}
         </div>
     {/if}
-    <EditModal bind:show_edit_modal={show_edit_modal} bind:chat_tab={chat_tab}/>
+    <EditModal bind:show_edit_modal={show_edit_modal} {chat_tab} on:save={on_modal_save}/>
 </div>
 
 <style>
