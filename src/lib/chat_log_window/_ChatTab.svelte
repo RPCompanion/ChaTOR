@@ -1,5 +1,6 @@
 
 <script lang="ts">
+    import { swtor_channel_messages } from "../network/swtor_message";
     import EditModal from "./_EditModal.svelte";
     import { settings } from "../network/settings";
     import { click_outside_handler } from "../click_outside";
@@ -7,6 +8,9 @@
     import type { IChatTab } from "../network/settings";
     export let chat_tab: IChatTab;
     export let index: number;
+
+    let unread_message_count: number = 0;
+    $: unread_message_count = $swtor_channel_messages.find((c) => c.chat_tab_name == chat_tab.name)?.messages.filter((m) => !m.read).length ?? 0;
 
     let show_edit_tab: boolean = false;
     let show_edit_modal: boolean = false;
@@ -56,6 +60,11 @@
 </script>
 
 <div class="relative" use:click_outside_handler on:click_outside={click_outside}>
+    {#if unread_message_count > 0}
+        <div class="absolute -right-1 -top-2 bg-red-900 text-white px-2 rounded-full shadow-md text-sm">
+            {unread_message_count > 9 ? '9+': unread_message_count}
+        </div>
+    {/if}
     <button 
         type="button" 
         class="chat-container-background text-white text-xl px-2 rounded-t-md hover:text-gray-400" 

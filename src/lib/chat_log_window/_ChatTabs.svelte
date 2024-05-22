@@ -6,8 +6,10 @@
     import { active_chat_tab_index } from "./chat_log_window_store";
     import EditModal from "./_EditModal.svelte";
     import { type SvelteDispatch } from "../svelte_utils";
+  import { set_swtor_channel_messages_read } from "./chat_log_window_utils";
 
     let show_edit_modal: boolean = false;
+    let old_chat_tab_index: number = $active_chat_tab_index;
     function on_new_chat_tab() {
         show_edit_modal = true;
     }
@@ -15,6 +17,12 @@
     function on_save(event: SvelteDispatch<IChatTab>) {
         $settings.chat.chat_tabs.push(event.detail);
         $settings = $settings;
+    }
+    
+    $: if ($active_chat_tab_index != old_chat_tab_index) {
+        console.log("here");
+        set_swtor_channel_messages_read($settings.chat.chat_tabs[$active_chat_tab_index].name);
+        old_chat_tab_index = $active_chat_tab_index;
     }
 
 </script>

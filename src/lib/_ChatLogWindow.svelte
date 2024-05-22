@@ -9,6 +9,7 @@
     import { active_chat_tab_index } from "./chat_log_window/chat_log_window_store";
     import { settings } from "./network/settings";
     import ChatTabs from "./chat_log_window/_ChatTabs.svelte";
+  import { set_swtor_channel_messages_read } from "./chat_log_window/chat_log_window_utils";
 
     let auto_scroll: boolean = true;
     let container: HTMLElement | undefined = undefined;
@@ -45,6 +46,10 @@
 
     function get_swtor_channel_messages(t_channel_messages: SwtorChatTabMessages[], index: number ): SwtorMessage[] {
         return t_channel_messages.find((c) => c.chat_tab_name == get_active_chat_tab_name(index))?.messages ?? [];
+    }
+
+    $: if ($swtor_channel_messages.length > 0) {
+        set_swtor_channel_messages_read(get_active_chat_tab_name($active_chat_tab_index));
     }
 
     afterUpdate(() => {
