@@ -1,7 +1,7 @@
 
 import { get } from "svelte/store";
 import { settings, type ISettings } from "./network/settings";
-import { Result } from "./result";
+import { Result, Ok, Err } from "./result";
 
 import nlp from "compromise";
 
@@ -32,7 +32,7 @@ export class AutoMessageSplitter {
 
         }
 
-        this.settings   = local_settings || get(settings);
+        this.settings = local_settings || get(settings);
 
     }
 
@@ -61,7 +61,7 @@ export class AutoMessageSplitter {
             return Result.error(prefix_result.unwrap_error());
         }
         
-        return Result.ok([prefix_result.unwrap()]);
+        return Ok([prefix_result.unwrap()]);
 
     }
 
@@ -70,7 +70,7 @@ export class AutoMessageSplitter {
         let array: string[] = nlp(this.message).sentences().out('array');
 
         if (array == null) {
-            return Result.error("No valid sentences found.");
+            return Err("No valid sentences found.");
         }
 
         return this.get_constructed_message_array(array);
@@ -85,7 +85,7 @@ export class AutoMessageSplitter {
         for (let i = 0; i < array.length; i++) {
 
             if (array[i].length + " ".length > GAME_MESSAGE_MAXIMUM) {
-                return Result.error("Sentence too long. -> " + array[i] + " <- Unable to auto format");
+                return Err("Sentence too long. -> " + array[i] + " <- Unable to auto format");
             }
 
             let temp = array[i].trim();
@@ -109,7 +109,7 @@ export class AutoMessageSplitter {
             messages.push(buffer.trim());
         }
 
-        return Result.ok(messages);
+        return Ok(messages);
 
     }
 
@@ -147,10 +147,10 @@ export class AutoMessageSplitter {
         let t_message = this.get_prefix(message) + " " + message;
 
         if (t_message.length > GAME_MESSAGE_MAXIMUM) {
-            return Result.error("Message too long. -> " + message + " <- Unable to prefix");
+            return Err("Message too long. -> " + message + " <- Unable to prefix");
         }
 
-        return Result.ok(t_message);
+        return Ok(t_message);
 
     }
 
