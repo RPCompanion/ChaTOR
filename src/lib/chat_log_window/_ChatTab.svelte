@@ -1,5 +1,6 @@
 
 <script lang="ts">
+    import EditModal from "./_EditModal.svelte";
     import { settings } from "../network/settings";
     import { click_outside_handler } from "../click_outside";
     import { active_chat_tab_index } from "./chat_log_window_store";
@@ -8,6 +9,7 @@
     export let index: number;
 
     let show_edit_tab: boolean = false;
+    let show_edit_modal: boolean = false;
     function on_click() {
 
         if ($active_chat_tab_index == index) {
@@ -24,11 +26,13 @@
     }
 
     function on_edit() {
-
+        show_edit_tab = false;
+        show_edit_modal = true;
     }
 
     function on_delete() {
 
+        show_edit_tab = false;
         $settings.chat.chat_tabs.splice(index, 1);
         $settings = $settings;
         
@@ -57,6 +61,7 @@
             {/if}
         </div>
     {/if}
+    <EditModal bind:show_edit_modal={show_edit_modal} bind:chat_tab={chat_tab}/>
 </div>
 
 <style>
