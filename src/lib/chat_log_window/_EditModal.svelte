@@ -7,6 +7,7 @@
     import type { IChatTab } from "../network/settings";
     import { settings } from "../network/settings";
     import { SwtorChannel } from "../network/swtor_channel";
+    import { swtor_channel_messages } from "../network/swtor_message";
 
     export let index: number | undefined = undefined;
     export let chat_tab: IChatTab = { name: "", channels: [] }
@@ -50,6 +51,22 @@
 
     }
 
+    function rename_swtor_channel_messages(new_name: string) {
+
+        if (index == undefined) {
+            return;
+        }
+
+        let old_name = $settings.chat.chat_tabs[index].name;
+        let idx = $swtor_channel_messages.findIndex((c) => c.chat_tab_name == old_name);
+        if (idx == -1) {
+            return;
+        }
+
+        $swtor_channel_messages[idx].chat_tab_name = new_name;
+
+    }
+
     function on_save() {
         
         chat_tab.name = chat_tab.name.trim();
@@ -67,6 +84,7 @@
         }
 
         show_edit_modal = false;
+        rename_swtor_channel_messages(chat_tab.name);
         dispatch("save", chat_tab);
 
     }

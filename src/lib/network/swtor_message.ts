@@ -6,7 +6,7 @@ import { Channel } from "./swtor_channel";
 
 export class SwtorChatTabMessages {
     
-    public readonly chat_tab_name: string;
+    public chat_tab_name: string;
     public messages: SwtorMessage[] = [];
 
     constructor(chat_tab_name: string) {
@@ -108,7 +108,7 @@ export function init_swtor_message_listener() {
                 if (t_find == undefined) {
                     return;
                 }
-                
+
                 t_find.messages.push(message);
 
            }); 

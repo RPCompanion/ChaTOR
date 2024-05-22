@@ -20,7 +20,6 @@
     }
     
     $: if ($active_chat_tab_index != old_chat_tab_index) {
-        console.log("here");
         set_swtor_channel_messages_read($settings.chat.chat_tabs[$active_chat_tab_index].name);
         old_chat_tab_index = $active_chat_tab_index;
     }
@@ -29,7 +28,7 @@
 
 <div class="flex flex-row gap-1 relative">
     {#each $settings.chat.chat_tabs as chat_tab, index}
-        <ChatTab {chat_tab} {index} />
+        <ChatTab chat_tab={JSON.parse(JSON.stringify(chat_tab))} {index} />
     {/each}
     <div class="relative">
         <button type="button" class="chat-container-background text-white text-xl px-2 rounded-t-md hover:text-gray-400" on:click={on_new_chat_tab}>+</button>
