@@ -22,12 +22,16 @@
     }
 
     function click_outside() {
+
         show_edit_tab = false;
+
     }
 
     function on_edit() {
+
         show_edit_tab = false;
         show_edit_modal = true;
+
     }
 
     function on_delete() {
@@ -43,7 +47,10 @@
     }
 
     function on_modal_save(event: any) {
-        console.log("TODO, save the event!!");
+
+        $settings.chat.chat_tabs[index] = event.detail;
+        $settings = $settings;
+
     }
 
 </script>
@@ -65,7 +72,7 @@
             {/if}
         </div>
     {/if}
-    <EditModal bind:show_edit_modal={show_edit_modal} {chat_tab} on:save={on_modal_save}/>
+    <EditModal bind:show_edit_modal={show_edit_modal} {chat_tab} on:save={on_modal_save} {index}/>
 </div>
 
 <style>

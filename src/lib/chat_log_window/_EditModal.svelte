@@ -5,8 +5,10 @@
     import { Result, Ok, Err } from "../result";
     import { fly } from "svelte/transition";
     import type { IChatTab } from "../network/settings";
+    import { settings } from "../network/settings";
     import { SwtorChannel } from "../network/swtor_channel";
 
+    export let index: number | undefined = undefined;
     export let chat_tab: IChatTab = { name: "", channels: [] }
     export let show_edit_modal: boolean;
 
@@ -20,6 +22,21 @@
         if (chat_tab.name.length == 0) {
             return Err("Chat tab name cannot be empty");
         }
+
+        if (chat_tab.name.length > 12) {
+            return Err("Chat tab name cannot be longer than 12 characters");
+        }
+
+        let filter_results = $settings.chat.chat_tabs.filter((tab) => tab.name == chat_tab.name);
+
+        if (index == undefined || $settings.chat.chat_tabs[index].name != chat_tab.name) {
+            
+            if (filter_results.length > 0) {
+                return Err("Chat tab name must be unique");
+            }
+
+        }
+
         return Ok([]);
 
     }
@@ -57,7 +74,6 @@
     function on_channel_input(channel: string) {
 
         let channel_number = Number(SwtorChannel[channel as keyof typeof SwtorChannel]);
-        console.log(channel_number);
 
         let index = chat_tab.channels.indexOf(channel_number);
 

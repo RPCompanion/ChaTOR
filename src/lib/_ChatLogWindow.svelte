@@ -2,11 +2,12 @@
 <script lang="ts">
     import { active_character } from "./network/characters";
     import { createEventDispatcher } from "svelte";
-    import { SwtorMessage, swtor_messages } from "./network/swtor_message";
+    import { SwtorChatTabMessages, SwtorMessage, swtor_channel_messages } from "./network/swtor_message";
     import { afterUpdate } from "svelte";
     import Checkbox from "./Checkbox.svelte";
     import { SwtorChannel } from "./network/swtor_channel";
     import { active_chat_tab_index } from "./chat_log_window/chat_log_window_store";
+    import { settings } from "./network/settings";
     import ChatTabs from "./chat_log_window/_ChatTabs.svelte";
 
     let auto_scroll: boolean = true;
@@ -38,13 +39,16 @@
 
     }
 
+    function get_active_chat_tab_name(index: number): string {
+        return $settings.chat.chat_tabs[index].name;
+    }
+
+    function get_swtor_channel_messages(t_channel_messages: SwtorChatTabMessages[], index: number ): SwtorMessage[] {
+        return t_channel_messages.find((c) => c.chat_tab_name == get_active_chat_tab_name(index))?.messages ?? [];
+    }
+
     afterUpdate(() => {
         scroll_container();
-    });
-
-    let relevant_messages: SwtorMessage[] = [];
-    $: relevant_messages = $swtor_messages.filter((message) => {
-        return message.channel.type == SwtorChannel.EMOTE || message.channel.type == SwtorChannel.SAY || message.channel.type == SwtorChannel.YELL || message.channel.type == SwtorChannel.WHISPER;
     });
 
 </script>
@@ -55,7 +59,7 @@
 <div>
     <ChatTabs/>
     <div bind:this={container} class="flex flex-col h-44 max-h-96 resize-y rounded-tr-md border-2 border-slate-700 overflow-y-auto chat-container-background">
-        {#each relevant_messages as message}
+        {#each get_swtor_channel_messages($swtor_channel_messages, $active_chat_tab_index) as message}
 
             <div bind:this={last_message} class="w-full opacity-100">
 
