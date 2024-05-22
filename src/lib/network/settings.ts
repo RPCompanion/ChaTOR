@@ -47,6 +47,10 @@ export function default_settings(): ISettings {
             retry_message_submission: false,
             chat_tabs: [
                 {
+                    name: "Global",
+                    channels: [SwtorChannel.GLOBAL]
+                },
+                {
                     name: "Local",
                     channels: [SwtorChannel.EMOTE, SwtorChannel.SAY, SwtorChannel.YELL, SwtorChannel.WHISPER]
                 }

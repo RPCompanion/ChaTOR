@@ -15,6 +15,10 @@ impl ChatTab {
 
         vec![
             ChatTab {
+                name: "Global".to_string(),
+                channels: vec![SwtorChannel::GLOBAL as i32]
+            },
+            ChatTab {
                 name: "Local".to_string(),
                 channels: vec![
                     SwtorChannel::EMOTE as i32, 
