@@ -40,7 +40,7 @@
 
 </script>
 
-<div class="relative">
+<div class="relative" use:click_outside_handler on:click_outside={click_outside}>
     <button 
         type="button" 
         class="chat-container-background text-white text-xl px-2 rounded-t-md hover:text-gray-400" 
@@ -50,7 +50,7 @@
     </button>
     {#if show_edit_tab}
         <!-- svelte-ignore ts2614 -->
-        <div class="flex flex-col gap-1 w-36 shadow-md bg-slate-700 absolute p-2 border-2 border-slate-800" use:click_outside_handler on:click_outside={click_outside}>
+        <div class="flex flex-col gap-1 w-36 shadow-md bg-slate-700 absolute p-2 border-2 border-slate-800" >
             <button type="button" class="text-white hover:text-gray-400" on:click={on_edit}>Edit</button>
             {#if $settings.chat.chat_tabs.length > 1 }
                 <button type="button" class="text-white hover:text-gray-400" on:click={on_delete}>Delete</button>
