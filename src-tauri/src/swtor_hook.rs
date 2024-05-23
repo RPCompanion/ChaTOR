@@ -3,38 +3,29 @@ use std::fs;
 use std::path::Path;
 
 use sha2::{Sha256, Digest};
-use windows::core::PWSTR;
-use windows::Win32::System::Threading::{OpenProcess, QueryFullProcessImageNameW, PROCESS_NAME_FORMAT, PROCESS_QUERY_INFORMATION};
+
 use std::sync::{Arc, Mutex, OnceLock};
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::time::Duration;
-use tokio::task;
+
 
 use tauri::Window;
 use serde_json::json;
-use windows::Win32::Foundation::{BOOL, HWND, LPARAM, MAX_PATH, WPARAM};
-use windows::Win32::UI::WindowsAndMessaging::{
-    EnumWindows, GetForegroundWindow, GetWindowTextW, GetWindowThreadProcessId, PostMessageW, SendMessageW, WM_CHAR, WM_KEYDOWN, WM_KEYUP
-};
+use windows::Win32::Foundation::{BOOL, HWND, LPARAM, MAX_PATH};
+use windows::Win32::UI::WindowsAndMessaging::{EnumWindows, GetForegroundWindow, GetWindowTextW, GetWindowThreadProcessId};
+use windows::core::PWSTR;
+use windows::Win32::System::Threading::{OpenProcess, QueryFullProcessImageNameW, PROCESS_NAME_FORMAT, PROCESS_QUERY_INFORMATION};
 
-use crate::dal::db::user_character_messages::{CommandMessage, UserCharacterMessages};
-use crate::utils::StringUtils;
-
-pub mod posting;
+pub mod post;
 
 lazy_static! {
     static ref SWTOR_HWND: Arc<Mutex<Option<HWND>>> = Arc::new(Mutex::new(None));
     static ref SWTOR_PID: Arc<Mutex<Option<u32>>> = Arc::new(Mutex::new(None));
-    static ref WRITING: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
-    static ref MESSAGE_HASHES: Arc<Mutex<Vec<u64>>> = Arc::new(Mutex::new(Vec::new()));
 }
 
 static PROCESS_CHECKSUM: OnceLock<Vec<u8>> = OnceLock::new();
 
-const ENTER_KEY: usize     = 0x0D;
-const BACKSPACE_KEY: usize = 0x08;
-const SHIFT_KEY: usize     = 0x10;
+
 
 unsafe fn set_process_checksum() {
 
@@ -116,41 +107,9 @@ pub fn hook_into_existing() {
 
 }
 
-fn post_message(msg_type: u32, wparam: usize, millis: u64) {
 
-    let wparam = WPARAM(wparam);
 
-    if let Some(hwnd) = SWTOR_HWND.lock().unwrap().as_ref() {
-
-        unsafe {
-            let _ = PostMessageW(*hwnd, msg_type, wparam, LPARAM(0));
-        }
-        if millis > 0 {
-            thread::sleep(Duration::from_millis(millis));
-        }
-
-    }
-
-}
-
-fn send_message(msg_type: u32, wparam: usize, millis: u64) {
-
-    let wparam = WPARAM(wparam);
-
-    if let Some(hwnd) = SWTOR_HWND.lock().unwrap().as_ref() {
-
-        unsafe {
-            let _ = SendMessageW(*hwnd, msg_type, wparam, LPARAM(0));
-        }
-        if millis > 0 {
-            thread::sleep(Duration::from_millis(millis));
-        }
-
-    }
-
-}
-
-fn window_in_focus() -> bool {
+pub fn window_in_focus() -> bool {
 
     let t_hwnd = Arc::clone(&SWTOR_HWND);
     if let Some(hwnd) = t_hwnd.lock().unwrap().as_ref() {
@@ -165,135 +124,15 @@ fn window_in_focus() -> bool {
 
 }
 
-fn prep_game_for_input() {
-
-    for _ in 0..64 {
-        send_message(WM_KEYDOWN, BACKSPACE_KEY, 2);
-    }
-
-    post_message(WM_KEYDOWN, SHIFT_KEY, 0);
-    post_message(WM_KEYDOWN, ENTER_KEY, 50);
-
-    post_message(WM_KEYUP, ENTER_KEY, 0);
-    post_message(WM_KEYUP, SHIFT_KEY, 50);
-
-}
-
-fn attempt_post_submission(window: &tauri::Window, message: &str) {
-
-    post_message(WM_KEYDOWN, ENTER_KEY, 250);
-
-    for c in message.chars() {
-
-        post_message(WM_CHAR, c as usize, 10);
-
-        if window_in_focus() {
-            window.set_focus().unwrap();
-        }
-
-    }
-
-    post_message(WM_KEYDOWN, ENTER_KEY, 20);
-
-}
-
-fn attempt_post_submission_with_retry(window: &tauri::Window, command_message: &CommandMessage) -> bool {
-
-    let message_hashes = Arc::clone(&MESSAGE_HASHES);
-    let c_message      = command_message.concat();
-    let message_hash   = command_message.message.as_u64_hash();
-
-    let mut retries = 0;
-    while retries < 3 {
-
-        attempt_post_submission(window, &c_message);
-
-        for _ in 0..4 {
-            thread::sleep(Duration::from_millis(500));
-            if message_hashes.lock().unwrap().contains(&message_hash) {
-                return true;
-            }
-        }
-        
-        retries += 1;
-
-    }
-
-    false
-
-}
-
-fn retry_logic(window: &tauri::Window, character_message: UserCharacterMessages) -> Result<(), &'static str> {
-
-    let command_messages = character_message.get_all_command_message_splits()?;
-    for command_message in command_messages {        
-
-        if command_message.is_command_only() {
-            attempt_post_submission(&window, &command_message.concat());
-        } else if !attempt_post_submission_with_retry(&window, &command_message) {
-            return Err("Failed to post message");
-        }
-
-        thread::sleep(Duration::from_millis(250));
-        
-    }
-
-    Ok(())
-
-}
-
-fn non_retry_logic(window: &tauri::Window, character_message: UserCharacterMessages) -> Result<(), &'static str> {
-
-    for message in character_message.messages {
-        attempt_post_submission(&window, &message);
-        thread::sleep(Duration::from_millis(250));
-    }
-
-    Ok(())
-
-}
-
-#[tauri::command]
-pub async fn submit_actual_post(window: tauri::Window, retry: bool, mut character_message: UserCharacterMessages) -> Result<(), &'static str> {
-
-    if WRITING.load(Ordering::Relaxed) {
-        return Err("Already writing");
-    }
-
-    WRITING.store(true, Ordering::Relaxed);
-
-    let result = task::spawn_blocking(move || {
-
-        character_message.prepare_messages();
-        character_message.store();
-
-        let message_hashes   = Arc::clone(&MESSAGE_HASHES);
-        message_hashes.lock().unwrap().clear();
-
-        prep_game_for_input();
-
-        if retry {
-            retry_logic(&window, character_message)?;
-        } else {
-            non_retry_logic(&window, character_message)?;
-        }
-
-        Ok(())
-
-    }).await.unwrap();
-
-    WRITING.store(false, Ordering::Relaxed);
-    result
-
-}
-
-pub fn push_incoming_message_hash(hash: u64) {
-    MESSAGE_HASHES.lock().unwrap().push(hash);
-}
-
 pub fn get_pid() -> Option<u32> {
 
     SWTOR_PID.lock().unwrap().clone()
+
+}
+
+pub fn get_hwnd() -> Option<HWND> {
+
+    SWTOR_HWND.lock().unwrap().clone()
 
 }
 

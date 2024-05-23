@@ -32,7 +32,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             swtor_hook::start_swtor_hook,
             swtor_hook::is_hooked_in,
-            swtor_hook::submit_actual_post,
+            swtor_hook::post::submit_actual_post,
             open_link,
             dal::db::custom_emote::get_all_custom_emotes,
             dal::db::custom_emote::create_custom_emote,
