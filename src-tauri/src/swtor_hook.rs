@@ -230,25 +230,15 @@ pub async fn submit_actual_post(window: tauri::Window, retry: bool, mut characte
 
     WRITING.store(true, Ordering::Relaxed);
 
-    task::spawn_blocking(move || {
+    let result = task::spawn_blocking(move || {
 
         character_message.prepare_messages();
+        character_message.store();
 
-        let command_messages: Vec<CommandMessage>;
-        match character_message.get_all_command_message_splits() {
-            Ok(messages) => {
-                command_messages = messages;
-            },
-            Err(e) => {
-                WRITING.store(false, Ordering::Relaxed);
-                return Err(e);
-            }
-        }
-
-        let message_hashes = Arc::clone(&MESSAGE_HASHES);
+        let command_messages = character_message.get_all_command_message_splits()?;
+        let message_hashes   = Arc::clone(&MESSAGE_HASHES);
         message_hashes.lock().unwrap().clear();
 
-        character_message.store();
         prep_game_for_input();
 
         if retry {
@@ -273,10 +263,12 @@ pub async fn submit_actual_post(window: tauri::Window, retry: bool, mut characte
 
         }
 
-        WRITING.store(false, Ordering::Relaxed);
         Ok(())
 
-    }).await.unwrap()
+    }).await.unwrap();
+
+    WRITING.store(false, Ordering::Relaxed);
+    result
 
 }
 

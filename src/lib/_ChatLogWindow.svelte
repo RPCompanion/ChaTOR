@@ -9,7 +9,7 @@
     import { active_chat_tab_index } from "./chat_log_window/chat_log_window_store";
     import { settings } from "./network/settings";
     import ChatTabs from "./chat_log_window/_ChatTabs.svelte";
-  import { set_swtor_channel_messages_read } from "./chat_log_window/chat_log_window_utils";
+    import { set_swtor_channel_messages_read } from "./chat_log_window/chat_log_window_utils";
 
     let auto_scroll: boolean = true;
     let container: HTMLElement | undefined = undefined;
