@@ -1,13 +1,13 @@
 
 <script lang="ts">
 
-    import { chat_log_active, settings } from "../../lib/network/settings";
+    import { settings } from "../../lib/network/settings";
     import { toast } from "@zerodevx/svelte-toast";
     import XButton from "../../lib/buttons/XButton.svelte";
     import ConfirmationModal from "../../lib/ConfirmationModal.svelte";
     import Checkbox from "../../lib/Checkbox.svelte";
     import { valid_messages } from "../utils";
-    import { submit_post, type MessageType } from "../../lib/network";
+    import { submit_post } from "../../lib/network";
     import StandardMenuButton from "../../lib/buttons/StandardMenuButton.svelte";
     import CustomEmotesList from "../../lib/_CustomEmotesList.svelte";
     import ChatLogWindow from "../../lib/_ChatLogWindow.svelte";
@@ -99,14 +99,15 @@
 </script>
 
 <div class="flex flex-col gap-2 w-full p-10 relative">
-
     <div class="text-white text-center bg-slate-700 text-2xl">Manual Formatting Mode</div>
     {#if $settings.chat_log.capture_chat_log && $settings.chat.show_chat_log_window}
         <ChatLogWindow on:whisper={on_whisper}/>
     {/if}
     <div class="relative h-6">
         <Checkbox on:checked={on_checked} checked={automated_posting} size="small">Automated posting</Checkbox>
-        <button type="button" class="bg-slate-800 text-white rounded-sm shadow-sm w-32 absolute right-0 hover:text-gray-300" on:click={clear_chat}>Clear chat</button>
+        {#if !$settings.chat.clear_chat_after_posting}
+            <button type="button" class="bg-slate-800 text-white rounded-sm shadow-sm w-32 absolute right-0 hover:text-gray-300" on:click={clear_chat}>Clear chat</button>
+        {/if}
     </div>
     <form>
         {#each messages as message, idx}

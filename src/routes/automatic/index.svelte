@@ -78,9 +78,11 @@
     {#if $settings.chat_log.capture_chat_log && $settings.chat.show_chat_log_window}
         <ChatLogWindow on:whisper={on_whisper}/>
     {/if}
-    <div class="relative h-6">
-        <button type="button" class="bg-slate-800 text-white rounded-sm shadow-sm w-32 absolute right-0" on:click={clear_chat}>Clear chat</button>
-    </div>
+    {#if !$settings.chat.clear_chat_after_posting}
+        <div class="relative h-6">
+            <button type="button" class="bg-slate-800 text-white rounded-sm shadow-sm w-32 absolute right-0" on:click={clear_chat}>Clear chat</button>
+        </div>
+    {/if} 
     <div class="relative">
         <textarea bind:this={textarea_elem} class="w-full min-h-36 outline-none p-1 rounded-md border-2 resize-none border-slate-700 chat-container-background text-white" bind:value={message} on:keydown={on_key_down}/>
         <div class="absolute bottom-1 right-2 text-white">{message.length}</div>
