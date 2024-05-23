@@ -21,6 +21,8 @@ use windows::Win32::UI::WindowsAndMessaging::{
 use crate::dal::db::user_character_messages::{CommandMessage, UserCharacterMessages};
 use crate::utils::StringUtils;
 
+pub mod posting;
+
 lazy_static! {
     static ref SWTOR_HWND: Arc<Mutex<Option<HWND>>> = Arc::new(Mutex::new(None));
     static ref SWTOR_PID: Arc<Mutex<Option<u32>>> = Arc::new(Mutex::new(None));
@@ -221,6 +223,36 @@ fn attempt_post_submission_with_retry(window: &tauri::Window, command_message: &
 
 }
 
+fn retry_logic(window: &tauri::Window, character_message: UserCharacterMessages) -> Result<(), &'static str> {
+
+    let command_messages = character_message.get_all_command_message_splits()?;
+    for command_message in command_messages {        
+
+        if command_message.is_command_only() {
+            attempt_post_submission(&window, &command_message.concat());
+        } else if !attempt_post_submission_with_retry(&window, &command_message) {
+            return Err("Failed to post message");
+        }
+
+        thread::sleep(Duration::from_millis(250));
+        
+    }
+
+    Ok(())
+
+}
+
+fn non_retry_logic(window: &tauri::Window, character_message: UserCharacterMessages) -> Result<(), &'static str> {
+
+    for message in character_message.messages {
+        attempt_post_submission(&window, &message);
+        thread::sleep(Duration::from_millis(250));
+    }
+
+    Ok(())
+
+}
+
 #[tauri::command]
 pub async fn submit_actual_post(window: tauri::Window, retry: bool, mut character_message: UserCharacterMessages) -> Result<(), &'static str> {
 
@@ -235,33 +267,15 @@ pub async fn submit_actual_post(window: tauri::Window, retry: bool, mut characte
         character_message.prepare_messages();
         character_message.store();
 
-        let command_messages = character_message.get_all_command_message_splits()?;
         let message_hashes   = Arc::clone(&MESSAGE_HASHES);
         message_hashes.lock().unwrap().clear();
 
         prep_game_for_input();
 
         if retry {
-
-            for command_message in command_messages {        
-
-                if command_message.is_command_only() {
-                    attempt_post_submission(&window, &command_message.concat());
-                } else if !attempt_post_submission_with_retry(&window, &command_message) {
-                    return Err("Failed to post message");
-                }
-
-                thread::sleep(Duration::from_millis(250));
-                
-            }
-
+            retry_logic(&window, character_message)?;
         } else {
-
-            for command_message in command_messages {
-                attempt_post_submission(&window, &command_message.concat());
-                thread::sleep(Duration::from_millis(250));
-            };
-
+            non_retry_logic(&window, character_message)?;
         }
 
         Ok(())
