@@ -9,12 +9,12 @@ use std::thread;
 use dll_syringe::{process::OwnedProcess, Syringe};
 
 use crate::{dal::db, swtor_hook::{self}};
+use crate::dal::db::swtor_message::SwtorMessage;
 
-use self::{message_container::MessageContainer, swtor_message::SwtorMessage};
+use self::message_container::MessageContainer;
 
 pub mod message_container;
 pub mod player_gui_state;
-pub mod swtor_message;
 
 const SUPPORTED_SWTOR_CHECKSUM: [u8; 32] = [
     195, 10, 27, 178, 67, 204, 136, 119, 181, 218, 101, 80, 230, 144, 3, 234, 9, 3, 76, 241, 245, 106, 37, 79, 182, 217, 30, 17, 78, 245, 231, 182
@@ -173,7 +173,7 @@ fn start_logging_propagation(window: tauri::Window) {
                 .drain_unstored();
 
             if !unstored_messages.is_empty() {
-                save_messages_to_database(unstored_messages.clone());
+                SwtorMessage::save_messages_to_db(unstored_messages.clone());
                 window.emit("swtor_messages", unstored_messages).unwrap();
             }
 
@@ -182,57 +182,6 @@ fn start_logging_propagation(window: tauri::Window) {
         }
 
     });
-
-}
-
-fn save_messages_to_database(messages: Vec<SwtorMessage>) {
-
-    let conn = db::get_connection();
-
-    const INSERT_PLAYER: &str = 
-    "
-        INSERT OR IGNORE INTO 
-            Characters (character_name)
-        SELECT
-            ?1
-        WHERE NOT EXISTS ( SELECT 1 FROM Characters WHERE character_name = ?1);
-    ";
-
-    let mut stmt = conn.prepare(INSERT_PLAYER).unwrap();
-    for message in messages.iter() {
-
-        match stmt.execute(&[&message.from]) {
-            Ok(_) => {},
-            Err(_err) => {}
-        }
-
-    }
-
-    const INSERT_MESSAGE: &str = 
-    "
-        INSERT OR IGNORE INTO 
-            ChatLog (chat_hash, character_id, message)
-        SELECT
-            ?1,
-            C.character_id,
-            ?2
-        FROM
-            Characters C
-        WHERE
-            ?2->>'from' = C.character_name;
-    ";
-    
-    let mut stmt = conn.prepare(INSERT_MESSAGE).unwrap();
-    for message in messages.iter() {
-
-        match stmt.execute(params![message.as_u64_hash() as i64, &message.as_json_str()]) {
-            Ok(_) => {},
-            Err(_err) => {
-                println!("Error inserting message {}", _err);
-            }
-        }
-
-    }
 
 }
 

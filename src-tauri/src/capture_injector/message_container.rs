@@ -3,7 +3,7 @@ use crate::share::*;
 use crate::swtor_hook::push_incoming_message_hash;
 use crate::utils::StringUtils;
 
-use crate::capture_injector::swtor_message::SwtorMessage;
+use crate::dal::db::swtor_message::SwtorMessage;
 
 pub struct MessageContainer {
     pub unstored_messages: Vec<SwtorMessage>
