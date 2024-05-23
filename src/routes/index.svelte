@@ -5,6 +5,6 @@
     import { goto } from "@roxi/routify";
 
     init_network();
-    $goto("/manual");
+    $goto("/automatic");
 
 </script>

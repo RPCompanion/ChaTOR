@@ -207,7 +207,7 @@ fn attempt_post_submission_with_retry(window: &tauri::Window, command_message: &
         attempt_post_submission(window, &c_message);
 
         for _ in 0..4 {
-            thread::sleep(Duration::from_millis(250));
+            thread::sleep(Duration::from_millis(500));
             if message_hashes.lock().unwrap().contains(&message_hash) {
                 return true;
             }
