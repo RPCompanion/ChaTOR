@@ -259,6 +259,7 @@ pub async fn submit_actual_post(window: tauri::Window, retry: bool, mut characte
 
             for command_message in command_messages {
                 attempt_post_submission(&window, &command_message.concat());
+                thread::sleep(Duration::from_millis(250));
             };
 
         }
