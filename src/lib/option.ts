@@ -18,6 +18,13 @@ export class Option<T> {
         return this.value;
     }
 
+    unwrap_or(default_value: T): T {
+        if (this.value === undefined) {
+            return default_value;
+        }
+        return this.value;
+    }
+
 }
 
 export function Some<T>(value: T): Option<T> {
