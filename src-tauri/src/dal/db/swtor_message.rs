@@ -2,9 +2,10 @@
 use chrono::prelude::*;
 use rusqlite::params;
 use serde::{Deserialize, Serialize};
+use crate::swtor::SwtorChannel;
 use crate::utils::StringUtils;
 
-use crate::dal::db;
+use crate::dal::db::{self, settings};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct SwtorMessage {
@@ -41,7 +42,7 @@ impl SwtorMessage {
                 Characters (character_name)
             SELECT
                 ?1
-            WHERE NOT EXISTS ( SELECT 1 FROM Characters WHERE character_name = ?1);
+            WHERE NOT EXISTS (SELECT 1 FROM Characters WHERE character_name = ?1);
         ";
 
         let mut stmt = conn.prepare(INSERT_PLAYER).unwrap();
@@ -53,6 +54,8 @@ impl SwtorMessage {
             }
 
         }
+
+        let save_global_msgs: bool = settings::get_settings().chat_log.log_global_chat;
 
         const INSERT_MESSAGE: &str = 
         "
@@ -70,6 +73,10 @@ impl SwtorMessage {
         
         let mut stmt = conn.prepare(INSERT_MESSAGE).unwrap();
         for message in messages.iter() {
+
+            if message.channel == SwtorChannel::GLOBAL as i32 && !save_global_msgs {
+                continue;
+            }
 
             match stmt.execute(params![message.as_u64_hash() as i64, &message.as_json_str()]) {
                 Ok(_) => {},

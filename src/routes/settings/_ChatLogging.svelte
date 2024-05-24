@@ -1,6 +1,5 @@
 
 <script lang="ts">
-    import { ArrowClockwise } from "phosphor-svelte";
     import { settings } from "../../lib/network/settings";
     import SettingSection from "./_SettingSection.svelte";
     import SettingsToggle from "./_SettingsToggle.svelte";
@@ -14,7 +13,6 @@
     const SECTION_SUB_TEXT: string = "Chat logging uses DLL injection, which is against the TOS of SWTOR and may result in a ban. Use at your own risk.";
 
     let characters: ICharacter[] = [];
-
 
     function init_all_characters() {
 
@@ -35,6 +33,11 @@
     {#if $settings.chat_log.character_ini_to_pull_from != undefined}
         <Setting setting="Enable Chat Logging">
             <SettingsToggle bind:checked={$settings.chat_log.capture_chat_log}></SettingsToggle>
+        </Setting>
+    {/if}
+    {#if $settings.chat_log.capture_chat_log}
+        <Setting setting="Log Global Chat">
+            <SettingsToggle bind:checked={$settings.chat_log.log_global_chat}></SettingsToggle>
         </Setting>
     {/if}
 </SettingSection>

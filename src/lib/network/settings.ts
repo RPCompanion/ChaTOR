@@ -23,6 +23,7 @@ export interface IChatSettings {
 
 export interface IChatLogSettings {
     capture_chat_log: boolean;
+    log_global_chat: boolean;
     character_ini_to_pull_from?: string;
 }
 
@@ -58,6 +59,7 @@ export function default_settings(): ISettings {
         },
         chat_log: {
             capture_chat_log: false,
+            log_global_chat: false,
             character_ini_to_pull_from: undefined
         }
 
