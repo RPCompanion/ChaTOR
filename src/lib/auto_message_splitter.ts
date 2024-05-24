@@ -39,11 +39,11 @@ export class AutoMessageSplitter {
     public split(): Result<string[], string> {
 
         if (this.constructor_error) {
-            return Result.error(this.constructor_error);
+            return Err(this.constructor_error);
         }
 
         if (this.message.length === 0) {
-            return Result.error("No messages to submit");
+            return Err("No messages to submit");
         }
 
         if (this.message.length < GAME_MESSAGE_MAXIMUM) {
@@ -58,7 +58,7 @@ export class AutoMessageSplitter {
 
         let prefix_result = this.prefix_message(this.message);
         if (prefix_result.is_error()) {
-            return Result.error(prefix_result.unwrap_error());
+            return Err(prefix_result.unwrap_error());
         }
         
         return Ok([prefix_result.unwrap()]);
