@@ -2,7 +2,7 @@
 use rusqlite::params;
 use serde::{Deserialize, Serialize};
 
-use crate::dal::db::{self, custom_emote};
+use crate::dal::db;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CustomEmote {
