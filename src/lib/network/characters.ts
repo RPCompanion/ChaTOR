@@ -57,6 +57,8 @@ export class Character {
             case SwtorChannel.YELL: return this.channel_colors[YELL_COLOR_INDEX];
             case SwtorChannel.EMOTE: return this.channel_colors[EMOTE_COLOR_INDEX];
             case SwtorChannel.WHISPER: return this.channel_colors[WHISPER_COLOR_INDEX];
+            case SwtorChannel.GUILD: return this.channel_colors[GUILD_COLOR_INDEX];
+            case SwtorChannel.GROUP: return this.channel_colors[GROUP_COLOR_INDEX];
             default: return this.channel_colors[SAY_COLOR_INDEX];
         }
 
@@ -76,6 +78,8 @@ export interface ICharacter {
     channel_colors: Color[];
 }
 
+export const GUILD_COLOR_INDEX: number   = 10;
+export const GROUP_COLOR_INDEX: number   = 9;
 export const WHISPER_COLOR_INDEX: number = 3;
 export const EMOTE_COLOR_INDEX: number   = 2;
 export const YELL_COLOR_INDEX: number    = 1;
