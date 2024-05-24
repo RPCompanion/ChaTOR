@@ -74,8 +74,12 @@ impl SwtorMessage {
         let mut stmt = conn.prepare(INSERT_MESSAGE).unwrap();
         for message in messages.iter() {
 
-            if message.channel == SwtorChannel::GLOBAL as i32 && !save_global_msgs {
-                continue;
+            if !save_global_msgs {
+
+                if !SwtorMessage::should_log_channel_message(message.channel) {
+                    continue;
+                }
+
             }
 
             match stmt.execute(params![message.as_u64_hash() as i64, &message.as_json_str()]) {
@@ -85,6 +89,23 @@ impl SwtorMessage {
                 }
             }
 
+        }
+
+    }
+
+    fn should_log_channel_message(channel: i32) -> bool {
+
+        let t_channel = SwtorChannel::try_from(channel);
+        if t_channel.is_err() {
+            println!("Error converting channel {}", channel);
+            return true;
+        } 
+
+        match t_channel.unwrap() {
+            SwtorChannel::GLOBAL => false,
+            SwtorChannel::PVP => false,
+            SwtorChannel::TRADE => false,
+            _ => true
         }
 
     }

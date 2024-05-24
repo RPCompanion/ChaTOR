@@ -36,7 +36,7 @@
         </Setting>
     {/if}
     {#if $settings.chat_log.capture_chat_log}
-        <Setting setting="Log Global Chat">
+        <Setting setting="Log Global Chat" sub_text="Logging for the global, trade and pvp channels">
             <SettingsToggle bind:checked={$settings.chat_log.log_global_chat}></SettingsToggle>
         </Setting>
     {/if}
