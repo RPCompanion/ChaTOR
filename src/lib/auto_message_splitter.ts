@@ -82,7 +82,7 @@ export class AutoMessageSplitter {
         let messages: string[] = [];
         let buffer = "";
 
-        const MAX_SENTENCE_ITERATIONS: number = 100;
+        const MAX_SENTENCE_ITERATIONS: number = 250;
         let actual_sentence_iterations: number = 0;
         for (let i = 0; i < array.length; i++) {
 
