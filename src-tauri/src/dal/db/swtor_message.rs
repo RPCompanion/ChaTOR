@@ -32,6 +32,17 @@ impl SwtorMessage {
         self.as_json_str().as_u64_hash()
     }
 
+    pub fn get_parsed_message(&self) -> String {
+
+        self.message
+            .replace("&quot;", "\"")
+            .replace("&lt;", "<")
+            .replace("&gt;", ">")
+            .replace("&amp;", "&")
+            .replace("&apos;", "'")
+
+    }
+
     pub fn save_messages_to_db(messages: Vec<SwtorMessage>) {
 
         let conn = db::get_connection();

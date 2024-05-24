@@ -91,7 +91,9 @@ export function init_swtor_message_listener() {
             message.message = message.message
                 .replaceAll("&quot;", "\"")
                 .replaceAll("&gt;", ">")
-                .replaceAll("&lt;", "<");
+                .replaceAll("&lt;", "<")
+                .replaceAll("&amp;", "&")
+                .replaceAll("&apos;", "'");
 
         });
 
