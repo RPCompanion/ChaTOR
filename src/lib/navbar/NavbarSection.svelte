@@ -18,12 +18,13 @@
     }
 
     function section_click() {
-        
+
         if (section.link != undefined) {
             goto_link(section.link);
             return;
         }
-
+        
+        trigger_navbar_callbacks(section.name);
         toggle_dropdown();
 
     }
@@ -42,7 +43,7 @@
         {/if}
     </button>
     {#if show_dropdown}
-        <div class="flex flex-col gap-1 bg-white p-2 absolute top-10 shadow-md" in:slide={{duration: 300}}>
+        <div class="flex flex-col gap-1 bg-white p-2 absolute top-10 shadow-md w-32" in:slide={{duration: 300}}>
             {#if section.elements != undefined}
                 {#each section.elements as element}
                     <button type="button" on:click={() => { goto_link(element.link); }} class="hover:text-slate-500 text-center">{element.name}</button>

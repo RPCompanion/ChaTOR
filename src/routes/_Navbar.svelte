@@ -2,6 +2,8 @@
 <script lang="ts">
 
     import { type INavbarSection } from "../lib/navbar/navbar";
+    import { trigger_navbar_callbacks } from "../lib/navbar/navbar";
+    import { click_outside_handler } from "../lib/click_outside";
     import NavbarSection from "../lib/navbar/NavbarSection.svelte";
 
     const CHAT_SECTION: INavbarSection = {
@@ -19,8 +21,17 @@
     };
 
     const EMOTE_SECTION: INavbarSection = {
-        name: "Custom Emotes",
-        link: "/custom_emotes"
+        name: "Emotes",
+        elements: [
+            {
+                name: "Add/Edit Emotes",
+                link: "/custom_emotes"
+            },
+            {
+                name: "Emote Board",
+                link: "/emote_board"
+            }
+        ]
     };
     
     const SETTINGS_SECTION: INavbarSection = {
@@ -30,7 +41,7 @@
 
 </script>
 
-<div class="w-full h-12 bg-slate-700 relative shadow-md grid grid-cols-2 z-10">
+<div class="w-full h-12 bg-slate-700 relative shadow-md grid grid-cols-2 z-10" use:click_outside_handler on:click_outside={trigger_navbar_callbacks}>
     <div class="flex flex-row gap-2">
         <NavbarSection section={CHAT_SECTION}/>
         <NavbarSection section={EMOTE_SECTION}/>

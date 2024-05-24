@@ -1,4 +1,5 @@
 
+import { writable } from "svelte/store";
 
 export interface INavbarSectionElement {
     name: string;
@@ -30,6 +31,6 @@ export function add_navbar_callback(unique_id: string, callback: () => void) {
 
 }
 
-export function trigger_navbar_callbacks() {
-    navbar_callbacks.forEach((element) => element.callback());
+export function trigger_navbar_callbacks(skip: string = "") {
+    navbar_callbacks.filter((c) => c.unique_id != skip).forEach((element) => element.callback());
 }
