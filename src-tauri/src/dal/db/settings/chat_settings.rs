@@ -5,7 +5,7 @@ pub mod chat_tab;
 
 use self::chat_tab::ChatTab;
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct ChatSettings {
 
     #[serde(default = "default_confirmation_before_posting")]

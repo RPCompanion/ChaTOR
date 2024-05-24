@@ -1,6 +1,7 @@
 
+use crate::dal::db::settings;
 use crate::share::*;
-use crate::swtor_hook::post::push_incoming_message_hash;
+use crate::swtor_hook::post;
 use crate::utils::StringUtils;
 
 use crate::dal::db::swtor_message::SwtorMessage;
@@ -27,7 +28,11 @@ impl MessageContainer {
         }
 
         let swtor_message: SwtorMessage = serde_json::from_str(&message.message).unwrap();
-        push_incoming_message_hash(swtor_message.message.as_u64_hash());
+
+        if settings::get_settings().chat.retry_message_submission {
+            post::push_incoming_message_hash(swtor_message.message.as_u64_hash());
+        }
+
         self.unstored_messages.push(swtor_message);
 
     }

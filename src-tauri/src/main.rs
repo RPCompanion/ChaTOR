@@ -17,6 +17,7 @@ mod swtor;
 fn main() {
 
     dal::init();
+    dal::db::settings::init();
 
     tauri::Builder::default()
         .on_window_event(|event| {

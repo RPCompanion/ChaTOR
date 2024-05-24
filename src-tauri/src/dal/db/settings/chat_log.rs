@@ -2,7 +2,7 @@
 use serde::{Deserialize, Serialize};
 
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct ChatLogSettings {
 
     #[serde(default = "default_capture_chat_log")]

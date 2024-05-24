@@ -1,4 +1,6 @@
 
+use std::sync::{Arc, Mutex};
+
 use rusqlite::params;
 use serde::{Deserialize, Serialize};
 
@@ -11,7 +13,7 @@ use chat_settings::ChatSettings;
 use chat_log::ChatLogSettings;
 
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct Settings {
     pub chat: ChatSettings,
     #[serde(default = "default_chat_log_settings")]
@@ -20,6 +22,10 @@ pub struct Settings {
 
 fn default_chat_log_settings() -> ChatLogSettings {
     ChatLogSettings::default()
+}
+
+lazy_static! {
+    static ref SETTINGS: Arc<Mutex<Option<Settings>>> = Arc::new(Mutex::new(None));
 }
 
 impl Settings {
@@ -73,10 +79,15 @@ impl Settings {
 
 #[tauri::command]
 pub fn get_settings() -> Settings {
-    Settings::get()
+    SETTINGS.lock().unwrap().as_ref().unwrap().clone()
 }
 
 #[tauri::command]
 pub fn update_settings(settings: Settings) {
     settings.update();
+    SETTINGS.lock().as_mut().unwrap().replace(settings);
+}
+
+pub fn init() {
+    SETTINGS.lock().as_mut().unwrap().replace(Settings::get());
 }

@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::swtor::SwtorChannel;
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct ChatTab {
     pub name: String,
     pub channels: Vec<i32>
