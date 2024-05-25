@@ -29,6 +29,13 @@ export class Result<Ok, Error> {
         return this.ok;
     }
 
+    unwrap_or(default_value: Ok): Ok {
+        if (this.ok === null) {
+            return default_value;
+        }
+        return this.ok;
+    }
+
     unwrap_error(): Error {
         if (this.error === null) {
             throw new Error("Cannot unwrap ok result");
