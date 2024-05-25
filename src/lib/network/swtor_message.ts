@@ -78,6 +78,34 @@ function setup_setting_subscription() {
 
 }
 
+function replace_html_entities(payload: ISwtorMessage[]) {
+
+    payload.forEach((message) => {
+
+        message.message = message.message
+            .replaceAll("&quot;", "\"")
+            .replaceAll("&gt;", ">")
+            .replaceAll("&lt;", "<")
+            .replaceAll("&amp;", "&")
+            .replaceAll("&apos;", "'");
+
+    });
+
+}
+
+function replace_html_tags(payload: ISwtorMessage[]) {
+
+    const re: RegExp = /<HL LID="([^"]+)">/g;
+    payload.forEach((message) => {
+
+        for (let obj of message.message.matchAll(re)) {
+            message.message = message.message.replace(obj[0], "");
+        }
+
+    });
+
+}
+
 export function init_swtor_message_listener() {
 
     setup_setting_subscription();
@@ -86,16 +114,8 @@ export function init_swtor_message_listener() {
         let t_chat_tab_messages = get(swtor_channel_messages);
         let payload: ISwtorMessage[] = messages.payload;
 
-        payload.forEach((message) => {
-
-            message.message = message.message
-                .replaceAll("&quot;", "\"")
-                .replaceAll("&gt;", ">")
-                .replaceAll("&lt;", "<")
-                .replaceAll("&amp;", "&")
-                .replaceAll("&apos;", "'");
-
-        });
+        replace_html_entities(payload);
+        replace_html_tags(payload);
 
         let t_settings = get(settings);        
         payload.map((message) => new SwtorMessage(message)).forEach((message) => {
