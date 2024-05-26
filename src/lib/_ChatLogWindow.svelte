@@ -37,7 +37,7 @@
             return;
         }
 
-        last_message.scrollIntoView({ behavior: "smooth", block: "end" });
+        last_message.scrollIntoView({ behavior: "instant", block: "end" });
 
     }
 
@@ -61,9 +61,8 @@
             case SwtorChannel.TRADE:   return Some("trade");
             case SwtorChannel.GROUP:   return Some("group");
             case SwtorChannel.GUILD:   return Some("guild");
+            default:                   return None();
         }
-
-        return None();
 
     }
 
@@ -82,7 +81,12 @@
 
     }
 
+    const COMPUTE_MESSAGE_FRAGMENTS: boolean = false;
     function get_message_fragments(message: SwtorMessage): string[] {
+
+        if (!COMPUTE_MESSAGE_FRAGMENTS) {
+            return [message.message];
+        }
 
         let idx = message.message.indexOf("\"");
         if (idx == -1) {
