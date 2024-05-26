@@ -10,6 +10,7 @@
     import { settings } from "./network/settings";
     import ChatTabs from "./chat_log_window/_ChatTabs.svelte";
     import { set_swtor_channel_messages_read } from "./chat_log_window/chat_log_window_utils";
+    import { Option, Some, None } from "./option";
 
     let auto_scroll: boolean = true;
     let container: HTMLElement | undefined = undefined;
@@ -48,6 +49,76 @@
         return t_channel_messages.find((c) => c.chat_tab_name == get_active_chat_tab_name(index))?.messages ?? [];
     }
 
+    function get_swtor_channel_text(message: SwtorMessage): Option<string> {
+
+        switch (message.channel.type) {
+            case SwtorChannel.SAY:     return Some("say");
+            case SwtorChannel.YELL:    return Some("yell");
+            case SwtorChannel.EMOTE:   return Some("emote");
+            case SwtorChannel.WHISPER: return Some("whisper");
+            case SwtorChannel.GLOBAL:  return Some("global");
+            case SwtorChannel.PVP:     return Some("pvp");
+            case SwtorChannel.TRADE:   return Some("trade");
+            case SwtorChannel.GROUP:   return Some("group");
+            case SwtorChannel.GUILD:   return Some("guild");
+        }
+
+        return None();
+
+    }
+
+    function get_message_from(message: SwtorMessage): string {
+        
+        if (message.channel.type == SwtorChannel.WHISPER && message.from == $active_character?.character_name) {
+            return `[to ${message.to}]`;
+        }
+
+        let channel_text = get_swtor_channel_text(message);
+        if (channel_text.is_some()) {
+            return `[${channel_text.unwrap()}] ${message.from}:`;
+        }
+
+        return message.from;
+
+    }
+
+    function get_message_fragments(message: SwtorMessage): string[] {
+
+        let idx = message.message.indexOf("\"");
+        if (idx == -1) {
+            return [message.message];
+        }
+
+        let fragments: string[] = [message.message.substring(0, idx)];
+        let temp: string        = message.message.substring(idx);
+
+        while (true) {
+
+            idx = temp.indexOf("\"", 1);
+            if (idx != -1) {
+
+                if (temp.startsWith("\"")) {
+                    fragments.push(temp.substring(0, idx + 1));
+                    temp = temp.substring(idx + 1);
+                } else {
+                    fragments.push(temp.substring(0, idx));
+                    temp = temp.substring(idx);
+                }
+
+            } else {
+                break;
+            }
+
+        }
+
+        if (temp.length > 0) {
+            fragments.push(temp);
+        }
+
+        return fragments;
+
+    }
+
     $: if ($swtor_channel_messages.length > 0) {
         set_swtor_channel_messages_read(get_active_chat_tab_name($active_chat_tab_index));
     }
@@ -73,19 +144,17 @@
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-static-element-interactions -->
                 <span class="text-slate-200 cursor-pointer" on:click={() => {on_character_click(message)}}>
-                    {#if message.from == $active_character?.character_name && message.channel.type == SwtorChannel.WHISPER}
-                        [to {message.to}]:
-                    {:else}
-                        {message.from}:
-                    {/if}
+                    {get_message_from(message)}
                 </span>
-                <span class="break-words " style="color: {$active_character?.get_channel_color(message.channel.type).to_hex()}">{message.message}</span>
+                {#each get_message_fragments(message) as fragment}
+                    {#if fragment.startsWith("\"") && fragment.endsWith("\"")}
+                        <span class="break-words " style="color: white;">{fragment}</span>
+                    {:else}
+                        <span class="break-words " style="color: {$active_character?.get_channel_color(message.channel.type).to_hex()}">{fragment}</span>
+                    {/if}
+                {/each}
             </div>
 
         {/each}
     </div>
 </div>
-
-<style>
-
-</style>
