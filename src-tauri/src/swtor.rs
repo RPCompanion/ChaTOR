@@ -9,8 +9,9 @@ pub enum SwtorChannel {
     EMOTE = 3,
     WHISPER = 4,
     GLOBAL = 51,
-    PVP = 52,
+    PVP   = 52,
     TRADE = 53,
     GROUP = 54,
+    OP    = 55,
     GUILD = 57
 }

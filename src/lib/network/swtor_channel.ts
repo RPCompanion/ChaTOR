@@ -8,6 +8,7 @@ export enum SwtorChannel {
     PVP = 52,
     TRADE = 53,
     GROUP = 54,
+    OP    = 55,
     GUILD = 57
 }
 
