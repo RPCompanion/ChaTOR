@@ -2,7 +2,7 @@
 use int_enum::IntEnum;
 
 #[repr(i32)]
-#[derive(IntEnum)]
+#[derive(IntEnum, Clone, Copy, PartialEq)]
 pub enum SwtorChannel {
     SAY = 1,
     YELL = 2,
@@ -13,5 +13,6 @@ pub enum SwtorChannel {
     TRADE = 53,
     GROUP = 54,
     OP    = 55,
-    GUILD = 57
+    GUILD = 57,
+    PlayerNotFound = 1003,
 }

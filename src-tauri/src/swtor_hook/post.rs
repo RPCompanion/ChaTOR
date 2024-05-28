@@ -1,5 +1,6 @@
 
 use tokio::task;
+use crate::swtor::SwtorChannel;
 use crate::utils::StringUtils;
 
 use crate::dal::db::user_character_messages::{CommandMessage, UserCharacterMessages};
@@ -10,21 +11,22 @@ use std::thread;
 use std::time::Duration;
 
 use crate::swtor_hook;
+use crate::swtor_hook::message_hash_container::MessageHashContainer;
 
 use windows::Win32::Foundation::{LPARAM, WPARAM};
 use windows::Win32::UI::WindowsAndMessaging::{PostMessageW, SendMessageW, WM_CHAR, WM_KEYDOWN, WM_KEYUP};
 
 lazy_static! {
     static ref WRITING: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
-    static ref MESSAGE_HASHES: Arc<Mutex<Vec<u64>>> = Arc::new(Mutex::new(Vec::new()));
+    static ref MESSAGE_HASH_CONTAINER: Arc<Mutex<MessageHashContainer>> = Arc::new(Mutex::new(MessageHashContainer::new()));
 }
 
 const ENTER_KEY: usize     = 0x0D;
 const BACKSPACE_KEY: usize = 0x08;
 const SHIFT_KEY: usize     = 0x10;
 
-pub fn push_incoming_message_hash(hash: u64) {
-    MESSAGE_HASHES.lock().unwrap().push(hash);
+pub fn push_incoming_message_hash(channel: SwtorChannel, hash: u64) {
+    MESSAGE_HASH_CONTAINER.lock().unwrap().push(channel, hash);
 }
 
 fn post_message(msg_type: u32, wparam: usize, millis: u64) {
@@ -95,9 +97,9 @@ fn attempt_post_submission(window: &tauri::Window, message: &str) {
 
 }
 
-fn attempt_post_submission_with_retry(window: &tauri::Window, command_message: &CommandMessage) -> bool {
+fn attempt_post_submission_with_retry(window: &tauri::Window, command_message: &CommandMessage) -> Result<(), &'static str> {
 
-    let message_hashes = Arc::clone(&MESSAGE_HASHES);
+    let message_hash_cont = Arc::clone(&MESSAGE_HASH_CONTAINER);
     let c_message      = command_message.concat();
     let message_hash   = command_message.message.as_u64_hash();
 
@@ -107,17 +109,21 @@ fn attempt_post_submission_with_retry(window: &tauri::Window, command_message: &
         attempt_post_submission(window, &c_message);
 
         for _ in 0..4 {
+
             thread::sleep(Duration::from_millis(500));
-            if message_hashes.lock().unwrap().contains(&message_hash) {
-                return true;
+            if message_hash_cont.lock().unwrap().message_hashes.contains(&message_hash) {
+                return Ok(());
+            } else if  message_hash_cont.lock().unwrap().channels.contains(&SwtorChannel::PlayerNotFound) {
+                return Err("Player not found");
             }
+
         }
         
         retries += 1;
 
     }
 
-    false
+    Err("Failed to post message")
 
 }
 
@@ -128,8 +134,8 @@ fn retry_logic(window: &tauri::Window, character_message: UserCharacterMessages)
 
         if command_message.is_command_only() {
             attempt_post_submission(&window, &command_message.concat());
-        } else if !attempt_post_submission_with_retry(&window, &command_message) {
-            return Err("Failed to post message");
+        } else {
+            attempt_post_submission_with_retry(&window, &command_message)?;
         }
 
         thread::sleep(Duration::from_millis(250));
@@ -165,8 +171,8 @@ pub async fn submit_actual_post(window: tauri::Window, retry: bool, mut characte
         character_message.prepare_messages();
         character_message.store();
 
-        let message_hashes   = Arc::clone(&MESSAGE_HASHES);
-        message_hashes.lock().unwrap().clear();
+        let message_hash_cont   = Arc::clone(&MESSAGE_HASH_CONTAINER);
+        message_hash_cont.lock().unwrap().clear();
 
         prep_game_for_input();
 

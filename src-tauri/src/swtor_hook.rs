@@ -17,6 +17,7 @@ use windows::core::PWSTR;
 use windows::Win32::System::Threading::{OpenProcess, QueryFullProcessImageNameW, PROCESS_NAME_FORMAT, PROCESS_QUERY_INFORMATION};
 
 pub mod post;
+pub mod message_hash_container;
 
 lazy_static! {
     static ref SWTOR_HWND: Arc<Mutex<Option<HWND>>> = Arc::new(Mutex::new(None));
