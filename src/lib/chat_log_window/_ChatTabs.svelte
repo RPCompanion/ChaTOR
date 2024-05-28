@@ -6,7 +6,7 @@
     import { active_chat_tab_index } from "./chat_log_window_store";
     import EditModal from "./_EditModal.svelte";
     import { type SvelteDispatch } from "../svelte_utils";
-  import { set_swtor_channel_messages_read } from "./chat_log_window_utils";
+    import { set_swtor_channel_messages_read } from "./chat_log_window_utils";
 
     let show_edit_modal: boolean = false;
     let old_chat_tab_index: number = $active_chat_tab_index;

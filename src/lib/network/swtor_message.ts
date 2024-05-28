@@ -95,6 +95,10 @@ function replace_html_entities(payload: ISwtorMessage[]) {
 
 function replace_html_tags(payload: ISwtorMessage[]) {
 
+    if (get(settings).chat_log.window.show_unknown_ids) {
+        return;
+    }
+
     const re: RegExp = /<HL LID="([^"]+)">/g;
     payload.forEach((message) => {
 

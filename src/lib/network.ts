@@ -67,7 +67,7 @@ export async function submit_post(message_type: MessageType, messages: string[])
     };
 
     let t_settings = get(settings);
-    let retry: boolean = t_settings.chat.retry_message_submission && t_settings.chat_log.capture_chat_log && message_type != "ButtonEmote";
+    let retry: boolean = t_settings.chat_log.retry_message_submission && t_settings.chat_log.capture_chat_log && message_type != "ButtonEmote";
 
     try {
 
