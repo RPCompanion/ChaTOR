@@ -16,7 +16,11 @@ impl ChatTab {
         vec![
             ChatTab {
                 name: "Global".to_string(),
-                channels: vec![SwtorChannel::GLOBAL as i32]
+                channels: vec![
+                    SwtorChannel::GLOBAL as i32,
+                    SwtorChannel::PVP as i32,
+                    SwtorChannel::TRADE as i32
+                ]
             },
             ChatTab {
                 name: "Local".to_string(),

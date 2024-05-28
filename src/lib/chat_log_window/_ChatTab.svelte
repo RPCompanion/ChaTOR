@@ -41,7 +41,7 @@
     function on_delete() {
 
         show_edit_tab = false;
-        $settings.chat.chat_tabs.splice(index, 1);
+        $settings.chat_log.window.chat_tabs.splice(index, 1);
         $settings = $settings;
         
         if ($active_chat_tab_index != 0) {
@@ -52,7 +52,7 @@
 
     function on_modal_save(event: any) {
 
-        $settings.chat.chat_tabs[index] = event.detail;
+        $settings.chat_log.window.chat_tabs[index] = event.detail;
         $settings = $settings;
 
     }
@@ -76,7 +76,7 @@
         <!-- svelte-ignore ts2614 -->
         <div class="flex flex-col gap-1 w-36 shadow-md bg-slate-700 absolute p-2 border-2 border-slate-800" >
             <button type="button" class="text-white hover:text-gray-400" on:click={on_edit}>Edit</button>
-            {#if $settings.chat.chat_tabs.length > 1 }
+            {#if $settings.chat_log.window.chat_tabs.length > 1 }
                 <button type="button" class="text-white hover:text-gray-400" on:click={on_delete}>Delete</button>
             {/if}
         </div>

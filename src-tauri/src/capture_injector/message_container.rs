@@ -29,7 +29,7 @@ impl MessageContainer {
 
         let swtor_message: SwtorMessage = serde_json::from_str(&message.message).unwrap();
 
-        if settings::get_settings().chat.retry_message_submission {
+        if settings::get_settings().chat_log.retry_message_submission {
             post::push_incoming_message_hash(swtor_message.get_parsed_message().as_u64_hash());
         }
 

@@ -16,15 +16,20 @@ export interface IChatSettings {
     clear_chat_after_posting: boolean;
     remove_starting_pronouns: boolean;
     starting_characters_are_lowercase: boolean;
+}
+
+export interface IChatLogWindow {
+    show_unknown_ids: boolean;
     show_chat_log_window: boolean;
-    retry_message_submission: boolean;
     chat_tabs: IChatTab[];
 }
 
 export interface IChatLogSettings {
     capture_chat_log: boolean;
     log_global_chat: boolean;
+    retry_message_submission: boolean;
     character_ini_to_pull_from?: string;
+    window: IChatLogWindow;
 }
 
 export interface ISettings {
@@ -44,23 +49,26 @@ export function default_settings(): ISettings {
             clear_chat_after_posting: false,
             remove_starting_pronouns: false,
             starting_characters_are_lowercase: true,
-            show_chat_log_window: false,
-            retry_message_submission: false,
-            chat_tabs: [
-                {
-                    name: "Global",
-                    channels: [SwtorChannel.GLOBAL]
-                },
-                {
-                    name: "Local",
-                    channels: [SwtorChannel.EMOTE, SwtorChannel.SAY, SwtorChannel.YELL, SwtorChannel.WHISPER]
-                }
-            ]
         },
         chat_log: {
             capture_chat_log: false,
             log_global_chat: false,
-            character_ini_to_pull_from: undefined
+            retry_message_submission: false,
+            character_ini_to_pull_from: undefined,
+            window: {
+                show_unknown_ids: false,
+                show_chat_log_window: false,
+                chat_tabs: [
+                    {
+                        name: "Global",
+                        channels: [SwtorChannel.GLOBAL, SwtorChannel.PVP, SwtorChannel.TRADE]
+                    },
+                    {
+                        name: "Local",
+                        channels: [SwtorChannel.EMOTE, SwtorChannel.SAY, SwtorChannel.YELL, SwtorChannel.WHISPER]
+                    }
+                ]
+            }
         }
 
     }

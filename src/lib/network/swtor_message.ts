@@ -53,10 +53,10 @@ function setup_setting_subscription() {
 
         let t_swtor_channel_messages = get(swtor_channel_messages);
 
-        if (t_swtor_channel_messages.length <= settings.chat.chat_tabs.length) {
+        if (t_swtor_channel_messages.length <= settings.chat_log.window.chat_tabs.length) {
 
             let temp = t_swtor_channel_messages.map((chat_tab) => chat_tab.chat_tab_name);
-            settings.chat.chat_tabs.forEach((chat_tab) => {
+            settings.chat_log.window.chat_tabs.forEach((chat_tab) => {
                 
                 if (!temp.includes(chat_tab.name)) {
                     t_swtor_channel_messages.push(new SwtorChatTabMessages(chat_tab.name));
@@ -67,7 +67,7 @@ function setup_setting_subscription() {
         } else {
 
             t_swtor_channel_messages = t_swtor_channel_messages.filter((chat_tab) => {
-                return settings.chat.chat_tabs.map((chat_tab) => chat_tab.name).includes(chat_tab.chat_tab_name);
+                return settings.chat_log.window.chat_tabs.map((chat_tab) => chat_tab.name).includes(chat_tab.chat_tab_name);
             });
 
         }
@@ -120,7 +120,7 @@ export function init_swtor_message_listener() {
         let t_settings = get(settings);        
         payload.map((message) => new SwtorMessage(message)).forEach((message) => {
 
-           t_settings.chat.chat_tabs.forEach((chat_tab) => {
+           t_settings.chat_log.window.chat_tabs.forEach((chat_tab) => {
 
                 if (!chat_tab.channels.includes(message.channel.type)) {
                     return;

@@ -28,9 +28,9 @@
             return Err("Chat tab name cannot be longer than 12 characters");
         }
 
-        let filter_results = $settings.chat.chat_tabs.filter((tab) => tab.name == chat_tab.name);
+        let filter_results = $settings.chat_log.window.chat_tabs.filter((tab) => tab.name == chat_tab.name);
 
-        if (index == undefined || $settings.chat.chat_tabs[index].name != chat_tab.name) {
+        if (index == undefined || $settings.chat_log.window.chat_tabs[index].name != chat_tab.name) {
             
             if (filter_results.length > 0) {
                 return Err("Chat tab name must be unique");
@@ -57,7 +57,7 @@
             return;
         }
 
-        let old_name = $settings.chat.chat_tabs[index].name;
+        let old_name = $settings.chat_log.window.chat_tabs[index].name;
         let idx = $swtor_channel_messages.findIndex((c) => c.chat_tab_name == old_name);
         if (idx == -1) {
             return;

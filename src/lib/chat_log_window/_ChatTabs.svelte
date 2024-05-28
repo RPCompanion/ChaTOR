@@ -15,19 +15,19 @@
     }
 
     function on_save(event: SvelteDispatch<IChatTab>) {
-        $settings.chat.chat_tabs.push(event.detail);
+        $settings.chat_log.window.chat_tabs.push(event.detail);
         $settings = $settings;
     }
     
     $: if ($active_chat_tab_index != old_chat_tab_index) {
-        set_swtor_channel_messages_read($settings.chat.chat_tabs[$active_chat_tab_index].name);
+        set_swtor_channel_messages_read($settings.chat_log.window.chat_tabs[$active_chat_tab_index].name);
         old_chat_tab_index = $active_chat_tab_index;
     }
 
 </script>
 
 <div class="flex flex-row gap-1 relative">
-    {#each $settings.chat.chat_tabs as chat_tab, index}
+    {#each $settings.chat_log.window.chat_tabs as chat_tab, index}
         <ChatTab chat_tab={JSON.parse(JSON.stringify(chat_tab))} {index} />
     {/each}
     <div class="relative">

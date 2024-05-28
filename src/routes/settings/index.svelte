@@ -4,6 +4,7 @@
     import ChatManualSection from "./_ChatManualSection.svelte";
     import ChatAutomaticSection from "./_ChatAutomaticSection.svelte";
     import ChatLogging from "./_ChatLogging.svelte";
+    import ChatLogWindow from "./_ChatLogWindow.svelte";
 </script>
 
 <div class="relative text-center text-2xl bg-slate-800 opacity-95 text-white h-12">Settings</div>
@@ -12,4 +13,5 @@
     <ChatManualSection/>
     <ChatAutomaticSection/>
     <ChatLogging/>
+    <ChatLogWindow/>
 </div>

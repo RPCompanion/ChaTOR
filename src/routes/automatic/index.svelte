@@ -75,7 +75,7 @@
 
 <div class="flex flex-col gap-2 w-full p-10 relative">
     <div class="text-white text-center bg-slate-700 text-2xl">Automatic Formatting Mode</div>
-    {#if $settings.chat_log.capture_chat_log && $settings.chat.show_chat_log_window}
+    {#if $settings.chat_log.capture_chat_log && $settings.chat_log.window.show_chat_log_window}
         <ChatLogWindow on:whisper={on_whisper}/>
     {/if}
     {#if !$settings.chat.clear_chat_after_posting}

@@ -42,7 +42,7 @@
     }
 
     function get_active_chat_tab_name(index: number): string {
-        return $settings.chat.chat_tabs[index].name;
+        return $settings.chat_log.window.chat_tabs[index].name;
     }
 
     function get_swtor_channel_messages(t_channel_messages: SwtorChatTabMessages[], index: number ): SwtorMessage[] {

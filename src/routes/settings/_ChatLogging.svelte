@@ -39,5 +39,8 @@
         <Setting setting="Log Global Chat" sub_text="Logging for the global, trade and pvp channels">
             <SettingsToggle bind:checked={$settings.chat_log.log_global_chat}></SettingsToggle>
         </Setting>
+        <Setting setting="Retry submitting unprocessed posts">
+            <SettingsToggle bind:checked={$settings.chat_log.retry_message_submission}></SettingsToggle>
+        </Setting>
     {/if}
 </SettingSection>
