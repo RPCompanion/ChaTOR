@@ -3,8 +3,7 @@ import { invoke } from "@tauri-apps/api";
 import { listen } from "@tauri-apps/api/event";
 import { writable, get } from "svelte/store";
 
-import { toast } from "@zerodevx/svelte-toast";
-import { Result } from "./result";
+import { Result, Ok, Err } from "./result";
 import { init_custom_emotes } from "./network/custom_emote";
 import { init_settings } from "./network/settings";
 import { init_swtor_message_listener } from "./network/swtor_message";
@@ -45,7 +44,7 @@ function init_hook() {
 export async function submit_post(message_type: MessageType, messages: string[]): Promise<Result<[], string>> {
 
     if (!get(hooked_in)) {
-        return Result.error("SWTOR not hooked in. Have you launched the game?");
+        return Err("SWTOR not hooked in. Have you launched the game?");
     }
 
     messages = messages.map((message) => message.trim());
@@ -53,9 +52,9 @@ export async function submit_post(message_type: MessageType, messages: string[])
     for (let message of messages) { 
         
         if (message.length == 0) {
-            return Result.error("Empty message detected. Please remove it.");
+            return Err("Empty message detected. Please remove it.");
         } else if (message.length > 255) {
-            return Result.error("Long message detected. Please shorten it.");
+            return Err("Long message detected. Please shorten it.");
         }
 
     }
@@ -72,11 +71,11 @@ export async function submit_post(message_type: MessageType, messages: string[])
     try {
 
         await invoke("submit_actual_post", {retry: retry, characterMessage: character_message});
-        return Result.ok([]);
+        return Ok([]);
 
     } catch (error: any) {
 
-        return Result.error(error);
+        return Err(error);
         
     }
 
