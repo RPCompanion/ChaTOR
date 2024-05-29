@@ -1,6 +1,6 @@
 
 <script lang="ts">
-    import { swtor_channel_messages } from "../network/swtor_message";
+    import { remove_swtor_channel, swtor_channel_messages } from "../network/swtor_message/swtor_chat_tab_messages";
     import EditModal from "./_EditModal.svelte";
     import { settings } from "../network/settings";
     import { click_outside_handler } from "../click_outside";
@@ -42,11 +42,13 @@
 
         show_edit_tab = false;
         $settings.chat_log.window.chat_tabs.splice(index, 1);
-        $settings = $settings;
-        
+
+        remove_swtor_channel(chat_tab.name);
         if ($active_chat_tab_index != 0) {
             $active_chat_tab_index -= 1;
         }
+
+        $settings = $settings;
 
     }
 

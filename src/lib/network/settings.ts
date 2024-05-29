@@ -4,6 +4,7 @@ import { invoke } from "@tauri-apps/api";
 import { toast } from "@zerodevx/svelte-toast";
 import { hooked_in } from "../network";
 import { SwtorChannel } from "./swtor_channel";
+import { set_initial_swtor_channels } from "./swtor_message/swtor_chat_tab_messages";
 
 export interface IChatTab {
     name: string;
@@ -86,6 +87,7 @@ export function init_settings(dependent_callback: () => void) {
         settings.subscribe((value) => {
             invoke("update_settings", {settings: value});
         });
+        set_initial_swtor_channels();
         chat_log_subscriber();
         dependent_callback();
 

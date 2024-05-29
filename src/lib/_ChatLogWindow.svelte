@@ -2,14 +2,20 @@
 <script lang="ts">
     import { active_character } from "./network/characters";
     import { createEventDispatcher } from "svelte";
-    import { SwtorChatTabMessages, SwtorMessage, swtor_channel_messages } from "./network/swtor_message";
+    import { SwtorMessage } from "./network/swtor_message";
+
+    import { 
+        SwtorChatTabMessages, 
+        swtor_channel_messages,
+        set_swtor_channel_messages_to_read 
+    } from "./network/swtor_message/swtor_chat_tab_messages";
+    
     import { afterUpdate } from "svelte";
     import Checkbox from "./Checkbox.svelte";
     import { SwtorChannel } from "./network/swtor_channel";
     import { active_chat_tab_index } from "./chat_log_window/chat_log_window_store";
     import { settings } from "./network/settings";
     import ChatTabs from "./chat_log_window/_ChatTabs.svelte";
-    import { set_swtor_channel_messages_read } from "./chat_log_window/chat_log_window_utils";
     import { Option, Some, None } from "./option";
 
     let auto_scroll: boolean = true;
@@ -124,7 +130,7 @@
     }
 
     $: if ($swtor_channel_messages.length > 0) {
-        set_swtor_channel_messages_read(get_active_chat_tab_name($active_chat_tab_index));
+        set_swtor_channel_messages_to_read(get_active_chat_tab_name($active_chat_tab_index));
     }
 
     afterUpdate(() => {

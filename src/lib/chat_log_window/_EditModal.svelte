@@ -7,7 +7,7 @@
     import type { IChatTab } from "../network/settings";
     import { settings } from "../network/settings";
     import { SwtorChannel } from "../network/swtor_channel";
-    import { swtor_channel_messages } from "../network/swtor_message";
+    import { swtor_channel_messages } from "../network/swtor_message/swtor_chat_tab_messages";
 
     export let index: number | undefined = undefined;
     export let chat_tab: IChatTab = { name: "", channels: [] }
