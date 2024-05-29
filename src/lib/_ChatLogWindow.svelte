@@ -10,7 +10,7 @@
         set_swtor_channel_messages_to_read 
     } from "./network/swtor_message/swtor_chat_tab_messages";
     
-    import { afterUpdate } from "svelte";
+    import { afterUpdate, onMount } from "svelte";
     import Checkbox from "./Checkbox.svelte";
     import { SwtorChannel } from "./network/swtor_channel";
     import { active_chat_tab_index } from "./chat_log_window/chat_log_window_store";
@@ -135,6 +135,33 @@
 
     afterUpdate(() => {
         scroll_container();
+    });
+
+    onMount(() => {
+
+        if (container != undefined) {
+            container.style.height = $settings.chat_log.window.window.height + "px";
+        }
+
+        let observer = new ResizeObserver(entries => {
+
+            for (let entry of entries) {
+
+                if (entry.target != container) {
+                    continue;
+                }
+                $settings.chat_log.window.window.height = entry.contentRect.height;
+                break;
+
+            }
+
+        });
+
+        observer.observe(container!);
+        return () => {
+            observer.disconnect();
+        }
+
     });
 
 </script>

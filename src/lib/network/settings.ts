@@ -23,6 +23,7 @@ export interface IChatLogWindow {
     show_unknown_ids: boolean;
     show_chat_log_window: boolean;
     chat_tabs: IChatTab[];
+    window: IWidthHeight;
 }
 
 export interface IChatLogSettings {
@@ -84,7 +85,11 @@ export function default_settings(): ISettings {
                         name: "Local",
                         channels: [SwtorChannel.EMOTE, SwtorChannel.SAY, SwtorChannel.YELL, SwtorChannel.WHISPER]
                     }
-                ]
+                ],
+                window: {
+                    width: 0,
+                    height: 176
+                }
             }
         }
 
