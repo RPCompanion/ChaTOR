@@ -7,11 +7,13 @@
     import type { IChatTab } from "../network/settings";
     import { settings } from "../network/settings";
     import { SwtorChannel } from "../network/swtor_channel";
-    import { swtor_channel_messages } from "../network/swtor_message/swtor_chat_tab_messages";
+    import { rename_swtor_channel, swtor_channel_messages } from "../network/swtor_message/swtor_chat_tab_messages";
 
     export let index: number | undefined = undefined;
     export let chat_tab: IChatTab = { name: "", channels: [] }
     export let show_edit_modal: boolean;
+
+    const CHAT_TAB_MAX_LENGTH: number = 16;
 
     const dispatch = createEventDispatcher();
     function on_cancel() {
@@ -24,8 +26,8 @@
             return Err("Chat tab name cannot be empty");
         }
 
-        if (chat_tab.name.length > 12) {
-            return Err("Chat tab name cannot be longer than 12 characters");
+        if (chat_tab.name.length > CHAT_TAB_MAX_LENGTH) {
+            return Err(`Chat tab name cannot be longer than ${CHAT_TAB_MAX_LENGTH} characters`);
         }
 
         let filter_results = $settings.chat_log.window.chat_tabs.filter((tab) => tab.name == chat_tab.name);
@@ -58,12 +60,7 @@
         }
 
         let old_name = $settings.chat_log.window.chat_tabs[index].name;
-        let idx = $swtor_channel_messages.findIndex((c) => c.chat_tab_name == old_name);
-        if (idx == -1) {
-            return;
-        }
-
-        $swtor_channel_messages[idx].chat_tab_name = new_name;
+        rename_swtor_channel(old_name, new_name);
 
     }
 
