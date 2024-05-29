@@ -14,8 +14,13 @@
     export let show_edit_modal: boolean;
 
     const CHAT_TAB_MAX_LENGTH: number = 16;
-
     const dispatch = createEventDispatcher();
+
+    $: if (!show_edit_modal) {
+        index    = undefined;
+        chat_tab = { name: "", channels: [] };
+    }
+
     function on_cancel() {
         show_edit_modal = false;
     }

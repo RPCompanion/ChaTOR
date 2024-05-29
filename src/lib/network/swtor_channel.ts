@@ -9,7 +9,8 @@ export enum SwtorChannel {
     TRADE = 53,
     GROUP = 54,
     OP    = 55,
-    OPS_LEADER = 61,
+    OPS_OFFICER = 61,
+    OPS_ANNOUNCEMENT = 58,
     GUILD = 57,
     GUILD_OFFICER = 58,
 }

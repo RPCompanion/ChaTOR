@@ -35,9 +35,7 @@
     {/each}
     <div class="relative">
         <button type="button" class="chat-container-background text-white text-xl px-2 rounded-t-md hover:text-gray-400" on:click={on_new_chat_tab}>+</button>
-        {#if show_edit_modal}
-            <EditModal bind:show_edit_modal={show_edit_modal} on:save={on_save} />
-        {/if}
+        <EditModal bind:show_edit_modal={show_edit_modal} on:save={on_save} />
     </div>
 </div>
 
