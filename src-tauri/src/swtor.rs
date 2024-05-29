@@ -8,6 +8,7 @@ pub enum SwtorChannel {
     YELL = 2,
     EMOTE = 3,
     WHISPER = 4,
+    PlayerAFK = 8,
     GLOBAL = 51,
     PVP   = 52,
     TRADE = 53,

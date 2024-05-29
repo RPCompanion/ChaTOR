@@ -36,7 +36,7 @@ lazy_static! {
     static ref QUIT: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
 }
 
-const CHAT_RELATIVE_ADDRESS: isize = 0x03f3380;
+const CHAT_RELATIVE_ADDRESS: isize = 0x03f3740;
 
 #[ctor::ctor]
 fn detour_init() {
