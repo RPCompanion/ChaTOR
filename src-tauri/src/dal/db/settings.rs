@@ -8,13 +8,18 @@ use super::get_connection;
 
 pub mod chat_settings;
 pub mod chat_log;
+pub mod app_settings;
+pub mod dimensions;
 
 use chat_settings::ChatSettings;
 use chat_log::ChatLogSettings;
+use app_settings::AppSettings;
 
 
 #[derive(Deserialize, Serialize, Clone)]
 pub struct Settings {
+    #[serde(default = "AppSettings::default")]
+    pub app: AppSettings,
     pub chat: ChatSettings,
     #[serde(default = "default_chat_log_settings")]
     pub chat_log: ChatLogSettings
@@ -33,6 +38,7 @@ impl Settings {
     pub fn default() -> Settings {
 
         Settings {
+            app: AppSettings::default(),
             chat: ChatSettings::default(),
             chat_log: ChatLogSettings::default()
         }

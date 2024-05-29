@@ -33,7 +33,17 @@ export interface IChatLogSettings {
     window: IChatLogWindow;
 }
 
+export interface IWidthHeight {
+    width: number;
+    height: number;
+}
+
+export interface IAppSettings {
+    window: IWidthHeight;
+}
+
 export interface ISettings {
+    app: IAppSettings;
     chat: IChatSettings;
     chat_log: IChatLogSettings;
 }
@@ -44,6 +54,12 @@ export function default_settings(): ISettings {
 
     return {
 
+        app: {
+            window: {
+                width: 800,
+                height: 600
+            }
+        },
         chat: {
             confirmation_before_posting: true,
             enter_to_post: false,
