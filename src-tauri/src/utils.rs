@@ -1,4 +1,7 @@
 
+use std::fs::File;
+use std::io::prelude::*;
+
 use sha2::{Sha256, Digest};
 
 pub trait StringUtils {
@@ -49,5 +52,14 @@ impl StringUtils for &str {
 		u64::from_str_radix(&result[..8].iter().map(|b| format!("{:02x}", b)).collect::<String>(), 16).unwrap()
 
 	}
+
+}
+
+pub fn get_file(path: &str) -> String {
+
+	let mut file = File::open(path).unwrap();
+	let mut contents = String::new();
+	file.read_to_string(&mut contents).unwrap();
+	contents
 
 }

@@ -65,3 +65,12 @@ CREATE TABLE IF NOT EXISTS Log_Errors
     error_message TEXT NOT NULL,
     error_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS DB_Version
+(
+    db_version_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    major INTEGER NOT NULL,
+    minor INTEGER NOT NULL,
+    patch INTEGER NOT NULL,
+    UNIQUE(major, minor, patch)
+);

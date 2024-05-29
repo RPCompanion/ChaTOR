@@ -12,6 +12,7 @@ pub mod chat_log;
 pub mod user_character_messages;
 pub mod log;
 pub mod swtor_message;
+pub mod migration;
 
 pub fn get_connection() -> Connection {
 
