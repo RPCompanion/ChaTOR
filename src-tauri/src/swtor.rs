@@ -15,5 +15,6 @@ pub enum SwtorChannel {
     GROUP = 54,
     OP    = 55,
     GUILD = 57,
+    GuildOfficer = 58,
     PlayerNotFound = 1003,
 }
