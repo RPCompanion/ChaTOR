@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use open;
-use tauri::WindowEvent;
+use tauri::{Manager, PhysicalSize, WindowEvent};
 
 #[macro_use]
 extern crate lazy_static;
@@ -29,6 +29,19 @@ fn main() {
                 _ => {}
             }
             
+        })
+        .setup(|app| {
+
+            let window = app.get_window("main").unwrap();
+            let settings = dal::db::settings::get_settings();
+
+            window.set_size(PhysicalSize {
+                width: settings.app.window.width as f64,
+                height: settings.app.window.height as f64
+            }).expect("error while setting window size.");
+
+            Ok(())
+
         })
         .invoke_handler(tauri::generate_handler![
             swtor_hook::start_swtor_hook,

@@ -5,7 +5,7 @@ use crate::dal::db::settings::dimensions::WidthHeight;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct AppSettings {
-    window: WidthHeight,     
+    pub window: WidthHeight,     
 }
 
 const TAURI_CONFIG_FILE: &str = include_str!("../../../../tauri.conf.json");
