@@ -13,5 +13,18 @@ export async function init_window_events() {
         })
 
     });
+    init_window_decoration();
+
+}
+
+function init_window_decoration() {
+
+    settings.subscribe((s) => {
+        if (s.app.show_window_decorations) {
+            appWindow.setDecorations(true);
+        } else {
+            appWindow.setDecorations(false);
+        }
+    });
 
 }
