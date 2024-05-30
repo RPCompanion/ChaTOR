@@ -41,6 +41,7 @@ export interface IWidthHeight {
 
 export interface IAppSettings {
     window: IWidthHeight;
+    always_on_top: boolean;
 }
 
 export interface ISettings {
@@ -59,7 +60,8 @@ export function default_settings(): ISettings {
             window: {
                 width: 800,
                 height: 600
-            }
+            },
+            always_on_top: false
         },
         chat: {
             confirmation_before_posting: true,
@@ -108,6 +110,7 @@ export function init_settings(dependent_callback: () => void) {
         settings.subscribe((value) => {
             invoke("update_settings", {settings: value});
         });
+
         set_initial_swtor_channels();
         chat_log_subscriber();
         dependent_callback();
@@ -118,10 +121,18 @@ export function init_settings(dependent_callback: () => void) {
 
 function chat_log_subscriber() {
 
+    init_injecting_capture();
+    init_hooking_capture();
+
+}
+
+function init_injecting_capture() {
+
     settings.subscribe((value) => {
 
         let t_chat_log_active = get(chat_log_active);
-        if (value.chat_log.capture_chat_log && !t_chat_log_active) {
+        let t_hooked_in       = get(hooked_in);
+        if (value.chat_log.capture_chat_log && !t_chat_log_active && t_hooked_in) {
 
             invoke("start_injecting_capture")
                 .then(() => {
@@ -144,6 +155,10 @@ function chat_log_subscriber() {
         }
 
     });
+
+}
+
+function init_hooking_capture() {
 
     hooked_in.subscribe((t_hooked_in) => {
 

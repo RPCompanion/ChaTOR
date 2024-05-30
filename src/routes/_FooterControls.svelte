@@ -1,5 +1,6 @@
 
 <script lang="ts">
+    import { settings } from '../lib/network/settings';
     import { appWindow } from '@tauri-apps/api/window';
     import Checkbox from '../lib/Checkbox.svelte';
     import { GithubLogo, DiscordLogo } from 'phosphor-svelte'
@@ -12,16 +13,12 @@
     } else {
         appWindow.setAlwaysOnTop(false);
     }
-
-    function on_checked(event: CustomEvent<boolean>) {
-        always_on_top = event.detail;
-    }
-
+    
 </script>
 
 <div class="relative w-full grid grid-cols-2 px-1">
     <div>
-        <Checkbox on:checked={on_checked}>Always on top</Checkbox>
+        <Checkbox bind:checked={$settings.app.always_on_top}>Always on top</Checkbox>
     </div>
     <div class="flex flex-row-reverse gap-2">
         <!--
