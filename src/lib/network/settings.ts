@@ -64,7 +64,7 @@ export function default_settings(): ISettings {
                 height: 600
             },
             show_window_decorations: true,
-            opacity: 1.0,
+            opacity: 100,
             always_on_top: false
         },
         chat: {

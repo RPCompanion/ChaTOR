@@ -14,7 +14,7 @@ pub struct AppSettings {
     pub show_window_decorations: bool,
 
     #[serde(default = "default_opacity")]
-    pub opacity: f32
+    pub opacity: i32
 
 }
 
@@ -28,8 +28,8 @@ fn default_show_window_decorations() -> bool {
     true
 }
 
-fn default_opacity() -> f32 {
-    1.0
+fn default_opacity() -> i32 {
+    100
 }
 
 impl AppSettings {
@@ -47,7 +47,7 @@ impl AppSettings {
             },
             show_window_decorations: true,
             always_on_top: false,
-            opacity: 1.0
+            opacity: 100
 
         }
 
