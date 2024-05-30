@@ -17,6 +17,9 @@
     let show_modal: boolean        = false;
     let automated_posting: boolean = true;
 
+
+    const MAX_MESSAGES: number = 5;
+
     function delete_message(idx: number) {
         messages.splice(idx, 1);
         messages = messages;
@@ -24,8 +27,8 @@
 
     function on_new_message() {
 
-        if (messages.length >= 3) {
-            toast.push("You can only have 3 messages at a time.");
+        if (messages.length >= MAX_MESSAGES) {
+            toast.push(`You can only have ${MAX_MESSAGES} messages at a time.`);
             return;
         }
 
@@ -106,27 +109,25 @@
     <div class="relative h-6">
         <Checkbox on:checked={on_checked} checked={automated_posting} size="small">Automated posting</Checkbox>
         {#if !$settings.chat.clear_chat_after_posting}
-            <button type="button" class="bg-slate-800 text-white rounded-sm shadow-sm w-32 absolute right-0 hover:text-gray-300" on:click={clear_chat}>Clear chat</button>
+            <button type="button" class="bg-slate-700 text-white rounded-sm shadow-sm w-32 absolute right-0 hover:text-gray-300" on:click={clear_chat}>Clear chat</button>
         {/if}
     </div>
-    <form>
-        {#each messages as message, idx}
-            <div class="relative">
-                <textarea class="w-full min-h-24 outline-none p-1 resize-none rounded-md border-2 border-slate-700 chat-container-background text-white" class:border-yellow-400={message.length >= 200 && message.length <= 255} class:border-red-500={message.length > 255} bind:value={message}/>
-                {#if idx != 0}
-                    <div class="absolute -right-2 -top-3">
-                        <XButton on:click={() => { delete_message(idx); }}/>
-                    </div>
-                {/if}
-                <div class="absolute bottom-1 right-0 text-white">{message.length}/255</div>
-                {#if !automated_posting}
-                    <button type="button" class="bg-slate-700 text-white rounded-sm shadow-sm px-2 absolute top-1/3 -right-8 hover:text-gray-300" on:click={() => { on_single_post(idx); }}>Post</button>
-                {/if}
-            </div>
-        {/each}
-    </form>
+    {#each messages as message, idx}
+        <div class="relative">
+            <textarea class="w-full min-h-24 outline-none p-1 resize-none rounded-md border-2 border-slate-700 chat-container-background text-white" class:border-yellow-400={message.length >= 200 && message.length <= 255} class:border-red-500={message.length > 255} bind:value={message}/>
+            {#if idx != 0}
+                <div class="absolute -right-2 -top-3">
+                    <XButton on:click={() => { delete_message(idx); }}/>
+                </div>
+            {/if}
+            <div class="absolute bottom-1 right-0 text-white">{message.length}/255</div>
+            {#if !automated_posting}
+                <button type="button" class="bg-slate-700 text-white rounded-sm shadow-sm px-2 absolute top-1/3 -right-8 hover:text-gray-300" on:click={() => { on_single_post(idx); }}>Post</button>
+            {/if}
+        </div>
+    {/each}
     <div class="w-full h-6 flex flex-row-reverse">
-        <button type="button" class="bg-slate-800 text-white rounded-sm shadow-sm w-32 hover:text-gray-300" on:click={on_new_message}>New</button>
+        <button type="button" class="bg-slate-700 text-white rounded-sm shadow-sm w-32 hover:text-gray-300" on:click={on_new_message}>New</button>
     </div>
     {#if automated_posting}
         <StandardMenuButton text="Post all" on:click={on_post_all}/>
