@@ -33,7 +33,7 @@
 <body>
     <div 
         data-tauri-drag-region 
-        class="h-8 bg-slate-700 class flex flex-row gap-1 fixed top-0 left-0 right-0 select-none justify-end"
+        class="h-8 bg-slate-700 class flex flex-row gap-1 fixed top-0 left-0 right-0 select-none justify-end z-50"
         class:border-x={!$settings.app.show_window_decorations}
         class:border-t={!$settings.app.show_window_decorations}
         class:border-slate-600={!$settings.app.show_window_decorations}
