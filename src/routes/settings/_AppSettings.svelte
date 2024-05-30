@@ -14,12 +14,15 @@
 </script>
 
 <SettingSection section="App Settings">
+    <Setting setting="Show background image">
+        <SettingsToggle bind:checked={$settings.app.show_background_image}></SettingsToggle>
+    </Setting>
     <Setting setting="Show window decorations" sub_text="Disable setting for a more seamless looking window.">
         <SettingsToggle bind:checked={$settings.app.show_window_decorations}></SettingsToggle>
     </Setting>
     {#if !$settings.app.show_window_decorations}
         <Setting setting="Window Opacity">
-            <SettingsRangeSlider bind:value={($settings.app.opacity)} max={100} min={50} on:value_change={on_value_change} />
+            <SettingsRangeSlider bind:value={($settings.app.opacity)} max={100} min={60} on:value_change={on_value_change} />
         </Setting>
     {/if}
 </SettingSection>

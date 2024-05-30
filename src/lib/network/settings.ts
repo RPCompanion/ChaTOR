@@ -44,6 +44,7 @@ export interface IAppSettings {
     show_window_decorations: boolean;
     opacity: number;
     always_on_top: boolean;
+    show_background_image: boolean;
 }
 
 export interface ISettings {
@@ -65,7 +66,8 @@ export function default_settings(): ISettings {
             },
             show_window_decorations: true,
             opacity: 100,
-            always_on_top: false
+            always_on_top: false,
+            show_background_image: true
         },
         chat: {
             confirmation_before_posting: true,
