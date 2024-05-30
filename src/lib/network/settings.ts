@@ -41,6 +41,8 @@ export interface IWidthHeight {
 
 export interface IAppSettings {
     window: IWidthHeight;
+    show_window_decorations: boolean;
+    opacity: number;
     always_on_top: boolean;
 }
 
@@ -61,6 +63,8 @@ export function default_settings(): ISettings {
                 width: 800,
                 height: 600
             },
+            show_window_decorations: true,
+            opacity: 1.0,
             always_on_top: false
         },
         chat: {

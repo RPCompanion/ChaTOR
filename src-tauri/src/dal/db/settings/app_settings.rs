@@ -5,15 +5,31 @@ use crate::dal::db::settings::dimensions::WidthHeight;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct AppSettings {
+
     pub window: WidthHeight,
     #[serde(default = "default_always_on_top")]
-    pub always_on_top: bool
+    pub always_on_top: bool,
+
+    #[serde(default = "default_show_window_decorations")]
+    pub show_window_decorations: bool,
+
+    #[serde(default = "default_opacity")]
+    pub opacity: f32
+
 }
 
 const TAURI_CONFIG_FILE: &str = include_str!("../../../../tauri.conf.json");
 
 fn default_always_on_top() -> bool {
     false
+}
+
+fn default_show_window_decorations() -> bool {
+    true
+}
+
+fn default_opacity() -> f32 {
+    1.0
 }
 
 impl AppSettings {
@@ -29,7 +45,9 @@ impl AppSettings {
                 width: windows["width"].as_i64().unwrap() as i32,
                 height: windows["height"].as_i64().unwrap() as i32
             },
-            always_on_top: false
+            show_window_decorations: true,
+            always_on_top: false,
+            opacity: 1.0
 
         }
 
