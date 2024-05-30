@@ -1,6 +1,5 @@
 <script lang="ts">
 
-    import Body from './body.svelte';
     import { SvelteToast } from '@zerodevx/svelte-toast';
     import { Router, createRouter } from '@roxi/routify'
     import routes from '../.routify/routes.default.js'
