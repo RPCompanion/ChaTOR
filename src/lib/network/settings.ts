@@ -122,7 +122,7 @@ export function init_settings(dependent_callback: () => void) {
 function chat_log_subscriber() {
 
     init_injecting_capture();
-    init_hooking_capture();
+    init_hooking_subscriber();
 
 }
 
@@ -158,7 +158,7 @@ function init_injecting_capture() {
 
 }
 
-function init_hooking_capture() {
+function init_hooking_subscriber() {
 
     hooked_in.subscribe((t_hooked_in) => {
 
