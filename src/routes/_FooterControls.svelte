@@ -6,14 +6,12 @@
     import { GithubLogo, DiscordLogo } from 'phosphor-svelte'
     import { open_link } from '../lib/network';
 
-    let always_on_top: boolean = false;
-
-    $: if (always_on_top) {
+    $: if ($settings.app.always_on_top) {
         appWindow.setAlwaysOnTop(true);
     } else {
         appWindow.setAlwaysOnTop(false);
     }
-    
+
 </script>
 
 <div class="relative w-full grid grid-cols-2 px-1">
