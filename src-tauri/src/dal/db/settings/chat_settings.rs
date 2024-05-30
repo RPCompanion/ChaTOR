@@ -42,15 +42,6 @@ pub fn default_starting_characters_are_lowercase() -> bool {
     true
 }
 
-pub fn default_capture_chat_log() -> bool {
-    false
-}
-
-pub fn default_retry_message_submission() -> bool {
-    false
-}
-
-
 impl ChatSettings {
 
     pub fn default() -> ChatSettings {

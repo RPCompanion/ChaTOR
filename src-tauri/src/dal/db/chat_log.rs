@@ -1,7 +1,7 @@
 
 use serde::{Deserialize, Serialize};
 use crate::dal::db;
-use rusqlite::{params, Error};
+use rusqlite::Error;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Message {
