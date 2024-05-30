@@ -171,7 +171,8 @@
 </div>
 <div>
     <ChatTabs/>
-    <div bind:this={container} class="flex flex-col h-44 max-h-96 resize-y rounded-tr-md border-2 border-slate-700 overflow-y-auto scrollbar scrollbar-thumb-sky-800 scrollbar-track-slate-100 chat-container-background">
+    <div 
+        bind:this={container} class="flex flex-col h-44 max-h-96 resize-y rounded-tr-md border-2 border-slate-700 overflow-y-auto scrollbar scrollbar-thumb-sky-800 scrollbar-track-slate-100 chat-container-background">
         {#each get_swtor_channel_messages($swtor_channel_messages, $active_chat_tab_index) as message}
 
             <div bind:this={last_message} class="w-full opacity-100">

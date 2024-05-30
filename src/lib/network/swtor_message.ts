@@ -61,7 +61,7 @@ function replace_html_tags(payload: ISwtorMessage[]) {
     payload.forEach((message) => {
 
         for (let obj of message.message.matchAll(re)) {
-            message.message = message.message.replace(obj[0], "");
+            message.message = message.message.replace(obj[0], "<Unknown ID>");
         }
 
     });
