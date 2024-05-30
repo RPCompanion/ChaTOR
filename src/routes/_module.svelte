@@ -9,7 +9,13 @@
 
 </script>
 
-<div class="flex flex-col min-h-screen bg-cover bg-no-repeat" style="background-image: url({watercolor}); opacity: {$settings.app.opacity/100.0}" >
+<div 
+    class="flex flex-col min-h-screen bg-cover bg-no-repeat"
+    style="background-image: url({watercolor}); opacity: {$settings.app.opacity/100.0}"
+    class:border-x={!$settings.app.show_window_decorations}
+    class:border-b={!$settings.app.show_window_decorations}
+    class:border-slate-600={!$settings.app.show_window_decorations}
+    >
     {#if !$settings.app.show_window_decorations}
         <NonDecoratedHeader/>
         <div class="h-8"></div>
