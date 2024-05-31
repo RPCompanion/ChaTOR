@@ -12,7 +12,6 @@
     } else {
         appWindow.setAlwaysOnTop(false);
     }
-
 </script>
 
 <div class="relative w-full grid grid-cols-2 px-1 pb-1">
