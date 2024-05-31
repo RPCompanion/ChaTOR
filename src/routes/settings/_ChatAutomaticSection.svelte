@@ -7,8 +7,11 @@
 </script>
 
 <SettingSection section="Chat - Automatic">
-    <Setting setting="Press enter to post">
+    <Setting setting="Press enter to confirmation screen">
         <SettingsToggle bind:checked={$settings.chat.enter_to_post}></SettingsToggle>
+    </Setting>
+    <Setting setting="Press enter to post (on confirmation screen)">
+        <SettingsToggle bind:checked={$settings.chat.enter_to_confirm}></SettingsToggle>
     </Setting>
     <Setting setting="Remove starting pronouns in a post">
         <SettingsToggle bind:checked={$settings.chat.remove_starting_pronouns}></SettingsToggle>

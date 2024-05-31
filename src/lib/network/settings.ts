@@ -14,6 +14,7 @@ export interface IChatTab {
 export interface IChatSettings {
     confirmation_before_posting: boolean;
     enter_to_post: boolean;
+    enter_to_confirm: boolean;
     clear_chat_after_posting: boolean;
     remove_starting_pronouns: boolean;
     starting_characters_are_lowercase: boolean;
@@ -72,6 +73,7 @@ export function default_settings(): ISettings {
         chat: {
             confirmation_before_posting: true,
             enter_to_post: false,
+            enter_to_confirm: false,
             clear_chat_after_posting: false,
             remove_starting_pronouns: false,
             starting_characters_are_lowercase: true,

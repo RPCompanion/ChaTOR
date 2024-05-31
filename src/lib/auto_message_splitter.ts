@@ -6,19 +6,22 @@ import { Result, Ok, Err } from "./result";
 import nlp from "compromise";
 
 import { GAME_MESSAGE_MAXIMUM, GAME_MESSAGE_MINIMUM } from "./messages";
+import { None, type Option, Some } from "./option";
 
 export class AutoMessageSplitter {
 
     private message: string;
     private settings: ISettings;
     private is_whisper: boolean;
+    private custom_command: Option<string>;
     private character_to_whisper?: string;
     private constructor_error?: string;
 
     constructor(message: string, local_settings?: ISettings) {
 
-        this.message    = message.trim();
-        this.is_whisper = this.message.startsWith("/w") || this.message.startsWith("/whisper");
+        this.message        = message.trim();
+        this.is_whisper     = this.message.startsWith("/w") || this.message.startsWith("/whisper");
+        this.custom_command = AutoMessageSplitter.get_custom_command(this.message);
 
         if (this.is_whisper) {
 
@@ -51,6 +54,23 @@ export class AutoMessageSplitter {
         }
 
         return this.get_multi_message_array();
+
+    }
+
+    private static get_custom_command(message: string): Option<string> {
+
+        if (message.startsWith("/emote") ||message.startsWith("/e") || message.startsWith("/say") || message.startsWith("/s") || message.startsWith("\"")) {
+            return None();
+        }
+
+        let reg = new RegExp("^\/([a-zA-Z0-9]+)");
+        let match = message.match(reg);
+
+        if (match == null) {
+            return None();
+        }
+
+        return Some(match[0]);
 
     }
 
@@ -175,6 +195,10 @@ export class AutoMessageSplitter {
 
         if (message.startsWith("/")) {
             return "";
+        }
+
+        if (this.custom_command.is_some()) {
+            return this.custom_command.unwrap();
         }
 
         if (this.is_whisper) {

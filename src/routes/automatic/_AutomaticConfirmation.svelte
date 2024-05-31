@@ -1,7 +1,7 @@
 
 <script lang="ts">
     
-    import { onMount } from "svelte";
+    import { onDestroy } from "svelte";
     import { fly } from "svelte/transition";
     import { createEventDispatcher } from "svelte";
     import { GAME_MESSAGE_MAXIMUM } from "../../lib/messages";
@@ -31,15 +31,31 @@
 
     }
 
-    $: if (show_modal) {
+    function add_event_listener() {
+
+        if (!$settings.chat.enter_to_confirm) {
+            return;
+        }
 
         setTimeout(() => {
             window.addEventListener("keydown", on_keydown);
-        }, 1); 
+        }, 1)
 
-    } else {
+    }
+
+    function remove_event_listener() {
         window.removeEventListener("keydown", on_keydown);
     }
+
+    $: if (show_modal) {
+        add_event_listener();
+    } else {
+        remove_event_listener();
+    }
+
+    onDestroy(() => {
+        remove_event_listener();
+    });
 
 </script>
 

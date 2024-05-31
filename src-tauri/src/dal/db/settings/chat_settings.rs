@@ -11,6 +11,9 @@ pub struct ChatSettings {
     #[serde(default = "default_enter_to_post")]
     pub enter_to_post: bool,
 
+    #[serde(default = "default_enter_to_confirm")]
+    pub enter_to_confirm: bool,
+
     #[serde(default = "default_clear_chat_after_posting")]
     pub clear_chat_after_posting: bool,
 
@@ -27,6 +30,10 @@ pub fn default_confirmation_before_posting() -> bool {
 }
 
 pub fn default_enter_to_post() -> bool {
+    false
+}
+
+pub fn default_enter_to_confirm() -> bool {
     false
 }
 
@@ -49,6 +56,7 @@ impl ChatSettings {
         ChatSettings {
             confirmation_before_posting: true,
             enter_to_post: false,
+            enter_to_confirm: false,
             clear_chat_after_posting: false,
             remove_starting_pronouns: false,
             starting_characters_are_lowercase: true,
