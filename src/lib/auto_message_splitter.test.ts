@@ -111,3 +111,52 @@ test("auto_message_split multiple question marks in a quote", () => {
     expect(splitter.split()).toEqual(expected);
 
 })
+
+test("auto_message_split custom command", () => {
+    /*
+        Might be a little too complicated to capture.
+    */
+    const input = `
+        /g had a faint smile grace her lips, a fleeting acknowledgement of the Sith's words that hinted at a measure of approval. 
+        Though she refrained from voicing her thoughts on the matter, there was a sense that she found him to be a 'good Sith,' or at least as close to one as the Empire would allow. 
+        Straightening her posture, Elizala met his gaze, her brows furrowing slightly as a question formed on her tongue. 
+        "If I may inquire, my lord," she began, "who will serve as my commanding officer in this new role? Or shall I be reporting to you?"
+    `;
+
+    const expected = {
+        ok: [
+            "/g had a faint smile grace her lips, a fleeting acknowledgement of the Sith's words that hinted at a measure of approval.",
+            "/g though she refrained from voicing her thoughts on the matter, there was a sense that she found him to be a 'good Sith,' or at least as close to one as the Empire would allow.",
+            `/g straightening her posture, Elizala met his gaze, her brows furrowing slightly as a question formed on her tongue. "If I may inquire, my lord," she began, "who will serve as my commanding officer in this new role? Or shall I be reporting to you?"`
+        ],
+        error: null
+    }
+
+    let splitter = new AutoMessageSplitter(input, default_settings());
+    expect(splitter.split()).toEqual(expected); 
+})
+
+test("auto_message_split multi-sentence quotes", () => {
+
+    /*
+        This test case is broken right now.
+    */
+
+    const input = `
+        /e would shake her head, an awkward grin playing on her lips as she watched the Lieutenant's culinary adventures unfold. 
+        "You are indeed correct, Lieutenant," she'd say, her crisp Imperial accent laced with a hint of mirth, "it certainly does not appear to be a sarlacc. 
+        I'll grant you that much." Despite her polite words, the expression on her face would suggest that perhaps the slug-like delicacy was, in fact, worse than the famed Tatooine creature.
+    `;
+
+    const expected = {
+        ok: [
+            "/e would shake her head, an awkward grin playing on her lips as she watched the Lieutenant's culinary adventures unfold.",
+            `/say "You are indeed correct, Lieutenant," she'd say, her crisp Imperial accent laced with a hint of mirth, "it certainly does not appear to be a sarlacc. I'll grant you that much."`,
+            `/e Despite her polite words, the expression on her face would suggest that perhaps the slug-like delicacy was, in fact, worse than the famed Tatooine creature.`
+        ],
+    }
+
+    let splitter = new AutoMessageSplitter(input, default_settings());
+    expect(splitter.split()).toEqual(expected);
+
+})
