@@ -1,6 +1,8 @@
 
 <script lang="ts">
 
+    import { save } from "@tauri-apps/api/dialog";
+    import { writeTextFile } from "@tauri-apps/api/fs";
     import { invoke } from "@tauri-apps/api";
     import Flatpickr, { type HookProps } from 'svelte-flatpickr'
     import 'flatpickr/dist/flatpickr.css'
@@ -8,6 +10,7 @@
     import { active_character } from "../../lib/network/characters";
     import { SwtorMessage } from "../../lib/network/swtor_message";
     import { afterUpdate } from "svelte";
+    import SmallButton from "../../lib/buttons/SmallButton.svelte";
 
     let container: HTMLElement | undefined    = undefined;
     let last_message: HTMLElement | undefined = undefined;
@@ -47,12 +50,29 @@
 
     }
 
+    async function on_export() {
+
+        const filepath = await save({
+            filters: [{ name: "Text Files", extensions: ["txt"] }]
+        });
+
+        if (filepath == undefined) {
+            return;
+        }
+
+        let temp: string[] = date_messages.map((m) => {
+           return `[${m.timestamp}] ${m.get_message_from()} ${m.get_message_fragments().join(" ")}`;
+        });
+
+        await writeTextFile(filepath, temp.join("\n"));
+
+    }
+
     afterUpdate(() => {
         scroll_to_last_message();
     });
 
     init_dates();
-
 
 </script>
 
@@ -85,4 +105,6 @@
             </div>
         {/each}
     </div>
+    <div class="h-6"></div>
+    <SmallButton on:click={on_export}>Export</SmallButton>
 </div>
