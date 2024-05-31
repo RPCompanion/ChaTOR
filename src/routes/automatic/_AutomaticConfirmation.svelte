@@ -1,9 +1,11 @@
 
 <script lang="ts">
     
+    import { onMount } from "svelte";
     import { fly } from "svelte/transition";
     import { createEventDispatcher } from "svelte";
     import { GAME_MESSAGE_MAXIMUM } from "../../lib/messages";
+    import { settings } from "../../lib/network/settings";
 
     export let messages: string[];
     export let show_modal: boolean = false;
@@ -15,6 +17,28 @@
 
     function on_submit() {
         dispatch("submitted");
+    }
+
+    function on_keydown(event: KeyboardEvent) {
+
+        if (!show_modal) {
+            return;
+        }
+
+        if (event.key == "Enter" && !event.shiftKey) {
+            on_submit();
+        }
+
+    }
+
+    $: if (show_modal) {
+
+        setTimeout(() => {
+            window.addEventListener("keydown", on_keydown);
+        }, 1); 
+
+    } else {
+        window.removeEventListener("keydown", on_keydown);
     }
 
 </script>
