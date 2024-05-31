@@ -16,6 +16,8 @@ use windows::Win32::UI::WindowsAndMessaging::{EnumWindows, GetForegroundWindow, 
 use windows::core::PWSTR;
 use windows::Win32::System::Threading::{OpenProcess, QueryFullProcessImageNameW, PROCESS_NAME_FORMAT, PROCESS_QUERY_INFORMATION};
 
+use crate::dal::db::log::log_error;
+
 pub mod post;
 pub mod message_hash_container;
 
@@ -38,6 +40,7 @@ unsafe fn set_process_checksum() {
 
     let handle = OpenProcess(PROCESS_QUERY_INFORMATION, false, pid);
     if handle.is_err() {
+        log_error(&handle.err().unwrap().to_string());
         return;
     }
 
