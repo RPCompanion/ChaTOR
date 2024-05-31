@@ -33,7 +33,7 @@
         dispatch("whisper", { character_name: message.from });
     }
 
-    function scroll_container() {
+    function scroll_to_last_message() {
 
         if (last_message == undefined) {
             return;
@@ -60,7 +60,7 @@
     }
 
     afterUpdate(() => {
-        scroll_container();
+        scroll_to_last_message();
     });
 
     onMount(() => {

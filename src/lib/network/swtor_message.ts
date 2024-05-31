@@ -21,7 +21,33 @@ export class SwtorMessage {
         this.timestamp = new Date(swtor_message.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit"});
         this.from      = swtor_message.from;
         this.to        = swtor_message.to;
-        this.message   = swtor_message.message;
+        this.message   = SwtorMessage.replace_html_tags(SwtorMessage.replace_html_entities(swtor_message.message));
+
+    }
+
+    private static replace_html_entities(message: string): string {
+
+        return message
+            .replaceAll("&quot;", "\"")
+            .replaceAll("&gt;", ">")
+            .replaceAll("&lt;", "<")
+            .replaceAll("&amp;", "&")
+            .replaceAll("&apos;", "'");
+
+    }
+
+    private static replace_html_tags(message: string): string {
+
+        if (get(settings).chat_log.window.show_unknown_ids) {
+            return message;
+        }
+
+        const re: RegExp = /<HL LID="([^"]+)">/g;
+        for (let obj of message.matchAll(re)) {
+            message = message.replace(obj[0], "<Unknown ID>");
+        }
+
+        return message;
 
     }
 
@@ -101,46 +127,11 @@ export interface ISwtorMessage {
 
 export const swtor_messages = writable<SwtorMessage[]>([]);
 
-function replace_html_entities(payload: ISwtorMessage[]) {
-
-    payload.forEach((message) => {
-
-        message.message = message.message
-            .replaceAll("&quot;", "\"")
-            .replaceAll("&gt;", ">")
-            .replaceAll("&lt;", "<")
-            .replaceAll("&amp;", "&")
-            .replaceAll("&apos;", "'");
-
-    });
-
-}
-
-function replace_html_tags(payload: ISwtorMessage[]) {
-
-    if (get(settings).chat_log.window.show_unknown_ids) {
-        return;
-    }
-
-    const re: RegExp = /<HL LID="([^"]+)">/g;
-    payload.forEach((message) => {
-
-        for (let obj of message.message.matchAll(re)) {
-            message.message = message.message.replace(obj[0], "<Unknown ID>");
-        }
-
-    });
-
-}
-
 export function init_swtor_message_listener() {
 
     listen("swtor_messages", (messages: any) => {
 
         let payload: ISwtorMessage[] = messages.payload;
-
-        replace_html_entities(payload);
-        replace_html_tags(payload);
       
         payload.map((message) => new SwtorMessage(message)).forEach((message) => {
             add_swtor_channel_message(message);

@@ -3,12 +3,14 @@ use serde::{Deserialize, Serialize};
 use crate::dal::db;
 use rusqlite::Error;
 
+use super::swtor_message::SwtorMessage;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Message {
     pub chat_log_id: i32,
     pub character_id: i32,
     pub timestamp: String,
-    pub message: String
+    pub message: SwtorMessage
 }
 
 pub struct ChatLog {
@@ -34,12 +36,18 @@ impl ChatLog {
 
         let mut stmt = conn.prepare(SELECT_MESSAGES).unwrap();
         let message_iter = stmt.query_map([], |row| {
+
+            let raw_message: String = row.get(3)?;
+            let message: SwtorMessage = serde_json::from_str(&raw_message)
+                .map_err(|e| Error::ToSqlConversionFailure(Box::new(e)))?;
+
             Ok(Message {
                 chat_log_id: row.get(0)?,
                 character_id: row.get(1)?,
                 timestamp: row.get(2)?,
-                message: row.get(3)?
+                message
             })
+
         });
 
         ChatLog {
@@ -67,11 +75,16 @@ impl ChatLog {
 
         let mut stmt = conn.prepare(SELECT_MESSAGES).unwrap();
         let message_iter = stmt.query_map([date], |row| {
+
+            let raw_message: String = row.get(3)?;
+            let message: SwtorMessage = serde_json::from_str(&raw_message)
+                .map_err(|e| Error::ToSqlConversionFailure(Box::new(e)))?;
+
             Ok(Message {
                 chat_log_id: row.get(0)?,
                 character_id: row.get(1)?,
                 timestamp: row.get(2)?,
-                message: row.get(3)?
+                message
             })
         });
 
