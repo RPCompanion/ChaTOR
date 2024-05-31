@@ -8,6 +8,7 @@
     import { settings } from "../network/settings";
     import { SwtorChannel } from "../network/swtor_channel";
     import { rename_swtor_channel, swtor_channel_messages } from "../network/swtor_message/swtor_chat_tab_messages";
+  import ChannelList from "../../components/_ChannelList.svelte";
 
     export let index: number | undefined = undefined;
     export let chat_tab: IChatTab = { name: "", channels: [] }
@@ -91,32 +92,13 @@
 
     }
 
-    function on_channel_input(channel: string) {
-
-        let channel_number = Number(SwtorChannel[channel as keyof typeof SwtorChannel]);
-
-        let index = chat_tab.channels.indexOf(channel_number);
-
-        if (index == -1) {
-            chat_tab.channels.push(channel_number);
-        } else {
-            chat_tab.channels.splice(index, 1);
-        }
-
-    }
-
 </script>
 
 {#if show_edit_modal}
     <div transition:fly|local="{{ duration: 500, y: -500 }}" class="w-72 min-h-48 bg-slate-700 p-2 border-2 border-slate-800 fixed z-20 modal-position flex flex-col gap-1">
         <input type="text" bind:value={chat_tab.name} maxlength="12" class=" outline-none border-2 border-slate-800 text-xl" placeholder="tab name">
         <p class="text-white text-xl"><b>Channel subscriptions</b></p>
-        {#each Object.keys(SwtorChannel).filter((key) => isNaN(Number(key))) as channel}
-            <div class="flex flex-row gap-1">
-                <input type="checkbox" id={channel} name={channel} value={channel} checked={chat_tab.channels.includes(Number(SwtorChannel[channel]))} on:input={() => { on_channel_input(channel) }} class="text-xl">
-                <label for={channel} class="text-white text-xl">{channel}</label>
-            </div>
-        {/each}
+        <ChannelList bind:channels={chat_tab.channels}/>
         <div class="flex flex-row gap-1">
             <button type="button" class="text-white border-slate-800 border-2 rounded-md w-1/2 text-xl" on:click={on_save}>Save</button>
             <button type="button" on:click={on_cancel} class="text-white border-slate-800 border-2 rounded-md w-1/2 text-xl" on:click={on_cancel}>Cancel</button>

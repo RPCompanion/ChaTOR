@@ -1,6 +1,7 @@
 
 <script lang="ts">
 
+    import { Funnel } from "phosphor-svelte";
     import { save } from "@tauri-apps/api/dialog";
     import { writeTextFile } from "@tauri-apps/api/fs";
     import { invoke } from "@tauri-apps/api";
@@ -11,11 +12,19 @@
     import { SwtorMessage } from "../../lib/network/swtor_message";
     import { afterUpdate } from "svelte";
     import SmallButton from "../../lib/buttons/SmallButton.svelte";
+    import { get_all_channel_ids } from "../../lib/network/swtor_channel";
+    import ChannelList from "../../components/_ChannelList.svelte";
+    import Filter from "./_Filter.svelte";
 
     let container: HTMLElement | undefined    = undefined;
     let last_message: HTMLElement | undefined = undefined;
+
+    let channel_filters: number[] = get_all_channel_ids();
     let dates: string[] = [];
-    let date_messages: SwtorMessage[] = [];
+    let date_messages: SwtorMessage[]     = [];
+    let filtered_messages: SwtorMessage[] = [];
+
+    let show_filters: boolean = false;
 
     function init_dates(callback?: () => void) {
 
@@ -31,11 +40,19 @@
 
     }
 
+    function set_filtered_messages() {  
+
+        filtered_messages = date_messages
+            .filter((m) => channel_filters.includes(m.channel.type));
+
+    }
+
     function on_change(e: CustomEvent<HookProps>) {
 
         let date = e.detail[1];
         invoke("get_chat_log_from_date", {date}).then((response) => {
             date_messages = (response as IChatLogMessage[]).map((m) => new SwtorMessage(m.message));
+            set_filtered_messages();
         });
 
     }
@@ -60,12 +77,16 @@
             return;
         }
 
-        let temp: string[] = date_messages.map((m) => {
+        let temp: string[] = filtered_messages.map((m) => {
            return `[${m.timestamp}] ${m.get_message_from()} ${m.get_message_fragments().join(" ")}`;
         });
 
         await writeTextFile(filepath, temp.join("\n"));
 
+    }
+
+    $: if (channel_filters) {
+        set_filtered_messages();
     }
 
     afterUpdate(() => {
@@ -83,10 +104,17 @@
     <div class="text-white text-2xl text-center bg-slate-600">Log Viewer</div>
     <div class="h-8"></div>
 
-    <Flatpickr options={{ enable: dates }} on:change={on_change} name="date" placeholder="Select a date" class="outline-none border-2 border-slate-700 rounded-md px-2 text-xl"/>
+    <div class="grid grid-cols-2 w-full">
+        <div class="w-full">
+            <Flatpickr options={{ enable: dates }} on:change={on_change} name="date" placeholder="Select a date" class="outline-none border-2 border-slate-700 rounded-md px-2 text-xl"/>
+        </div>
+        <div class="flex flex-row-reverse relative w-full">
+            <Filter bind:channel_filters={channel_filters}/>
+        </div>
+    </div>
     <div class="h-6"></div>
     <div bind:this={container} class="flex flex-col h-96 rounded-tr-md border-2 border-slate-700 overflow-y-auto scrollbar scrollbar-thumb-sky-800 scrollbar-track-slate-100 chat-container-background">
-        {#each date_messages as message}
+        {#each filtered_messages as message}
 
             <div bind:this={last_message} class="w-full opacity-100">
                 <span class="text-white">[{message.timestamp}]</span>

@@ -11,7 +11,7 @@ export enum SwtorChannel {
     GROUP = 54,
     OP    = 55,
     OPS_OFFICER = 61,
-    OPS_ANNOUNCEMENT = 58,
+    OPS_ANNOUNCEMENT = 56,
     GUILD = 57,
     GUILD_OFFICER = 58,
 }
@@ -39,5 +39,13 @@ export class Channel {
         }
 
     }
+
+}
+
+export function get_all_channel_ids(): number[] {
+
+    return Object.keys(SwtorChannel)
+        .filter((key) => !isNaN(Number(key)))
+        .map((key) => Number(key));
 
 }
