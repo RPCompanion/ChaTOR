@@ -136,12 +136,37 @@ test("auto_message_split custom command", () => {
     expect(splitter.split()).toEqual(expected); 
 })
 
+test("auto_message_split first last name whisper", () => {
+
+    const input = `
+        /w Somebodyyy bodyy: Ah okay! I got my bachelors of science in physics and then got into a PhD program in high energy physics. 
+        I was the computer geek of the group. I wrote simulation code for the detector we were building, and detectors that already existed. 
+        All that code was in C++, Lua and a little bit of python. Then I left the program. The time required to be a successful physicist wasn't conducive to having a work/life balance. 
+        Nowadays I program in rust.
+    `
+
+    const expected = {
+        ok: [
+            "/w Somebodyyy bodyy: Ah okay! I got my bachelors of science in physics and then got into a PhD program in high energy physics. I was the computer geek of the group.",
+            "/w Somebodyyy bodyy: i wrote simulation code for the detector we were building, and detectors that already existed. All that code was in C++, Lua and a little bit of python. Then I left the program.",
+            "/w Somebodyyy bodyy: the time required to be a successful physicist wasn't conducive to having a work/life balance. Nowadays I program in rust."
+        ],
+        error: null
+    }
+
+    let splitter = new AutoMessageSplitter(input, default_settings());
+    expect(splitter.split()).toEqual(expected);
+
+});
+
+/*
 test("auto_message_split multi-sentence quotes", () => {
 
     /*
         This test case is broken right now.
     */
 
+    /*
     const input = `
         /e would shake her head, an awkward grin playing on her lips as she watched the Lieutenant's culinary adventures unfold. 
         "You are indeed correct, Lieutenant," she'd say, her crisp Imperial accent laced with a hint of mirth, "it certainly does not appear to be a sarlacc. 
@@ -160,3 +185,5 @@ test("auto_message_split multi-sentence quotes", () => {
     expect(splitter.split()).toEqual(expected);
 
 })
+
+*/

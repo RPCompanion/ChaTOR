@@ -21,7 +21,7 @@ export class AutoMessageSplitter {
 
         this.message        = message.trim();
         this.is_whisper     = this.message.startsWith("/w") || this.message.startsWith("/whisper");
-        this.custom_command = AutoMessageSplitter.get_custom_command(this.message);
+        this.custom_command = this.is_whisper ? None() : AutoMessageSplitter.get_custom_command(this.message);
 
         if (this.is_whisper) {
 
@@ -59,7 +59,7 @@ export class AutoMessageSplitter {
 
     private static get_custom_command(message: string): Option<string> {
 
-        if (message.startsWith("/emote") ||message.startsWith("/e") || message.startsWith("/say") || message.startsWith("/s") || message.startsWith("\"")) {
+        if (message.startsWith("/emote") || message.startsWith("/e") || message.startsWith("/say") || message.startsWith("/s") || message.startsWith("\"")) {
             return None();
         }
 
