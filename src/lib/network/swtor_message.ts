@@ -5,6 +5,7 @@ import { listen } from "@tauri-apps/api/event";
 import { Channel, SwtorChannel } from "./swtor_channel";
 import { add_swtor_channel_message } from "./swtor_message/swtor_chat_tab_messages";
 import { active_character } from "./characters";
+import { add_player } from "./players";
 
 export class SwtorMessage {
 
@@ -135,6 +136,7 @@ export function init_swtor_message_listener() {
       
         payload.map((message) => new SwtorMessage(message)).forEach((message) => {
             add_swtor_channel_message(message);
+            add_player(message.from);
         });            
 
     });

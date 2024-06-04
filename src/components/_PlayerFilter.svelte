@@ -45,8 +45,11 @@
 </button>
 
 {#if show_filters}
-    <div class="absolute top-10 z-10 bg-slate-600 p-2 rounded-md shadow-md" transition:fade|local="{{ duration: 250 }}">
-        <SelectList bind:elems={elems} on:input={input}/>
+    <div class="absolute top-10 z-10 bg-slate-600 p-2 rounded-md shadow-md " transition:fade|local="{{ duration: 250 }}">
+    <div class="text-white text-xl text-center">Players</div>
+    <div class="max-h-96 overflow-y-auto">
+            <SelectList bind:elems={elems} on:input={input}/>
+        </div>
         <div class="flex flex-row gap-2">
             <SmallButton on:click={select_all}>Select All</SmallButton>
             <SmallButton on:click={deselect_all}>Deselect All</SmallButton>
