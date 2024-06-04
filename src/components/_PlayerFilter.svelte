@@ -6,13 +6,23 @@
     import SelectList from "./_SelectList.svelte";
     import { type IListElem } from "./select_list";
     import { UserList } from "phosphor-svelte";
+    import { click_outside_handler } from "../lib/click_outside";
 
     export let elems: IListElem<string>[];
     
+    let mouse_over: boolean = false;
     let show_filters: boolean = false;
-    function toggle_show_filters() {
+    let player_search: string = "";
 
+    function toggle_show_filters() {
         show_filters = !show_filters;
+    }
+
+    function click_outside() {
+
+        if (!mouse_over) {
+            show_filters = false;
+        }
 
     }
 
@@ -40,16 +50,21 @@
 
 </script>
 
-<button class="hover:text-gray-400 text-white" on:click={toggle_show_filters}>
+<button class="hover:text-gray-400 text-white" on:click={toggle_show_filters} on:mouseenter={() => {mouse_over = true}} on:mouseleave={() => {mouse_over = false}}>
     <UserList size={24}/>
 </button>
 
 {#if show_filters}
-    <div class="absolute top-10 z-10 bg-slate-600 p-2 rounded-md shadow-md " transition:fade|local="{{ duration: 250 }}">
-    <div class="text-white text-xl text-center">Players</div>
-    <div class="max-h-96 overflow-y-auto">
-            <SelectList bind:elems={elems} on:input={input}/>
+    <div class="absolute top-10 z-10 bg-slate-600 p-2 rounded-md shadow-md " transition:fade|local="{{ duration: 250 }}" use:click_outside_handler on:click_outside={click_outside}>
+        <div class="text-white text-xl text-center">Players</div>
+        <div class="w-full">
+            <input type="text" bind:value={player_search} placeholder="Search for player" class="w-full px-2 rounded-md outline-none border-2 border-slate-700">
         </div>
+        <div class="h-2"></div>
+        <div class="max-h-96 overflow-y-auto">
+            <SelectList bind:elems={elems} on:input={input} search={player_search.toLowerCase()}/>
+        </div>
+        <div class="h-2"></div>
         <div class="flex flex-row gap-2">
             <SmallButton on:click={select_all}>Select All</SmallButton>
             <SmallButton on:click={deselect_all}>Deselect All</SmallButton>
