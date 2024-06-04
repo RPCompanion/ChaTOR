@@ -1,7 +1,6 @@
 
 <script lang="ts">
 
-    import { Funnel } from "phosphor-svelte";
     import { save } from "@tauri-apps/api/dialog";
     import { writeTextFile } from "@tauri-apps/api/fs";
     import { invoke } from "@tauri-apps/api";
@@ -13,8 +12,9 @@
     import { afterUpdate } from "svelte";
     import SmallButton from "../../lib/buttons/SmallButton.svelte";
     import { get_all_channel_ids } from "../../lib/network/swtor_channel";
-    import ChannelList from "../../components/_ChannelList.svelte";
     import Filter from "./_Filter.svelte";
+    import PlayerFilter from "../../components/_PlayerFilter.svelte";
+    import { type IListElem } from "../../components/select_list";
 
     let container: HTMLElement | undefined    = undefined;
     let last_message: HTMLElement | undefined = undefined;
@@ -22,9 +22,8 @@
     let channel_filters: number[] = get_all_channel_ids();
     let dates: string[] = [];
     let date_messages: SwtorMessage[]     = [];
+    let players: IListElem<string>[]      = [];
     let filtered_messages: SwtorMessage[] = [];
-
-    let show_filters: boolean = false;
 
     function init_dates(callback?: () => void) {
 
@@ -43,7 +42,8 @@
     function set_filtered_messages() {  
 
         filtered_messages = date_messages
-            .filter((m) => channel_filters.includes(m.channel.type));
+            .filter((m) => channel_filters.includes(m.channel.type))
+            .filter((m) => players.find((p) => p.value == m.from)?.selected);
 
     }
 
@@ -51,8 +51,18 @@
 
         let date = e.detail[1];
         invoke("get_chat_log_from_date", {date}).then((response) => {
+
             date_messages = (response as IChatLogMessage[]).map((m) => new SwtorMessage(m.message));
+            
+            let player_names = date_messages.map((m) => m.from);
+            let unique_player_names = [...new Set(player_names)];
+
+            players = unique_player_names.map((name) => {
+                return { value: name, selected: true };
+            });
+
             set_filtered_messages();
+
         });
 
     }
@@ -85,7 +95,7 @@
 
     }
 
-    $: if (channel_filters) {
+    $: if (channel_filters || players) {
         set_filtered_messages();
     }
 
@@ -108,8 +118,9 @@
         <div class="w-full">
             <Flatpickr options={{ enable: dates }} on:change={on_change} name="date" placeholder="Select a date" class="outline-none border-2 border-slate-700 rounded-md px-2 text-xl"/>
         </div>
-        <div class="flex flex-row-reverse relative w-full">
+        <div class="flex flex-row-reverse relative w-full gap-2">
             <Filter bind:channel_filters={channel_filters}/>
+            <PlayerFilter bind:elems={players}/>
         </div>
     </div>
     <div class="h-6"></div>
