@@ -111,3 +111,17 @@ export function set_swtor_channel_messages_to_read(chat_tab_name: string) {
     swtor_channel_messages.set(t_scm);
 
 }
+
+export function clear_swtor_channel_messages(chat_tab_name: string) {
+
+    let t_scm = get(swtor_channel_messages);
+    let t_chat_tab = t_scm.find((chat_tab) => chat_tab.chat_tab_name == chat_tab_name);
+
+    if (t_chat_tab == undefined) {
+        return;
+    }
+
+    t_chat_tab.messages = [];
+    swtor_channel_messages.set(t_scm);
+
+}

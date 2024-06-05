@@ -1,11 +1,17 @@
 
 <script lang="ts">
-    import { remove_swtor_channel, swtor_channel_messages } from "../network/swtor_message/swtor_chat_tab_messages";
+
+    import { 
+        remove_swtor_channel, 
+        clear_swtor_channel_messages,
+        swtor_channel_messages 
+    } from "../network/swtor_message/swtor_chat_tab_messages";
     import EditModal from "./_EditModal.svelte";
     import { settings } from "../network/settings";
     import { click_outside_handler } from "../click_outside";
     import { active_chat_tab_index } from "./chat_log_window_store";
     import type { IChatTab } from "../network/settings";
+
     export let chat_tab: IChatTab;
     export let index: number;
 
@@ -14,6 +20,7 @@
 
     let show_edit_tab: boolean = false;
     let show_edit_modal: boolean = false;
+
     function on_click() {
 
         if ($active_chat_tab_index == index) {
@@ -52,6 +59,13 @@
 
     }
 
+    function on_clear_chat() {
+
+        clear_swtor_channel_messages(chat_tab.name);
+        show_edit_tab = false;
+
+    }
+
     function on_modal_save(event: any) {
 
         $settings.chat_log.window.chat_tabs[index] = event.detail;
@@ -85,6 +99,7 @@
         <!-- svelte-ignore ts2614 -->
         <div class="flex flex-col gap-1 w-36 shadow-md bg-slate-700 absolute p-2 border-2 border-slate-800" >
             <button type="button" class="text-white hover:text-gray-400" on:click={on_edit}>Edit</button>
+            <button type="button" class="text-white hover:text-gray-400" on:click={on_clear_chat}>Clear Chat</button>
             {#if $settings.chat_log.window.chat_tabs.length > 1 }
                 <button type="button" class="text-white hover:text-gray-400" on:click={on_delete}>Delete</button>
             {/if}
