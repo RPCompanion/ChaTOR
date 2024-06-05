@@ -104,7 +104,7 @@
 
 </script>
 
-<div class="w-full">
+<div class="w-full grid grid-cols-2">
     <div>
         <Checkbox bind:checked={auto_scroll} size="small">Auto scroll</Checkbox>
     </div>
