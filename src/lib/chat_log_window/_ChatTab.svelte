@@ -112,6 +112,6 @@
 
 <style>
     .active-tab {
-        background-color: rgba(7, 56, 76, 1.0);
+        background-color: rgba(36, 85, 105, 1.0);
     }
 </style>
