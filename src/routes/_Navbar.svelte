@@ -59,7 +59,7 @@
 
 </script>
 
-<div class="w-full h-12 bg-slate-700 relative shadow-md grid grid-cols-2 z-10" use:click_outside_handler on:click_outside={trigger_navbar_callbacks}>
+<div class="w-full h-12 bg-slate-700 relative shadow-md grid grid-cols-2 z-10" use:click_outside_handler={trigger_navbar_callbacks}>
     <div class="flex flex-row gap-2">
         <NavbarSection section={chat_section}/>
         <NavbarSection section={EMOTE_SECTION}/>

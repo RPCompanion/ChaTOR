@@ -61,7 +61,7 @@
 </button>
 
 {#if show_filters}
-    <div class="absolute top-10 z-10 bg-slate-600 p-2 rounded-md shadow-md " transition:fade|local="{{ duration: 250 }}" use:click_outside_handler on:click_outside={click_outside}>
+    <div class="absolute top-10 z-10 bg-slate-600 p-2 rounded-md shadow-md " transition:fade|local="{{ duration: 250 }}" use:click_outside_handler={click_outside}>
         <div class="text-white text-xl text-center">Players</div>
         <div class="w-full">
             <input type="text" bind:value={player_search} placeholder="Search for player" class="w-full px-2 rounded-md outline-none border-2 border-slate-700">

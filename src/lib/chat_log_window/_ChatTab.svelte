@@ -82,7 +82,7 @@
 
 </script>
 
-<div class="relative" use:click_outside_handler on:click_outside={click_outside}>
+<div class="relative" use:click_outside_handler={click_outside}>
     {#if unread_message_count > 0}
         <div class="absolute -right-1 -top-2 bg-red-900 text-white px-2 rounded-full shadow-md text-sm">
             {unread_message_count > 9 ? '9+': unread_message_count}
