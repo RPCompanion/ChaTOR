@@ -14,14 +14,20 @@
     let show_filters: boolean = false;
     let player_search: string = "";
 
+    function clear_player_search() {
+        player_search = "";
+    }
+
     function toggle_show_filters() {
         show_filters = !show_filters;
+        clear_player_search();
     }
 
     function click_outside() {
 
         if (!mouse_over) {
             show_filters = false;
+            clear_player_search();
         }
 
     }
