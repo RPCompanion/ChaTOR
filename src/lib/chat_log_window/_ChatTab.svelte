@@ -56,6 +56,13 @@
 
         $settings.chat_log.window.chat_tabs[index] = event.detail;
         $settings = $settings;
+        show_edit_modal = false;
+
+    }
+
+    function on_modal_cancel() {
+
+        show_edit_modal = false;
 
     }
 
@@ -83,7 +90,9 @@
             {/if}
         </div>
     {/if}
-    <EditModal bind:show_edit_modal={show_edit_modal} {chat_tab} on:save={on_modal_save} {index}/>
+    {#if show_edit_modal}
+        <EditModal {chat_tab} {index} on:save={on_modal_save} on:cancel={on_modal_cancel}/>
+    {/if}
 </div>
 
 <style>

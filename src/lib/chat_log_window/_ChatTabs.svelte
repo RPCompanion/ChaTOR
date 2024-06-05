@@ -7,6 +7,7 @@
     import EditModal from "./_EditModal.svelte";
     import { type SvelteDispatch } from "../svelte_utils";
     import { add_swtor_channel, set_swtor_channel_messages_to_read } from "../network/swtor_message/swtor_chat_tab_messages";
+  import { deep_copy } from "../utils";
 
     let show_edit_modal: boolean = false;
     let old_chat_tab_index: number = $active_chat_tab_index;
@@ -14,12 +15,19 @@
         show_edit_modal = true;
     }
 
-    function on_save(event: SvelteDispatch<IChatTab>) {
+    function on_modal_save(event: SvelteDispatch<IChatTab>) {
 
         $settings.chat_log.window.chat_tabs.push(event.detail);
         $settings = $settings;
+        show_edit_modal = false;
         add_swtor_channel(event.detail.name);
         
+    }
+
+    function on_modal_cancel() {
+
+        show_edit_modal = false;
+
     }
     
     $: if ($active_chat_tab_index != old_chat_tab_index) {
@@ -31,11 +39,13 @@
 
 <div class="flex flex-row gap-1 relative">
     {#each $settings.chat_log.window.chat_tabs as chat_tab, index}
-        <ChatTab chat_tab={JSON.parse(JSON.stringify(chat_tab))} {index} />
+        <ChatTab chat_tab={deep_copy(chat_tab)} {index} />
     {/each}
     <div class="relative">
         <button type="button" class="chat-container-background text-white text-xl px-2 rounded-t-md hover:text-gray-400" on:click={on_new_chat_tab}>+</button>
-        <EditModal bind:show_edit_modal={show_edit_modal} on:save={on_save} />
+        {#if show_edit_modal}
+            <EditModal on:save={on_modal_save} on:cancel={on_modal_cancel} />
+        {/if}
     </div>
 </div>
 
