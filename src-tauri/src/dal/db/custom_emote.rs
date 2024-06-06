@@ -32,12 +32,12 @@ impl CustomEmote {
         let conn = db::get_connection();
         const INSERT_QUERY: &str = 
         "  
-            INSERT INTO CustomEmotes (emote_name, emote)
-            VALUES (?1, ?2)
+            INSERT INTO CustomEmotes (emote_name, emote, order_index)
+            VALUES (?1, ?2, ?3)
             RETURNING custom_emote_id;
         ";
 
-        let response = conn.query_row(INSERT_QUERY, params![&emote_name, &emote], |row| { 
+        let response = conn.query_row(INSERT_QUERY, params![&emote_name, &emote, order_index], |row| { 
 
             match row.get(0) { 
                 Ok(custom_emote_id) => Ok(custom_emote_id),

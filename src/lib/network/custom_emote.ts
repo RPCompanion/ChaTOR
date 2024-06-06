@@ -1,15 +1,34 @@
 
 import { toast } from "@zerodevx/svelte-toast";
-import { writable } from "svelte/store";
+import { writable, get } from "svelte/store";
 import { invoke } from "@tauri-apps/api";
 
 export interface ICustomEmote {
     custom_emote_id: number;
     emote_name: string,
-    emote: string
+    emote: string;
+    favourite: boolean;
+    order_index: number;
 }
 
 export const custom_emotes = writable<ICustomEmote[]>([]);
+
+export function get_next_order_index(favourite: boolean): number {
+
+    let t_custom_emotes = get(custom_emotes);
+
+    if (t_custom_emotes.length > 0) {
+
+        return t_custom_emotes
+            .filter((emote) => emote.favourite == favourite)
+            .sort((a, b) => a.order_index - b.order_index)
+            .at(-1)!.order_index + 1;
+            
+    }
+
+    return 0;
+
+}
 
 export function init_custom_emotes() {
 
@@ -21,7 +40,7 @@ export function init_custom_emotes() {
 
 export function create_custom_emote(emote_name: string, emote: string) {
 
-    invoke("create_custom_emote", { emoteName: emote_name, emote: emote }).then((response: any) => {
+    invoke("create_custom_emote", { emoteName: emote_name, emote: emote, orderIndex: get_next_order_index(false) }).then((response: any) => {
 
         console.log(response)
         custom_emotes.update((current) => {
