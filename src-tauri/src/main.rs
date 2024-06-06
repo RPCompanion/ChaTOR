@@ -4,6 +4,9 @@
 use open;
 use tauri::{Manager, PhysicalSize, WindowEvent};
 
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
+
 #[macro_use]
 extern crate lazy_static;
 
@@ -18,6 +21,8 @@ fn main() {
 
     dal::init();
     dal::db::settings::init();
+
+    setup_sigterm_handler();
 
     tauri::Builder::default()
         .on_window_event(|event| {
@@ -39,6 +44,13 @@ fn main() {
                 width: settings.app.window.width as f64,
                 height: settings.app.window.height as f64
             }).expect("error while setting window size.");
+
+            if settings.app.always_on_top {
+
+                window.set_always_on_top(true)
+                    .expect("error while setting always on top.");
+                
+            }
 
             Ok(())
 
@@ -62,6 +74,16 @@ fn main() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+fn setup_sigterm_handler() {
+
+    ctrlc::set_handler(|| {
+        capture_injector::stop_injecting_capture();
+        std::process::exit(0);
+    })
+    .expect("Error setting Ctrl-C handler.");
+
 }
 
 #[tauri::command]
