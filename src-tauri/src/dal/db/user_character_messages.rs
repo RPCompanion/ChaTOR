@@ -41,6 +41,20 @@ impl CommandMessage {
         self.command.is_some() && self.message.len() == 0
     }
 
+    pub fn should_retry(&self) -> bool {
+
+        if let Some(command) = self.command.as_ref() {
+
+            if command == "/roll" {
+                return false;
+            }
+
+        }
+
+        true
+
+    }
+
 }
 
 #[derive(Deserialize, Serialize)]

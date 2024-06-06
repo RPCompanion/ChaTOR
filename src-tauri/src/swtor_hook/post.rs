@@ -132,7 +132,7 @@ fn retry_logic(window: &tauri::Window, character_message: UserCharacterMessages)
     let command_messages = character_message.get_all_command_message_splits()?;
     for command_message in command_messages {        
 
-        if command_message.is_command_only() {
+        if command_message.is_command_only() || !command_message.should_retry() {
             attempt_post_submission(&window, &command_message.concat());
         } else {
             attempt_post_submission_with_retry(&window, &command_message)?;
