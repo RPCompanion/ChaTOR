@@ -1,5 +1,4 @@
 
-use std::{fs, path::Path};
 
 use crate::dal;
 use rusqlite::Connection;
@@ -14,6 +13,8 @@ pub mod log;
 pub mod swtor_message;
 pub mod migration;
 
+use migration::Migration;
+
 pub fn get_connection() -> Connection {
 
     let em_dirs = dal::get_em_dirs();
@@ -22,9 +23,31 @@ pub fn get_connection() -> Connection {
 
 }
 
+fn database_exists() -> bool {
+
+    let em_dirs = dal::get_em_dirs();
+    let db_path = em_dirs.get_data_dir_path("blinky.db");
+    std::path::Path::new(&db_path).exists()
+
+}
+
 pub fn init() {
+
+    let existing_database = database_exists();
 
     let conn = get_connection();
     conn.execute_batch(TABLES).expect("Error creating tables");
+
+    let migration = Migration::new(conn);
+
+    if !existing_database {
+
+        migration.insert_game_version();
+
+    } else if migration.should_migrate() {
+
+        migration.migrate().expect("Error migrating database");
+
+    }
 
 }

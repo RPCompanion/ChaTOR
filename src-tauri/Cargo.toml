@@ -1,8 +1,8 @@
 [package]
 name = "swtor_chat"
-version = "0.1.0"
+version = "0.1.1"
 description = "A Chat system for Star Wars: The Old Republic."
-authors = ["you"]
+authors = ["Emma Davenport"]
 license = ""
 repository = ""
 default-run = "swtor_chat"
