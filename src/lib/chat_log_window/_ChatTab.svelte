@@ -25,7 +25,6 @@
     let show_edit_tab: boolean    = false;
     let show_edit_modal: boolean  = false;
     let mouse_over: boolean       = false;
-    let timeout_id: number;
 
     function on_click() {
 
@@ -97,12 +96,6 @@
         mouse_over = false;
 
     }
-
-    onDestroy(() => {
-            
-        clearTimeout(timeout_id);
-    
-    });
 
 </script>
 
