@@ -72,7 +72,10 @@ impl CustomEmote {
                 favourite,
                 order_index
             FROM 
-                CustomEmotes;
+                CustomEmotes
+            ORDER BY
+                favourite DESC, 
+                order_index ASC;
         ";
 
         let mut stmt = conn.prepare(SELECT_QUERY).unwrap();
@@ -152,9 +155,20 @@ impl CustomEmote {
         let sorter = |mut emotes: Vec<CustomEmote>| {
 
             emotes.sort_by(|a, b| a.order_index.cmp(&b.order_index));
+            let mut already_ordered: bool = true;
             for (idx, e) in emotes.iter_mut().enumerate() {
+
+                if e.order_index != idx as i32 {
+                    already_ordered = false;
+                }
                 e.order_index = idx as i32;
+
             }
+
+            if already_ordered {
+                return;
+            }
+
             emotes.iter().for_each(|e| e.save().unwrap());
 
         };
