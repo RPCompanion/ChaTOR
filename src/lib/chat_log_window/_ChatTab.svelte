@@ -11,6 +11,8 @@
     import { click_outside_handler } from "../click_outside";
     import { active_chat_tab_index } from "./chat_log_window_store";
     import type { IChatTab } from "../network/settings";
+    import { dragHandle } from "svelte-dnd-action";
+    import { onDestroy } from "svelte";
 
     export let chat_tab: IChatTab;
     export let index: number;
@@ -18,8 +20,11 @@
     let unread_message_count: number = 0;
     $: unread_message_count = $swtor_channel_messages.find((c) => c.chat_tab_name == chat_tab.name)?.messages.filter((m) => !m.read).length ?? 0;
 
-    let show_edit_tab: boolean = false;
-    let show_edit_modal: boolean = false;
+    let show_edit_tab: boolean    = false;
+    let show_edit_modal: boolean  = false;
+    let mouse_is_over: boolean    = false;
+    let show_drag_handle: boolean = false;
+    let timeout_id: number;
 
     function on_click() {
 
@@ -80,6 +85,37 @@
 
     }
 
+    function on_mouse_enter() {
+
+        mouse_is_over = true;
+        timeout_id = setTimeout(() => {
+
+            if (mouse_is_over) {
+                show_drag_handle = true;
+            }
+
+        }, 400);
+
+    }
+
+    function on_mouse_leave() {
+
+        mouse_is_over = false;
+
+    }
+
+    function on_drag_handle_leave() {
+
+        show_drag_handle = false;
+
+    }
+
+    onDestroy(() => {
+            
+        clearTimeout(timeout_id);
+    
+    });
+
 </script>
 
 <div class="relative" use:click_outside_handler={click_outside}>
@@ -88,11 +124,17 @@
             {unread_message_count > 9 ? '9+': unread_message_count}
         </div>
     {/if}
+    {#if show_drag_handle}
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <div use:dragHandle class="w-full h-full absolute" aria-label="drag-handle for {chat_tab.name}" on:mouseleave={on_drag_handle_leave}></div>
+    {/if}
     <button 
         type="button" 
         class="chat-container-background text-white text-xl px-2 rounded-t-md hover:text-gray-400" 
         class:active-tab={$active_chat_tab_index == index}
-        on:click={on_click}>
+        on:click={on_click}
+        on:mouseenter={on_mouse_enter}
+        on:mouseleave={on_mouse_leave}>
         {chat_tab.name}
     </button>
     {#if show_edit_tab}
