@@ -54,7 +54,9 @@
                 "providerShortName": null,
                 "signingIdentity": null
             },
-            "resources": [],
+            "resources": [
+                "./sql"
+            ],
             "shortDescription": "",
             "targets": "all",
             "windows": {
