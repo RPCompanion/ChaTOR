@@ -14,6 +14,7 @@ pub mod swtor_message;
 pub mod migration;
 
 use migration::Migration;
+use custom_emote::CustomEmote;
 
 pub fn get_connection() -> Connection {
 
@@ -49,5 +50,13 @@ pub fn init() {
         migration.migrate().expect("Error migrating database");
 
     }
+
+    finalize_init();
+
+}
+
+fn finalize_init() {
+
+    let _ = CustomEmote::clean_up_order_index_gaps();
 
 }

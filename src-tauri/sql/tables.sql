@@ -8,6 +8,11 @@ CREATE TABLE IF NOT EXISTS CustomEmotes
     order_index INTEGER NOT NULL
 );
 
+/*
+    CustomEmotes.order_index is used to keep track of the order of the emotes. Uniqueness is not enforced and
+    favourites and non-favourites may share similar indices.
+*/
+
 CREATE TABLE IF NOT EXISTS CustomCategory
 (
     custom_category_id INTEGER PRIMARY KEY AUTOINCREMENT,

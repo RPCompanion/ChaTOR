@@ -4,16 +4,18 @@ use serde::{Deserialize, Serialize};
 
 use crate::dal::db;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CustomEmote {
     pub custom_emote_id: i32,
     pub emote_name: String,
-    pub emote: String
+    pub emote: String,
+    pub favourite: bool,
+    pub order_index: i32
 }
 
 impl CustomEmote {
 
-    pub fn new(emote_name: String, emote: String) -> Result<CustomEmote, &'static str> {
+    pub fn new(emote_name: String, emote: String, order_index: i32) -> Result<CustomEmote, &'static str> {
 
         if emote_name.is_empty() {
             return Err("Emote name cannot be empty");
@@ -49,7 +51,9 @@ impl CustomEmote {
             Ok(custom_emote_id) => Ok(CustomEmote {
                 custom_emote_id,
                 emote_name,
-                emote
+                emote,
+                favourite: false,
+                order_index
             }),
             Err(_) => Err("Error inserting custom emote")
         }
@@ -62,7 +66,11 @@ impl CustomEmote {
         const SELECT_QUERY: &str = 
         "
             SELECT 
-                custom_emote_id, emote_name, emote
+                custom_emote_id, 
+                emote_name, 
+                emote,
+                favourite,
+                order_index
             FROM 
                 CustomEmotes;
         ";
@@ -73,7 +81,9 @@ impl CustomEmote {
             Ok(CustomEmote {
                 custom_emote_id: row.get(0)?,
                 emote_name: row.get(1)?,
-                emote: row.get(2)?
+                emote: row.get(2)?,
+                favourite: row.get(3)?,
+                order_index: row.get(4)?
             })
 
         });
@@ -117,12 +127,15 @@ impl CustomEmote {
             UPDATE 
                 CustomEmotes
             SET 
-                emote_name = ?1, emote = ?2
+                emote_name = ?1, 
+                emote = ?2,
+                favourite = ?3,
+                order_index = ?4
             WHERE 
-                custom_emote_id = ?3;
+                custom_emote_id = ?5;
         ";
 
-        match conn.execute(UPDATE_QUERY, params![&self.emote_name, &self.emote, self.custom_emote_id]) {
+        match conn.execute(UPDATE_QUERY, params![&self.emote_name, &self.emote, &self.favourite, &self.order_index, self.custom_emote_id]) {
             Ok(_) => {},
             Err(e) => {
                 println!("{:?}", e);
@@ -132,6 +145,36 @@ impl CustomEmote {
 
         return Ok(())
     
+    }
+
+    pub fn clean_up_order_index_gaps() -> Result<(), &'static str> {
+
+        let sorter = |mut emotes: Vec<CustomEmote>| {
+
+            emotes.sort_by(|a, b| a.order_index.cmp(&b.order_index));
+            for (idx, e) in emotes.iter_mut().enumerate() {
+                e.order_index = idx as i32;
+            }
+            emotes.iter().for_each(|e| e.save().unwrap());
+
+        };
+
+        let emotes = CustomEmote::get_all()?;
+        let favourite_emotes: Vec<CustomEmote> = emotes
+            .clone()
+            .into_iter()
+            .filter(|e| e.favourite)
+            .collect();
+
+        let non_favourite_emotes: Vec<CustomEmote> = emotes
+            .into_iter()
+            .filter(|e| !e.favourite)
+            .collect();
+
+        sorter(favourite_emotes);
+        sorter(non_favourite_emotes);
+        Ok(())
+
     }
 
 }
@@ -144,9 +187,9 @@ pub fn get_all_custom_emotes() -> Result<Vec<CustomEmote>, &'static str> {
 }
 
 #[tauri::command]
-pub fn create_custom_emote(emote_name: String, emote: String) -> Result<CustomEmote, &'static str> {
+pub fn create_custom_emote(emote_name: String, emote: String, order_index: i32) -> Result<CustomEmote, &'static str> {
 
-    CustomEmote::new(emote_name, emote)
+    CustomEmote::new(emote_name, emote, order_index)
 
 }
 
