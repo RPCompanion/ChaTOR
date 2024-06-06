@@ -114,7 +114,7 @@
         </div>
     {/if}
     {#if mouse_over}
-        <div use:dragHandle class="w-4 h-4 -top-1 -left-1 absolute " aria-label="drag-handle for {chat_tab.name}" transition:fade|local="{{ duration: 250 }}">
+        <div use:dragHandle class="w-4 h-4 -top-1 -left-1 absolute " aria-label="drag-handle for {chat_tab.name}" transition:fade|local="{{ duration: 500 }}">
             <ArrowsOutCardinal class="text-white"/>
         </div>
     {/if}
