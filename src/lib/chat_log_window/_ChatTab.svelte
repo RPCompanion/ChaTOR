@@ -94,7 +94,7 @@
                 show_drag_handle = true;
             }
 
-        }, 400);
+        }, 1000);
 
     }
 
