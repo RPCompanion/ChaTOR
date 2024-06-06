@@ -3,7 +3,9 @@ CREATE TABLE IF NOT EXISTS CustomEmotes
 (
     custom_emote_id INTEGER PRIMARY KEY AUTOINCREMENT,
     emote_name VARCHAR(255) UNIQUE NOT NULL,
-    emote VARCHAR(255) NOT NULL
+    emote VARCHAR(255) NOT NULL,
+    favourite BOOLEAN NOT NULL DEFAULT(FALSE),
+    order_index INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS CustomCategory
