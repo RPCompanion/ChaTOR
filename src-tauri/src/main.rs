@@ -4,9 +4,6 @@
 use open;
 use tauri::{Manager, PhysicalSize, WindowEvent};
 
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::Arc;
-
 #[macro_use]
 extern crate lazy_static;
 
@@ -45,12 +42,8 @@ fn main() {
                 height: settings.app.window.height as f64
             }).expect("error while setting window size.");
 
-            if settings.app.always_on_top {
-
-                window.set_always_on_top(true)
-                    .expect("error while setting always on top.");
-                
-            }
+            window.set_always_on_top(settings.app.always_on_top)
+                .expect("error while setting always on top.");
 
             Ok(())
 
