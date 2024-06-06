@@ -7,12 +7,14 @@
     import EditModal from "./_EditModal.svelte";
     import { type SvelteDispatch } from "../svelte_utils";
     import { add_swtor_channel, set_swtor_channel_messages_to_read } from "../network/swtor_message/swtor_chat_tab_messages";
-  import { deep_copy } from "../utils";
+    import { deep_copy } from "../utils";
 
     let show_edit_modal: boolean = false;
     let old_chat_tab_index: number = $active_chat_tab_index;
     function on_new_chat_tab() {
+
         show_edit_modal = true;
+
     }
 
     function on_modal_save(event: SvelteDispatch<IChatTab>) {
