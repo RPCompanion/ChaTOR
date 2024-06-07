@@ -2,16 +2,13 @@
 <script lang="ts">
 
     import { afterUpdate } from "svelte";
-    import { flip } from "svelte/animate";
     import { dndzone } from 'svelte-dnd-action';
 
-    import { fade } from "svelte/transition";
-    import XButton from "../../lib/buttons/XButton.svelte";
-    import { custom_emotes, delete_custom_emote, update_custom_emote } from "../../lib/network/custom_emote";
+    import Emote from "./_Emote.svelte";
+    import { custom_emotes } from "../../lib/network/custom_emote";
     import EmoteModal from "./_EmoteModal.svelte";
 
     let show_modal = false;
-    let show_x_button_idx: number | undefined = undefined;
     let emotes: any = $custom_emotes;
 
     let scroll_bottom: boolean = false;
@@ -72,19 +69,24 @@
 <div class="h-12"></div>
 <div class="w-full relative">
     <section bind:this={emote_section} class="flex flex-col gap-2 max-h-96 overflow-y-auto">
-        {#each $custom_emotes as emote, idx}
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <!-- svelte-ignore a11y-mouse-events-have-key-events -->
-            <div class="flex flex-row gap-2 px-2 relative" on:mouseenter={() => { show_x_button_idx = idx }} on:mouseleave={() => { show_x_button_idx = undefined }}>
-                <input type="text" bind:value={emote.emote_name} class="w-1/2 text-xl outline-none border-slate-500 border-2 rounded-md px-1" on:focusout={() =>  { update_custom_emote(emote); }}/>
-                <input type="text" bind:value={emote.emote} class="w-1/2 text-xl outline-none border-slate-500 border-2 rounded-md px-1" on:focusout={() => { update_custom_emote(emote); }} />
-                {#if show_x_button_idx == idx}
-                    <div class="absolute right-0 bottom-3" transition:fade|local={{ duration: 150 }}>
-                        <XButton on:click={() => { delete_custom_emote(emote.custom_emote_id); }}/>
-                    </div>
-                {/if}
-            </div>
+
+        <div class="h-2"></div>
+        {#if $custom_emotes.filter((e) => e.favourite).length > 0}
+            <p class="text-white text-2xl text-center">Favourite Emotes</p>
+        {/if}
+        {#each $custom_emotes.filter((e) => e.favourite).sort((a, b) => a.order_index - b.order_index) as emote}
+            <Emote {emote} favourite={true}/>
         {/each}
+
+        
+        {#if $custom_emotes.filter((e) => !e.favourite).length > 0 && $custom_emotes.filter((e) => e.favourite).length > 0}
+            <div class="h-1"></div>
+            <p class="text-white text-2xl text-center">Emotes</p>
+        {/if}
+        {#each $custom_emotes.filter((e) => !e.favourite).sort((a, b) => a.order_index - b.order_index) as emote}
+            <Emote {emote} favourite={false}/>
+        {/each}
+
     </section>
     <div class="h-6"></div>
     <div class="flex flex-row justify-center">
