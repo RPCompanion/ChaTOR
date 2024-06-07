@@ -43,5 +43,5 @@
             <ArrowsOutCardinal class="text-white"/>
         </div>
     {/if}
-    <VariableSizeButton on:click={on_click} my_classes="bg-yellow-500 text-black text-xl px-2 rounded-md hover:text-white">{emote.emote_name}</VariableSizeButton>
+    <VariableSizeButton on:click={on_click} my_classes="bg-yellow-500 text-black text-2xl px-2 rounded-md hover:text-white">{emote.emote_name}</VariableSizeButton>
 </div>

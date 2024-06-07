@@ -25,7 +25,7 @@
         <div>
             <VariableSizeButton 
                 on:click={() => { on_emote_click(emote); }}
-                my_classes={emote.favourite ? "bg-yellow-500 text-black text-xl px-2 rounded-md hover:text-white" : undefined}
+                my_classes={emote.favourite ? "bg-yellow-500 text-black text-2xl px-2 rounded-md hover:text-white" : undefined}
             >{emote.emote_name}</VariableSizeButton>
         </div>
     {/each}

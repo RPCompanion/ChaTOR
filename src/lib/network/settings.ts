@@ -65,10 +65,10 @@ export function default_settings(): ISettings {
                 width: 800,
                 height: 600
             },
-            show_window_decorations: true,
+            show_window_decorations: false,
             opacity: 100,
             always_on_top: false,
-            show_background_image: true
+            show_background_image: false
         },
         chat: {
             confirmation_before_posting: true,

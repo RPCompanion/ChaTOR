@@ -28,7 +28,7 @@ fn default_always_on_top() -> bool {
 }
 
 fn default_show_window_decorations() -> bool {
-    true
+    false
 }
 
 fn default_opacity() -> i32 {
@@ -36,7 +36,7 @@ fn default_opacity() -> i32 {
 }
 
 fn default_show_background_image() -> bool {
-    true
+    false
 }
 
 impl AppSettings {
@@ -52,10 +52,10 @@ impl AppSettings {
                 width: windows["width"].as_i64().unwrap() as i32,
                 height: windows["height"].as_i64().unwrap() as i32
             },
-            show_window_decorations: true,
+            show_window_decorations: false,
             always_on_top: false,
             opacity: 100,
-            show_background_image: true
+            show_background_image: false
 
         }
 
