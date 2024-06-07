@@ -3,7 +3,7 @@
     import { dndzone, type DndEvent } from "svelte-dnd-action";
     import { update_custom_emotes_batch, type ICustomEmote } from "../../lib/network/custom_emote";
     import Emote from "./_Emote.svelte";
-    import { get_relevant_emotes_from_list, type IDNDCustomEmote } from "../../lib/custom_emote_utils";
+    import { get_relevant_emotes_from_list, reorder_emotes_and_update, type IDNDCustomEmote } from "../../lib/custom_emote_utils";
 
     export let emotes: ICustomEmote[];
     export let favourite: boolean;
@@ -20,10 +20,7 @@
     function on_finalize(e: CustomEvent<DndEvent<IDNDCustomEmote>>) {
 
         items = e.detail.items;
-        items.forEach((emote, index) => {
-            emote.order_index = index;
-        });
-        update_custom_emotes_batch(items);
+        reorder_emotes_and_update(items);
 
     }
 
