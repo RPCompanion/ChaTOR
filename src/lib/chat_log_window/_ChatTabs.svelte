@@ -69,7 +69,7 @@
 </script>
 
 <div class="flex flex-row gap-1 relative">
-    <div class="flex flex-row gap-1 relative" use:dndzone="{{items}}" on:consider={on_consider} on:finalize={on_finalize}>
+    <div class="flex flex-row gap-1 relative" use:dndzone="{{items, dropFromOthersDisabled: true}}" on:consider={on_consider} on:finalize={on_finalize}>
         {#each items as chat_tab(chat_tab.id)}
             <ChatTab chat_tab={deep_copy(chat_tab)} index={chat_tab.id} />
         {/each}

@@ -26,7 +26,7 @@
 
 </script>
 
-<section class="flex flex-col gap-2" use:dndzone="{{items}}" on:consider={on_consider} on:finalize={on_finalize}>
+<section class="flex flex-col gap-2" use:dndzone="{{items, dropFromOthersDisabled: true}}" on:consider={on_consider} on:finalize={on_finalize}>
     {#each items as emote(emote.id)}
         <Emote {emote} {favourite}/>
     {/each}
