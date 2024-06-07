@@ -91,3 +91,14 @@ export function update_custom_emote(custom_emote: ICustomEmote) {
 
 }
 
+export function update_custom_emotes_batch(t_custom_emotes: ICustomEmote[]) {
+
+    invoke("update_custom_emotes_batch", { customEmotes: t_custom_emotes }).then(() => {
+        init_custom_emotes();
+    }).catch((error: string) => {
+        toast.push(error);
+        init_custom_emotes();
+    });
+
+}
+

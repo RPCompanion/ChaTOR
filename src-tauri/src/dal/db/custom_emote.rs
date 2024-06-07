@@ -4,6 +4,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::dal::db;
 
+use super::log::log_error;
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CustomEmote {
     pub custom_emote_id: i32,
@@ -218,5 +220,26 @@ pub fn delete_custom_emote(custom_emote_id: i32) {
 pub fn update_custom_emote(custom_emote: CustomEmote) -> Result<(), String> {
 
     custom_emote.save()
+
+}
+
+#[tauri::command]
+pub fn update_custom_emotes_batch(custom_emotes: Vec<CustomEmote>) -> Result<(), &'static str> {
+
+    for custom_emote in custom_emotes {
+
+        match custom_emote.save() {
+            Ok(_) => {},
+            Err(e) => {
+
+                log_error(&e);
+                CustomEmote::clean_up_order_index_gaps()?;
+                return Err("Error saving custom emotes");
+                
+            }
+        }
+            
+    }
+    Ok(())
 
 }

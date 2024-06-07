@@ -57,6 +57,7 @@ fn main() {
             dal::db::custom_emote::create_custom_emote,
             dal::db::custom_emote::delete_custom_emote,
             dal::db::custom_emote::update_custom_emote,
+            dal::db::custom_emote::update_custom_emotes_batch,
             dal::db::settings::get_settings,
             dal::db::settings::update_settings,
             dal::characters::get_all_characters,
