@@ -7,7 +7,7 @@
     import StandardMenuButton from "../../lib/buttons/StandardMenuButton.svelte";
     import { AutoMessageSplitter } from "../../lib/auto_message_splitter";
     import AutomaticConfirmation from "./_AutomaticConfirmation.svelte";
-    import CustomEmotesList from "../../lib/_CustomEmotesList.svelte";
+    import CustomEmotesList from "../../components/emotes_list/_CustomEmotesList.svelte";
     import ChatLogWindow from "../../lib/_ChatLogWindow.svelte";
 
     let message: string     = "";

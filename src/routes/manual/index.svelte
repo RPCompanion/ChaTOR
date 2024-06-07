@@ -9,7 +9,7 @@
     import { valid_messages } from "../utils";
     import { submit_post } from "../../lib/network";
     import StandardMenuButton from "../../lib/buttons/StandardMenuButton.svelte";
-    import CustomEmotesList from "../../lib/_CustomEmotesList.svelte";
+    import CustomEmotesList from "../../components/emotes_list/_CustomEmotesList.svelte";
     import ChatLogWindow from "../../lib/_ChatLogWindow.svelte";
 
     let messages: string[] = [""];
