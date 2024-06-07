@@ -3,7 +3,7 @@
 
     import { toast } from "@zerodevx/svelte-toast";
     import { custom_emotes, type ICustomEmote } from "../../lib/network/custom_emote";
-    import SmallButton from "../../lib/buttons/SmallButton.svelte";
+    import VariableSizeButton from "../../lib/buttons/VariableSizeButton.svelte";
     import { submit_post } from "../../lib/network";
 
     async function on_emote_click(emote: ICustomEmote) {
@@ -22,6 +22,11 @@
 <div class="h-6"></div>
 <div class="flex flex-row flex-wrap gap-1 w-full justify-center">
     {#each $custom_emotes as emote}
-        <SmallButton on:click={() => { on_emote_click(emote); }}>{emote.emote_name}</SmallButton>
+        <div>
+            <VariableSizeButton 
+                on:click={() => { on_emote_click(emote); }}
+                my_classes={emote.favourite ? "bg-yellow-500 text-black text-xl px-2 rounded-md hover:text-white" : undefined}
+            >{emote.emote_name}</VariableSizeButton>
+        </div>
     {/each}
 </div>
