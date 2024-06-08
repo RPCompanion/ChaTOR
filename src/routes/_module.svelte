@@ -30,7 +30,7 @@
 
 <style>
     .background-img {
-        background-image: url("../assets//watercolor-2.png");
+        background-image: url("../assets//watercolor.webp");
     }
 
     .background-color {
