@@ -2,7 +2,7 @@
 import { invoke } from "@tauri-apps/api";
 import { writable, get } from "svelte/store";
 import { settings } from "./settings";
-import { SwtorChannel } from "./swtor_channel";
+import { ESwtorChannel } from "./swtor_channel";
 
 export class Color {
 
@@ -50,18 +50,18 @@ export class Character {
 
     }
 
-    public get_channel_color(channel: SwtorChannel): Color {
+    public get_channel_color(channel: ESwtorChannel): Color {
 
         switch (channel) {
-            case SwtorChannel.SAY: return this.channel_colors[SAY_COLOR_INDEX];
-            case SwtorChannel.YELL: return this.channel_colors[YELL_COLOR_INDEX];
-            case SwtorChannel.EMOTE: return this.channel_colors[EMOTE_COLOR_INDEX];
-            case SwtorChannel.WHISPER: return this.channel_colors[WHISPER_COLOR_INDEX];
-            case SwtorChannel.GUILD: return this.channel_colors[GUILD_COLOR_INDEX];
-            case SwtorChannel.GUILD_OFFICER: return this.channel_colors[GUILD_COLOR_INDEX];
-            case SwtorChannel.GROUP: return this.channel_colors[GROUP_COLOR_INDEX];
-            case SwtorChannel.OP: return this.channel_colors[OPS_COLOR_INDEX];
-            case SwtorChannel.OPS_OFFICER: return this.channel_colors[OPS_LEADER_COLOR_INDEX];
+            case ESwtorChannel.SAY: return this.channel_colors[SAY_COLOR_INDEX];
+            case ESwtorChannel.YELL: return this.channel_colors[YELL_COLOR_INDEX];
+            case ESwtorChannel.EMOTE: return this.channel_colors[EMOTE_COLOR_INDEX];
+            case ESwtorChannel.WHISPER: return this.channel_colors[WHISPER_COLOR_INDEX];
+            case ESwtorChannel.GUILD: return this.channel_colors[GUILD_COLOR_INDEX];
+            case ESwtorChannel.GUILD_OFFICER: return this.channel_colors[GUILD_COLOR_INDEX];
+            case ESwtorChannel.GROUP: return this.channel_colors[GROUP_COLOR_INDEX];
+            case ESwtorChannel.OP: return this.channel_colors[OPS_COLOR_INDEX];
+            case ESwtorChannel.OPS_OFFICER: return this.channel_colors[OPS_LEADER_COLOR_INDEX];
             default: return this.channel_colors[SAY_COLOR_INDEX];
         }
 

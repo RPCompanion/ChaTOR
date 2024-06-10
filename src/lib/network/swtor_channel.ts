@@ -1,6 +1,6 @@
 import { type Option, None, Some } from "../option";
 
-export enum SwtorChannel {
+export enum ESwtorChannel {
     SAY = 1,
     YELL = 2,
     EMOTE = 3,
@@ -16,9 +16,9 @@ export enum SwtorChannel {
     GUILD_OFFICER = 58,
 }
 
-export class Channel {
+export class SwtorChannel {
 
-    public readonly type: SwtorChannel;
+    public readonly type: ESwtorChannel;
     constructor(channel: number) {
         this.type = channel;
     }
@@ -26,16 +26,33 @@ export class Channel {
     public get_name(): Option<string> {
 
         switch (this.type) {
-            case SwtorChannel.SAY:     return Some("say");
-            case SwtorChannel.YELL:    return Some("yell");
-            case SwtorChannel.EMOTE:   return Some("emote");
-            case SwtorChannel.WHISPER: return Some("whisper");
-            case SwtorChannel.GLOBAL:  return Some("global");
-            case SwtorChannel.PVP:     return Some("pvp");
-            case SwtorChannel.TRADE:   return Some("trade");
-            case SwtorChannel.GROUP:   return Some("group");
-            case SwtorChannel.GUILD:   return Some("guild");
+            case ESwtorChannel.SAY:     return Some("say");
+            case ESwtorChannel.YELL:    return Some("yell");
+            case ESwtorChannel.EMOTE:   return Some("emote");
+            case ESwtorChannel.WHISPER: return Some("whisper");
+            case ESwtorChannel.GLOBAL:  return Some("global");
+            case ESwtorChannel.PVP:     return Some("pvp");
+            case ESwtorChannel.TRADE:   return Some("trade");
+            case ESwtorChannel.GROUP:   return Some("group");
+            case ESwtorChannel.GUILD:   return Some("guild");
             default:                   return None();
+        }
+
+    }
+
+    public get_command(): Option<string> {
+
+        switch (this.type) {
+            case ESwtorChannel.SAY: return Some("/s");
+            case ESwtorChannel.YELL: return Some("/y");
+            case ESwtorChannel.EMOTE: return Some("/e");
+            case ESwtorChannel.WHISPER: return Some("/w");
+            case ESwtorChannel.GLOBAL: return Some("/1");
+            case ESwtorChannel.PVP: return Some("/pvp");
+            case ESwtorChannel.TRADE: return Some("/trade");
+            case ESwtorChannel.GROUP: return Some("/group");
+            case ESwtorChannel.GUILD: return Some("/g");
+            default: return None();
         }
 
     }
@@ -44,7 +61,7 @@ export class Channel {
 
 export function get_all_channel_ids(): number[] {
 
-    return Object.keys(SwtorChannel)
+    return Object.keys(ESwtorChannel)
         .filter((key) => !isNaN(Number(key)))
         .map((key) => Number(key));
 

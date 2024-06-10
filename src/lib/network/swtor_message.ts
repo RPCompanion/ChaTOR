@@ -2,14 +2,14 @@
 import { get, writable } from "svelte/store";
 import { settings } from "./settings";
 import { listen } from "@tauri-apps/api/event";
-import { Channel, SwtorChannel } from "./swtor_channel";
+import { SwtorChannel, ESwtorChannel } from "./swtor_channel";
 import { add_swtor_channel_message } from "./swtor_message/swtor_chat_tab_messages";
 import { active_character } from "./characters";
 import { add_player } from "./players";
 
 export class SwtorMessage {
 
-    public readonly channel: Channel;
+    public readonly channel: SwtorChannel;
     public readonly timestamp: string;
     public readonly from: string;
     public readonly to: string;
@@ -18,7 +18,7 @@ export class SwtorMessage {
     
     constructor(swtor_message: ISwtorMessage) {
 
-        this.channel   = new Channel(swtor_message.channel);
+        this.channel   = new SwtorChannel(swtor_message.channel);
         this.timestamp = new Date(swtor_message.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit"});
         this.from      = swtor_message.from;
         this.to        = swtor_message.to;
@@ -54,7 +54,7 @@ export class SwtorMessage {
 
     public get_message_from(): string {
 
-        if (this.channel.type == SwtorChannel.WHISPER && this.from == get(active_character)?.character_name) {
+        if (this.channel.type == ESwtorChannel.WHISPER && this.from == get(active_character)?.character_name) {
             return `[to ${this.to}]`;
         }
 

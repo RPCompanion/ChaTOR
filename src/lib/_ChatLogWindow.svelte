@@ -12,7 +12,7 @@
     
     import { afterUpdate, onMount } from "svelte";
     import Checkbox from "./Checkbox.svelte";
-    import { SwtorChannel } from "./network/swtor_channel";
+    import { ESwtorChannel } from "./network/swtor_channel";
     import { active_chat_tab_index } from "./chat_log_window/chat_log_window_store";
     import { settings } from "./network/settings";
     import ChatTabs from "./chat_log_window/_ChatTabs.svelte";
@@ -33,7 +33,7 @@
 
     function on_character_click(message: SwtorMessage) {
 
-        if (message.channel.type == SwtorChannel.WHISPER && message.from == $active_character?.character_name) {
+        if (message.channel.type == ESwtorChannel.WHISPER && message.from == $active_character?.character_name) {
             dispatch("whisper", { character_name: message.to });
             return;
         }

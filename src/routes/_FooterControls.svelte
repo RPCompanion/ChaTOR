@@ -15,8 +15,7 @@
 </script>
 
 <div class="relative w-full grid grid-cols-2 px-1 pb-1">
-    <div class="flex flex-row gap-1">
-        
+    <div class="flex flex-row gap-1"> 
         <div class="flex flex-row gap-1">
             <span class="text-white text-xl">Made with</span>
             <Heart size={28} color="red"/>

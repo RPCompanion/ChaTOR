@@ -3,7 +3,7 @@ import { writable, get } from "svelte/store";
 import { invoke } from "@tauri-apps/api";
 import { toast } from "@zerodevx/svelte-toast";
 import { hooked_in } from "../network";
-import { SwtorChannel } from "./swtor_channel";
+import { ESwtorChannel } from "./swtor_channel";
 import { set_initial_swtor_channels } from "./swtor_message/swtor_chat_tab_messages";
 
 export interface IChatTab {
@@ -89,11 +89,11 @@ export function default_settings(): ISettings {
                 chat_tabs: [
                     {
                         name: "Global",
-                        channels: [SwtorChannel.GLOBAL, SwtorChannel.PVP, SwtorChannel.TRADE]
+                        channels: [ESwtorChannel.GLOBAL, ESwtorChannel.PVP, ESwtorChannel.TRADE]
                     },
                     {
                         name: "Local",
-                        channels: [SwtorChannel.EMOTE, SwtorChannel.SAY, SwtorChannel.YELL, SwtorChannel.WHISPER]
+                        channels: [ESwtorChannel.EMOTE, ESwtorChannel.SAY, ESwtorChannel.YELL, ESwtorChannel.WHISPER]
                     }
                 ],
                 window: {
