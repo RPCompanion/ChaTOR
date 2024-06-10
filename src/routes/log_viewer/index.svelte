@@ -15,6 +15,7 @@
     import Filter from "./_Filter.svelte";
     import PlayerFilter from "../../components/_PlayerFilter.svelte";
     import { type IListElem } from "../../components/select_list";
+    import PageFormatting from "../../components/_PageFormatting.svelte";
 
     let container: HTMLElement | undefined    = undefined;
     let last_message: HTMLElement | undefined = undefined;
@@ -108,11 +109,7 @@
 </script>
 
 
-<div class="px-6">
-
-    <div class="h-8"></div>
-    <div class="text-white text-2xl text-center bg-slate-600">Log Viewer</div>
-    <div class="h-8"></div>
+<PageFormatting title="Log Viewer">
 
     <div class="grid grid-cols-2 w-full">
         <div class="w-full">
@@ -146,4 +143,4 @@
     </div>
     <div class="h-6"></div>
     <SmallButton on:click={on_export}>Export</SmallButton>
-</div>
+</PageFormatting>

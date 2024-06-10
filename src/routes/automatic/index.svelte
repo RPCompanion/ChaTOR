@@ -1,6 +1,7 @@
 
 <script lang="ts">
 
+    import PageFormatting from "../../components/_PageFormatting.svelte";
     import { settings } from "../../lib/network/settings";
     import { toast } from "@zerodevx/svelte-toast";
     import { submit_post } from "../../lib/network";
@@ -73,22 +74,23 @@
 </script>
 
 
-<div class="flex flex-col gap-2 w-full p-10 relative">
-    <div class="text-white text-center bg-slate-700 text-2xl">Automatic Formatting Mode</div>
-    {#if $settings.chat_log.capture_chat_log && $settings.chat_log.window.show_chat_log_window}
-        <ChatLogWindow on:whisper={on_whisper}/>
-    {/if}
-    {#if !$settings.chat.clear_chat_after_posting}
-        <div class="relative h-6">
-            <button type="button" class="bg-slate-800 text-white rounded-sm shadow-sm w-32 absolute right-0" on:click={clear_chat}>Clear chat</button>
+<PageFormatting title="Automatic Formatting Mode">
+    <div class="flex flex-col gap-2">
+        {#if $settings.chat_log.capture_chat_log && $settings.chat_log.window.show_chat_log_window}
+            <ChatLogWindow on:whisper={on_whisper}/>
+        {/if}
+        {#if !$settings.chat.clear_chat_after_posting}
+            <div class="relative h-6">
+                <button type="button" class="bg-slate-800 text-white rounded-sm shadow-sm w-32 absolute right-0" on:click={clear_chat}>Clear chat</button>
+            </div>
+        {/if} 
+        <div class="relative">
+            <textarea bind:this={textarea_elem} class="w-full min-h-36 outline-none p-1 rounded-md border-2 resize-none border-slate-700 chat-container-background text-white" bind:value={message} on:keydown={on_key_down}/>
+            <div class="absolute bottom-1 right-2 text-white">{message.length}</div>
         </div>
-    {/if} 
-    <div class="relative">
-        <textarea bind:this={textarea_elem} class="w-full min-h-36 outline-none p-1 rounded-md border-2 resize-none border-slate-700 chat-container-background text-white" bind:value={message} on:keydown={on_key_down}/>
-        <div class="absolute bottom-1 right-2 text-white">{message.length}</div>
+        <StandardMenuButton text="Post" on:click={enable_confirmation_modal}/>
+        <div class="h-6"></div>
+        <CustomEmotesList/>
     </div>
-    <StandardMenuButton text="Post" on:click={enable_confirmation_modal}/>
-    <div class="h-6"></div>
-    <CustomEmotesList/>
-</div>
+</PageFormatting>
 <AutomaticConfirmation bind:messages={messages} {show_modal} on:cancel={() => { show_modal = false; }} on:submitted={on_submitted}/>

@@ -28,6 +28,16 @@
         link: "/settings"
     };
 
+    const ROLEPLAY_SECTION: INavbarSection = {
+        name: "Roleplay",
+        elements: [
+            {
+                name: "Star Forge Beacons",
+                link: "/star_forge_beacons"
+            }
+        ]
+    }
+
     function get_chat_section(settings: ISettings): INavbarSection {
 
         let chat_section: INavbarSection = {
@@ -63,6 +73,7 @@
     <div class="flex flex-row gap-2">
         <NavbarSection section={chat_section}/>
         <NavbarSection section={EMOTE_SECTION}/>
+        <NavbarSection section={ROLEPLAY_SECTION}/>
     </div>
     <div class="flex flex-row-reverse">
         <NavbarSection section={SETTINGS_SECTION}/>
