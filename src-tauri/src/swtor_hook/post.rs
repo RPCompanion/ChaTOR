@@ -79,7 +79,7 @@ fn prep_game_for_input() {
 
 }
 
-fn attempt_post_submission(window: &tauri::Window, message: &str) {
+fn attempt_post_submission(message: &str) {
 
     post_message(WM_KEYDOWN, ENTER_KEY, 250);
 
@@ -87,17 +87,13 @@ fn attempt_post_submission(window: &tauri::Window, message: &str) {
 
         post_message(WM_CHAR, c as usize, 10);
 
-        if swtor_hook::window_in_focus() {
-            window.set_focus().unwrap();
-        }
-
     }
 
     post_message(WM_KEYDOWN, ENTER_KEY, 20);
 
 }
 
-fn attempt_post_submission_with_retry(window: &tauri::Window, command_message: &CommandMessage) -> Result<(), &'static str> {
+fn attempt_post_submission_with_retry(command_message: &CommandMessage) -> Result<(), &'static str> {
 
     let message_hash_cont = Arc::clone(&MESSAGE_HASH_CONTAINER);
     let c_message      = command_message.concat();
@@ -106,7 +102,7 @@ fn attempt_post_submission_with_retry(window: &tauri::Window, command_message: &
     let mut retries = 0;
     while retries < 3 {
 
-        attempt_post_submission(window, &c_message);
+        attempt_post_submission(&c_message);
 
         for _ in 0..4 {
 
@@ -127,15 +123,15 @@ fn attempt_post_submission_with_retry(window: &tauri::Window, command_message: &
 
 }
 
-fn retry_logic(window: &tauri::Window, character_message: UserCharacterMessages) -> Result<(), &'static str> {
+fn retry_logic(character_message: UserCharacterMessages) -> Result<(), &'static str> {
 
     let command_messages = character_message.get_all_command_message_splits()?;
     for command_message in command_messages {        
 
         if command_message.is_command_only() || !command_message.should_retry() {
-            attempt_post_submission(&window, &command_message.concat());
+            attempt_post_submission(&command_message.concat());
         } else {
-            attempt_post_submission_with_retry(&window, &command_message)?;
+            attempt_post_submission_with_retry(&command_message)?;
         }
 
         thread::sleep(Duration::from_millis(250));
@@ -146,14 +142,36 @@ fn retry_logic(window: &tauri::Window, character_message: UserCharacterMessages)
 
 }
 
-fn non_retry_logic(window: &tauri::Window, character_message: UserCharacterMessages) -> Result<(), &'static str> {
+fn non_retry_logic(character_message: UserCharacterMessages) -> Result<(), &'static str> {
 
     for message in character_message.messages {
-        attempt_post_submission(&window, &message);
+        attempt_post_submission(&message);
         thread::sleep(Duration::from_millis(250));
     }
 
     Ok(())
+
+}
+
+fn block_window_focus_thread(window: tauri::Window) {
+
+    thread::spawn(move || {
+
+        while WRITING.load(Ordering::Relaxed) {
+
+            if swtor_hook::window_in_focus() {
+
+                match window.set_focus() {
+                    Ok(_) => {},
+                    Err(_) => {}
+                }
+
+            }
+            thread::sleep(Duration::from_millis(10));
+
+        }
+
+    });
 
 }
 
@@ -166,6 +184,7 @@ pub async fn submit_actual_post(window: tauri::Window, retry: bool, mut characte
 
     WRITING.store(true, Ordering::Relaxed);
 
+    block_window_focus_thread(window);
     let result = task::spawn_blocking(move || {
 
         character_message.prepare_messages();
@@ -177,9 +196,9 @@ pub async fn submit_actual_post(window: tauri::Window, retry: bool, mut characte
         prep_game_for_input();
 
         if retry {
-            retry_logic(&window, character_message)?;
+            retry_logic(character_message)?;
         } else {
-            non_retry_logic(&window, character_message)?;
+            non_retry_logic(character_message)?;
         }
 
         Ok(())
