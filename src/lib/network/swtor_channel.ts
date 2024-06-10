@@ -48,8 +48,8 @@ export class SwtorChannel {
             case ESwtorChannel.EMOTE: return Some("/e");
             case ESwtorChannel.WHISPER: return Some("/w");
             case ESwtorChannel.GLOBAL: return Some("/1");
-            case ESwtorChannel.PVP: return Some("/pvp");
-            case ESwtorChannel.TRADE: return Some("/trade");
+            case ESwtorChannel.PVP: return Some("/2");
+            case ESwtorChannel.TRADE: return Some("/3");
             case ESwtorChannel.GROUP: return Some("/group");
             case ESwtorChannel.GUILD: return Some("/g");
             default: return None();
