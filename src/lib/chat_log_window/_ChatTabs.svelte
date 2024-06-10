@@ -17,7 +17,8 @@
     let show_edit_modal: boolean = false;
     let old_chat_tab_index: number = $active_chat_tab_index;
 
-    let items: DNDChatTab[] = get_dnd_chat_tabs(); 
+    let items: DNDChatTab[] = get_dnd_chat_tabs($settings.chat_log.window.chat_tabs); 
+    $: items = get_dnd_chat_tabs($settings.chat_log.window.chat_tabs);
 
     function on_new_chat_tab() {
 
@@ -29,7 +30,6 @@
 
         $settings.chat_log.window.chat_tabs.push(event.detail);
         $settings = $settings;
-        items = get_dnd_chat_tabs();
         show_edit_modal = false;
         add_swtor_channel(event.detail.name);
         
@@ -41,9 +41,9 @@
 
     }
 
-    function get_dnd_chat_tabs() {
+    function get_dnd_chat_tabs(chat_tabs: IChatTab[]) {
             
-        return $settings.chat_log.window.chat_tabs
+        return chat_tabs
             .map((chat_tab, index) => ({ ...chat_tab, id: index }));
             
     }
@@ -57,7 +57,7 @@
     function on_finalize(e: CustomEvent<DndEvent<DNDChatTab>>) {
 
         $settings.chat_log.window.chat_tabs = e.detail.items;
-        items = get_dnd_chat_tabs();
+        $settings = $settings;
 
     }
     
