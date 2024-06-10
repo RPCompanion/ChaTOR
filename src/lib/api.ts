@@ -1,13 +1,13 @@
 
 import { Result, Ok, Err } from "./result";
 
-const WEBSITE_URL = "https://apiv2.rpcompanion.com/"
+const WEBSITE_URL = "https://apiv2.rpcompanion.com"
 export const API_ENDPOINTS = {
 
     third_party: {
         discord_beacons: {
             star_forge:  {
-                url: `${WEBSITE_URL}api/third_party/discord_beacons/star_forge`,
+                url: `${WEBSITE_URL}/third_party/discord_beacons/star_forge`,
                 type: "GET"
             }
         }

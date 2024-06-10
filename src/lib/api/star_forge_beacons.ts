@@ -5,7 +5,7 @@ import { Result, Ok, Err } from "../result";
 export interface IStarForgeBeacon {
     avatar_url?: string;
     name: string;
-    global_name: string;
+    global_name?: string;
     create_time: string;
     message: string;
     attachments: string[];
