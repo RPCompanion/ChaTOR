@@ -3,6 +3,7 @@
 
     import PageFormatting from "../../components/_PageFormatting.svelte";
     import { settings } from "../../lib/network/settings";
+    import { active_chat_tab_index } from "../../lib/chat_log_window/chat_log_window_store";
     import { toast } from "@zerodevx/svelte-toast";
     import { submit_post } from "../../lib/network";
     import StandardMenuButton from "../../lib/buttons/StandardMenuButton.svelte";
@@ -11,6 +12,8 @@
     import CustomEmotesList from "../../components/emotes_list/_CustomEmotesList.svelte";
     import ChatLogWindow from "../../lib/_ChatLogWindow.svelte";
     import CustomCommand from "../../components/_CustomCommand.svelte";
+  import { None, type Option } from "../../lib/option";
+  import { SwtorChannel } from "../../lib/network/swtor_channel";
 
     let message: string     = "";
     let messages: string[]  = [];
@@ -43,7 +46,13 @@
             return;
         }
 
-        let response = new AutoMessageSplitter(message).split();
+        let default_channel = $settings.chat_log.window.chat_tabs[$active_chat_tab_index].default_channel;
+        let custom_command: Option<string> = None();
+        if (default_channel != undefined) {
+            custom_command = new SwtorChannel(default_channel).get_command();
+        }
+
+        let response = new AutoMessageSplitter(message, undefined, custom_command).split();
         if (response.is_error()) {
             toast.push("Error: " + response.unwrap_error());
             return;

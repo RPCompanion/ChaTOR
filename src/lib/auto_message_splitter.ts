@@ -17,11 +17,11 @@ export class AutoMessageSplitter {
     private character_to_whisper?: string;
     private constructor_error?: string;
 
-    constructor(message: string, local_settings?: ISettings) {
+    constructor(message: string, local_settings?: ISettings, custom_command: Option<string> = None()) {
 
         this.message        = message.trim();
         this.is_whisper     = this.message.startsWith("/w") || this.message.startsWith("/whisper");
-        this.custom_command = this.is_whisper ? None() : AutoMessageSplitter.get_custom_command(this.message);
+        this.custom_command = this.is_whisper ? None() : AutoMessageSplitter.get_custom_command(this.message, custom_command);
 
         if (this.is_whisper) {
 
@@ -57,8 +57,9 @@ export class AutoMessageSplitter {
 
     }
 
-    private static get_custom_command(message: string): Option<string> {
+    private static get_custom_command(message: string, custom_command: Option<string>): Option<string> {
 
+        // The autosplitter will handle these commands.
         if (message.startsWith("/emote") || message.startsWith("/e") || message.startsWith("/say") || message.startsWith("/s") || message.startsWith("\"")) {
             return None();
         }
@@ -67,7 +68,17 @@ export class AutoMessageSplitter {
         let match = message.match(reg);
 
         if (match == null) {
+
+            /* 
+                Effectively the user hasn't provided a command in their text, so check if there is a custom command provided.
+                This value will typically be provided by the user in their chat_tab settings.
+            */
+            if (custom_command.is_some()) {
+                return custom_command;
+            }
+
             return None();
+
         }
 
         return Some(match[0]);
