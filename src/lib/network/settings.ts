@@ -8,7 +8,8 @@ import { set_initial_swtor_channels } from "./swtor_message/swtor_chat_tab_messa
 
 export interface IChatTab {
     name: string;
-    channels: number[]
+    channels: number[];
+    default_channel?: number;
 }
 
 export interface IChatSettings {
@@ -89,11 +90,13 @@ export function default_settings(): ISettings {
                 chat_tabs: [
                     {
                         name: "Global",
-                        channels: [ESwtorChannel.GLOBAL, ESwtorChannel.PVP, ESwtorChannel.TRADE]
+                        channels: [ESwtorChannel.GLOBAL, ESwtorChannel.PVP, ESwtorChannel.TRADE],
+                        default_channel: ESwtorChannel.GLOBAL
                     },
                     {
                         name: "Local",
-                        channels: [ESwtorChannel.EMOTE, ESwtorChannel.SAY, ESwtorChannel.YELL, ESwtorChannel.WHISPER]
+                        channels: [ESwtorChannel.EMOTE, ESwtorChannel.SAY, ESwtorChannel.YELL, ESwtorChannel.WHISPER],
+                        default_channel: undefined
                     }
                 ],
                 window: {

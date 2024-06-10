@@ -3,6 +3,10 @@ export class Option<T> {
 
     constructor(private readonly value: T | undefined) {}
     
+    to_optional(): T | undefined {
+        return this.value;
+    }
+
     is_some(): boolean {
         return this.value !== undefined;
     }

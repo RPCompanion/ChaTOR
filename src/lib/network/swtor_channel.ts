@@ -19,7 +19,7 @@ export enum ESwtorChannel {
 export class SwtorChannel {
 
     public readonly type: ESwtorChannel;
-    constructor(channel: number) {
+    constructor(channel: ESwtorChannel) {
         this.type = channel;
     }
 
@@ -50,8 +50,12 @@ export class SwtorChannel {
             case ESwtorChannel.GLOBAL: return Some("/1");
             case ESwtorChannel.PVP: return Some("/2");
             case ESwtorChannel.TRADE: return Some("/3");
-            case ESwtorChannel.GROUP: return Some("/group");
+            case ESwtorChannel.GROUP: return Some("/p");
             case ESwtorChannel.GUILD: return Some("/g");
+            case ESwtorChannel.GUILD_OFFICER: return Some("/o");
+            case ESwtorChannel.OP: return Some("/ops");
+            case ESwtorChannel.OPS_OFFICER: return Some("/oo");
+            case ESwtorChannel.OPS_ANNOUNCEMENT: return Some("/oa");
             default: return None();
         }
 
@@ -64,5 +68,14 @@ export function get_all_channel_ids(): number[] {
     return Object.keys(ESwtorChannel)
         .filter((key) => !isNaN(Number(key)))
         .map((key) => Number(key));
+
+}
+
+export function get_all_channel_names(): string[] {
+
+    return get_all_channel_ids()
+        .map((id) => new SwtorChannel(id).get_name())
+        .filter((name) => name.is_some())
+        .map((name) => name.unwrap());
 
 }

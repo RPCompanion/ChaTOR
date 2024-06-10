@@ -6,7 +6,8 @@ use crate::swtor::SwtorChannel;
 #[derive(Deserialize, Serialize, Clone)]
 pub struct ChatTab {
     pub name: String,
-    pub channels: Vec<i32>
+    pub channels: Vec<i32>,
+    pub default_channel: Option<i32>
 }
 
 impl ChatTab {
@@ -20,7 +21,8 @@ impl ChatTab {
                     SwtorChannel::GLOBAL as i32,
                     SwtorChannel::PVP as i32,
                     SwtorChannel::TRADE as i32
-                ]
+                ],
+                default_channel: Some(SwtorChannel::GLOBAL as i32)
             },
             ChatTab {
                 name: "Local".to_string(),
@@ -29,7 +31,8 @@ impl ChatTab {
                     SwtorChannel::SAY as i32, 
                     SwtorChannel::YELL as i32, 
                     SwtorChannel::WHISPER as i32
-                ]
+                ],
+                default_channel: None
             }
         ]
 

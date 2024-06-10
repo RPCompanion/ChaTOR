@@ -10,6 +10,7 @@
     import AutomaticConfirmation from "./_AutomaticConfirmation.svelte";
     import CustomEmotesList from "../../components/emotes_list/_CustomEmotesList.svelte";
     import ChatLogWindow from "../../lib/_ChatLogWindow.svelte";
+    import CustomCommand from "../../components/_CustomCommand.svelte";
 
     let message: string     = "";
     let messages: string[]  = [];
@@ -83,10 +84,11 @@
             <div class="relative h-6">
                 <button type="button" class="bg-slate-800 text-white rounded-sm shadow-sm w-32 absolute right-0" on:click={clear_chat}>Clear chat</button>
             </div>
-        {/if} 
+        {/if}
         <div class="relative">
             <textarea bind:this={textarea_elem} class="w-full min-h-36 outline-none p-1 rounded-md border-2 resize-none border-slate-700 chat-container-background text-white" bind:value={message} on:keydown={on_key_down}/>
             <div class="absolute bottom-1 right-2 text-white">{message.length}</div>
+            <CustomCommand/>
         </div>
         <StandardMenuButton text="Post" on:click={enable_confirmation_modal}/>
         <div class="h-6"></div>
