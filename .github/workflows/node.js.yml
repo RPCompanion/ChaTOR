@@ -1,0 +1,37 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run tauri build
+    - name: Zip output files
+      run: |
+          Compress-Archive -Path ./src-tauri/target/release/SWTOR-Chat.exe, ./src-tauri/target/release/swtor_chat_capture.dll, ./src-tauri/target/release/sql -DestinationPath ./release.zip
+    - uses: actions/upload-artifact@v3
+      with:
+        name: tauri-build
+        path: ./src-tauri/target/release/release.zip
