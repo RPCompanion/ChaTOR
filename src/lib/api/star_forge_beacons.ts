@@ -15,7 +15,14 @@ export async function get_star_forge_beacons(): Promise<Result<IStarForgeBeacon[
 
     let star_forge_api = API_ENDPOINTS.third_party.discord_beacons.star_forge;
 
-    let response = await http_get<IStarForgeBeacon[], IGenericAPIError>(star_forge_api.url);
+    let response;
+    
+    try {
+        response = await http_get<IStarForgeBeacon[], IGenericAPIError>(star_forge_api.url);
+    } catch(err) {
+        return Err("Failed to fetch data from the server.")
+    }
+
     if (response.is_error()) {
         return Err(response.unwrap_error().message);
     }
