@@ -41,4 +41,4 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: tauri-build
-        path: ./src-tauri/target/release/release.zip
+        path: ./release.zip
