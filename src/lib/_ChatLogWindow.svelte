@@ -18,6 +18,7 @@
     import ChatTabs from "./chat_log_window/_ChatTabs.svelte";
     import { players_filter } from "./network/players";
     import PlayerFilter from "../components/_PlayerFilter.svelte";
+  import { unicode_unescape } from "./utils";
 
     let auto_scroll: boolean = true;
     let container: HTMLElement | undefined = undefined;
@@ -128,9 +129,9 @@
                 </span>
                 {#each message.get_message_fragments() as fragment}
                     {#if fragment.startsWith("\"") && fragment.endsWith("\"")}
-                        <span class="break-words " style="color: white;">{fragment}</span>
+                        <span class="break-words " style="color: white;">{unicode_unescape(fragment)}</span>
                     {:else}
-                        <span class="break-words " style="color: {$active_character?.get_channel_color(message.channel.type).to_hex()}">{fragment}</span>
+                        <span class="break-words " style="color: {$active_character?.get_channel_color(message.channel.type).to_hex()}">{unicode_unescape(fragment)}</span>
                     {/if}
                 {/each}
             </div>

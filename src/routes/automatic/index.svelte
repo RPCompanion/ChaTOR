@@ -14,6 +14,7 @@
     import CustomCommand from "../../components/_CustomCommand.svelte";
   import { None, type Option } from "../../lib/option";
   import { SwtorChannel } from "../../lib/network/swtor_channel";
+  import { unicode_escape } from "../../lib/utils";
 
     let message: string     = "";
     let messages: string[]  = [];
@@ -52,7 +53,7 @@
             custom_command = new SwtorChannel(default_channel).get_command();
         }
 
-        let response = new AutoMessageSplitter(message, undefined, custom_command).split();
+        let response = new AutoMessageSplitter(unicode_escape(message), undefined, custom_command).split();
         if (response.is_error()) {
             toast.push("Error: " + response.unwrap_error());
             return;
@@ -77,8 +78,10 @@
     }
 
     function on_whisper(event: any) {
+
         message = "/w " + event.detail.character_name + ": ";
         textarea_elem!.focus();
+
     }
 
 </script>
@@ -95,8 +98,13 @@
             </div>
         {/if}
         <div class="relative">
-            <textarea bind:this={textarea_elem} class="w-full min-h-36 outline-none p-1 rounded-md border-2 resize-none border-slate-700 chat-container-background text-white" bind:value={message} on:keydown={on_key_down}/>
-            <div class="absolute bottom-1 right-2 text-white">{message.length}</div>
+            <textarea 
+                bind:this={textarea_elem} 
+                class="w-full min-h-36 outline-none p-1 rounded-md border-2 resize-none border-slate-700 chat-container-background text-white" 
+                bind:value={message} 
+                on:keydown={on_key_down}
+            />
+            <div class="absolute bottom-1 right-2 text-white">{unicode_escape(message).length}</div>
             <CustomCommand/>
         </div>
         <StandardMenuButton text="Post" on:click={enable_confirmation_modal}/>

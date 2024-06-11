@@ -1,6 +1,7 @@
 
 import { Result } from "../lib/result";
 import { GAME_MESSAGE_MAXIMUM, GAME_MESSAGE_MINIMUM } from "../lib/messages";
+import { unicode_escape } from "../lib/utils";
 
 export function valid_messages(messages: string[]): Result<[], string> {
 
@@ -11,7 +12,7 @@ export function valid_messages(messages: string[]): Result<[], string> {
     for (let message of messages) {
 
         let temp = message.trim();
-        if (temp.length < GAME_MESSAGE_MINIMUM || temp.length > GAME_MESSAGE_MAXIMUM) {
+        if (unicode_escape(temp).length < GAME_MESSAGE_MINIMUM || unicode_escape(temp).length > GAME_MESSAGE_MAXIMUM) {
             return Result.error("Messages must be between 1 and 255 characters");
         }
 

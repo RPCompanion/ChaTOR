@@ -12,6 +12,7 @@
     import StandardMenuButton from "../../lib/buttons/StandardMenuButton.svelte";
     import CustomEmotesList from "../../components/emotes_list/_CustomEmotesList.svelte";
     import ChatLogWindow from "../../lib/_ChatLogWindow.svelte";
+  import { unicode_escape } from "../../lib/utils";
 
     let messages: string[] = [""];
 
@@ -62,7 +63,7 @@
     async function submit_messages() {
 
         show_modal = false;
-        let response = await submit_post("ChatMessage", messages);
+        let response = await submit_post("ChatMessage", messages.map((message) => unicode_escape(message)));
 
         if (response.is_error()) {
             toast.push(response.unwrap_error(), { theme: { "--toastBackground": "red" } });
@@ -116,13 +117,13 @@
         </div>
         {#each messages as message, idx}
             <div class="relative">
-                <textarea class="w-full min-h-24 outline-none p-1 resize-none rounded-md border-2 border-slate-700 chat-container-background text-white" class:border-yellow-400={message.length >= 200 && message.length <= 255} class:border-red-500={message.length > 255} bind:value={message}/>
+                <textarea class="w-full min-h-24 outline-none p-1 resize-none rounded-md border-2 border-slate-700 chat-container-background text-white" class:border-yellow-400={unicode_escape(message).length >= 200 && unicode_escape(message).length <= 255} class:border-red-500={unicode_escape(message).length > 255} bind:value={message}/>
                 {#if idx != 0}
                     <div class="absolute -right-2 -top-3">
                         <XButton on:click={() => { delete_message(idx); }}/>
                     </div>
                 {/if}
-                <div class="absolute bottom-1 right-0 text-white">{message.length}/255</div>
+                <div class="absolute bottom-1 right-0 text-white">{unicode_escape(message).length}/255</div>
                 {#if !automated_posting}
                     <button type="button" class="bg-slate-700 text-white rounded-sm shadow-sm px-2 absolute top-1/3 -right-8 hover:text-gray-300" on:click={() => { on_single_post(idx); }}>Post</button>
                 {/if}
