@@ -5,7 +5,7 @@ export function deep_copy<T>(obj: T): T {
 
 export function unicode_escape(str: string): string {
 
-    return str.replace(/[\u007F-\uFFFF]/g, (chr) => {
+    return str.replace(/[\u00FF-\uFFFF]/g, (chr) => {
         return "\\u" + ("0000" + chr.charCodeAt(0).toString(16)).slice(-4);
     });
 
