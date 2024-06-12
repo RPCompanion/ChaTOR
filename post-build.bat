@@ -11,6 +11,8 @@ xcopy ".\sql" "chator\sql" /E /I
 
 copy ".\ChaTOR.exe" "chator\ChaTOR.exe"
 copy ".\swtor_chat_capture.dll" "chator\swtor_chat_capture.dll"
+copy ".\blauncher.exe" "chator\blauncher.exe"
+copy ".\.itch.toml" "chator\.itch.toml"
 
 REM Check if argument is provided and run butler command
 if not "%~1"=="" (

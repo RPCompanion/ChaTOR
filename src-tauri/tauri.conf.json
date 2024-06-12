@@ -55,7 +55,10 @@
                 "signingIdentity": null
             },
             "resources": [
-                "./sql"
+                "./sql",
+                "./misc/blauncher.exe",
+                "./misc/.itch.toml",
+                "./misc/post-build.bat"
             ],
             "shortDescription": "",
             "targets": "all",
