@@ -7,7 +7,7 @@
         "distDir": "../dist/client"
     },
     "package": {
-        "productName": "SWTOR-Chat",
+        "productName": "ChaTOR",
         "version": "0.1.1"
     },
     "tauri": {

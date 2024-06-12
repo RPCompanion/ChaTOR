@@ -1,11 +1,11 @@
 [package]
-name = "swtor_chat"
+name = "chator"
 version = "0.1.1"
 description = "A Chat system for Star Wars: The Old Republic."
 authors = ["Emma Davenport"]
 license = ""
 repository = ""
-default-run = "swtor_chat"
+default-run = "chator"
 edition = "2021"
 rust-version = "1.60"
 
@@ -17,7 +17,7 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [[bin]]
-name = "swtor_chat"
+name = "chator"
 path = "src/main.rs"
 
 

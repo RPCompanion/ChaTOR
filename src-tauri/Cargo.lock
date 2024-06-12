@@ -317,6 +317,33 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fd16c4719339c4530435d38e511904438d07cce7950afa3718a84ac36c10e89e"
 
 [[package]]
+name = "chator"
+version = "0.1.1"
+dependencies = [
+ "chrono",
+ "clipboard-win",
+ "ctor",
+ "ctrlc",
+ "directories",
+ "dll-syringe",
+ "em-libs",
+ "int-enum",
+ "lazy_static",
+ "open",
+ "regex",
+ "retour",
+ "rusqlite",
+ "rust-ini",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tauri",
+ "tauri-build",
+ "tokio",
+ "windows 0.52.0",
+]
+
+[[package]]
 name = "chrono"
 version = "0.4.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3028,33 +3055,6 @@ name = "strsim"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
-
-[[package]]
-name = "swtor_chat"
-version = "0.1.1"
-dependencies = [
- "chrono",
- "clipboard-win",
- "ctor",
- "ctrlc",
- "directories",
- "dll-syringe",
- "em-libs",
- "int-enum",
- "lazy_static",
- "open",
- "regex",
- "retour",
- "rusqlite",
- "rust-ini",
- "serde",
- "serde_json",
- "sha2",
- "tauri",
- "tauri-build",
- "tokio",
- "windows 0.52.0",
-]
 
 [[package]]
 name = "syn"
