@@ -1,0 +1,5 @@
+
+[[actions]]
+name = "launch"
+path = "blauncher.exe"
+platforms = "windows"
