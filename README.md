@@ -24,4 +24,4 @@ A third-party chat client for the MMORPG, Star Wars: The Old Republic. Presently
 
 # License
 
-Licensed under the GPLv3
+Licensed under the AGPLv3
