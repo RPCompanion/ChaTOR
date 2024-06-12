@@ -56,7 +56,6 @@
             },
             "resources": [
                 "./sql",
-                "./misc/blauncher.exe",
                 "./misc/.itch.toml",
                 "./post-build.bat"
             ],
