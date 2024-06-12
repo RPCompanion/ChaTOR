@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 .routify
 *.code-workspace
-misc/blauncher.exe
+*.exe
