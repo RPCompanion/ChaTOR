@@ -44,8 +44,6 @@ pub fn init() {
 
     check_to_copy_old_database();
 
-    let existing_database = database_exists();
-
     let tables = get_sql_file("tables.sql")
         .expect("Error reading tables.sql");
 
@@ -55,7 +53,7 @@ pub fn init() {
 
     let migration = Migration::new(conn);
 
-    if !existing_database {
+    if !database_exists() {
 
         migration.insert_game_version();
 
