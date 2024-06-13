@@ -49,7 +49,14 @@ impl Character {
 
             let path = project.config_local_dir().parent().unwrap().join("settings");
             let mut characters: Vec<Character> = Vec::new();
-            for entry in path.read_dir().unwrap() {
+
+            let entries = path.read_dir();
+
+            if entries.is_err() {
+                return Err("Could not read settings directory. Is SWTOR installed?");
+            }
+
+            for entry in entries.unwrap() {
 
                 match entry {
                     Ok(entry) => {

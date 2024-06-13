@@ -4,11 +4,13 @@
     import SettingSection from "./_SettingSection.svelte";
     import SettingsToggle from "./_SettingsToggle.svelte";
     import SettingsDropdown from "./_SettingsDropdown.svelte";
+    import { Result, Ok, Err } from "../../lib/result";
     import Setting from "./_Setting.svelte";
     import { 
         get_all_characters, 
         type ICharacter
     } from "../../lib/network/characters";
+    import { toast } from "@zerodevx/svelte-toast";
 
     const SECTION_SUB_TEXT: string = "Chat logging uses DLL injection, which is against the TOS of SWTOR and may result in a ban. Use at your own risk.";
 
@@ -16,8 +18,23 @@
 
     function init_all_characters() {
 
-        get_all_characters((temp: ICharacter[]) => {
-            characters = temp;
+        get_all_characters((temp: Result<ICharacter[], string>) => {
+
+            if (temp.is_error()) {
+
+                toast.push(temp.unwrap_error(), {
+                    theme: {
+                        "--toastBackground": "#ff0000",
+                        "--toastColor": "#ffffff"
+                    }
+                });
+
+                return;
+
+            }
+
+            characters = temp.unwrap();
+
         });
         
     }

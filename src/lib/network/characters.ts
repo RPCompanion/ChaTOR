@@ -3,6 +3,7 @@ import { invoke } from "@tauri-apps/api";
 import { writable, get } from "svelte/store";
 import { settings } from "./settings";
 import { ESwtorChannel } from "./swtor_channel";
+import { Result, Ok, Err } from "../result";
 
 export class Color {
 
@@ -92,7 +93,7 @@ export const SAY_COLOR_INDEX: number     = 0;
 
 export const active_character = writable<Character | undefined>(undefined);
 
-export function get_all_characters(callback: (characters: ICharacter[]) => void) {
+export function get_all_characters(callback: (characters: Result<ICharacter[], string>) => void) {
 
     invoke("get_all_characters").then((response: any) => {
 
@@ -102,15 +103,22 @@ export function get_all_characters(callback: (characters: ICharacter[]) => void)
                 channel_colors: c.channel_colors.map((cc: IColor) => new Color(cc.r, cc.g, cc.b))
             }
         });
-        callback(temp);
+        callback(Ok(temp));
 
     })
+    .catch((error: string) => {
+        callback(Err(error));
+    });
 
 }
 
 export function init_active_character() {
 
-    get_all_characters((characters: ICharacter[]) => {
+    get_all_characters((characters: Result<ICharacter[], string>) => {
+
+        if (characters.is_error()) {
+            return;
+        }
 
         let character_name = get(settings).chat_log.character_ini_to_pull_from;
 
@@ -118,7 +126,10 @@ export function init_active_character() {
             return;
         }
 
-        let character = characters.find((c: ICharacter) => c.character_name === character_name);
+        let character = characters
+            .unwrap()
+            .find((c: ICharacter) => c.character_name === character_name);
+
         if (character == undefined) {
             return;
         }
