@@ -47,6 +47,11 @@ windows = { version = "0.52", features = ["Data_Xml_Dom", "Win32_Foundation", "W
 em-libs = { git = "https://github.com/Davenport-Physics/EmLibs"}
 directories = "5.0.1"
 
+# logging
+tracing = "0.1"
+tracing-subscriber = "0.3"
+tracing-appender = "0.2"
+
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.
 # If you use cargo directly instead of tauri's cli you can use this feature flag to switch between tauri's `dev` and `build` modes.

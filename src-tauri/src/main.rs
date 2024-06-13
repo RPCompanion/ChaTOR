@@ -1,8 +1,14 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+
+use std::path::Path;
+
 use open;
 use tauri::{Manager, PhysicalSize, WindowEvent};
+use tracing::{info, error};
+use tracing_subscriber::{self, fmt, prelude::*};
+use tracing_appender::{self, non_blocking::WorkerGuard};
 
 #[macro_use]
 extern crate lazy_static;
@@ -14,12 +20,13 @@ mod share;
 mod utils;
 mod swtor;
 
+
+
 fn main() {
 
-    dal::init();
-    dal::db::settings::init();
-
-    setup_sigterm_handler();
+    let _guard = init_logging();
+    init_system();
+    info!("Starting Chator");
 
     tauri::Builder::default()
         .on_window_event(|event| {
@@ -73,6 +80,40 @@ fn main() {
         .expect("error while running tauri application");
 }
 
+fn init_logging() -> WorkerGuard {
+
+    let path = Path::new("./logs");
+    if !path.exists() {
+
+        std::fs::create_dir("./logs")
+            .expect("error while creating logs directory");
+
+    }
+
+    let file_appender = tracing_appender::rolling::hourly("./logs", "chator.log");
+    let (non_blocking, guard) = tracing_appender::non_blocking(file_appender);
+
+    tracing_subscriber::registry()
+        .with(fmt::layer()
+            .with_writer(non_blocking)
+            .with_level(true)
+            .with_ansi(false)
+        )
+        .init();
+
+    guard
+
+}
+
+fn init_system() {
+
+    setup_panic_hook();
+    setup_sigterm_handler();
+    dal::init();
+    dal::db::settings::init();
+    
+}
+
 fn setup_sigterm_handler() {
 
     ctrlc::set_handler(|| {
@@ -80,6 +121,15 @@ fn setup_sigterm_handler() {
         std::process::exit(0);
     })
     .expect("Error setting Ctrl-C handler.");
+
+}
+
+fn setup_panic_hook() {
+
+    std::panic::set_hook(Box::new(|panic_info| {
+        capture_injector::stop_injecting_capture();
+        error!("Panic: {:?}", panic_info);
+    }));
 
 }
 
