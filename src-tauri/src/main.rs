@@ -5,8 +5,8 @@
 use std::path::Path;
 
 use open;
-use tauri::{Manager, PhysicalSize, WindowEvent};
-use tracing::{info, error};
+use tauri::{api::dialog::blocking::message, Manager, PhysicalSize, WindowEvent};
+use tracing::{error, info};
 use tracing_subscriber::{self, fmt, prelude::*};
 use tracing_appender::{self, non_blocking::WorkerGuard};
 
@@ -20,13 +20,11 @@ mod share;
 mod utils;
 mod swtor;
 
-
-
 fn main() {
 
     let _guard = init_logging();
     init_system();
-    info!("Starting Chator");
+    info!("Starting ChaTOR");
 
     tauri::Builder::default()
         .on_window_event(|event| {
@@ -78,6 +76,9 @@ fn main() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+
+    info!("Thanks for using ChaTOR");
+
 }
 
 fn init_logging() -> WorkerGuard {
@@ -128,14 +129,30 @@ fn setup_panic_hook() {
 
     std::panic::set_hook(Box::new(|panic_info| {
 
-        match std::env::current_dir() {
-            Ok(dir) => {
-                let _ = open::that(format!("{}/{}", dir.to_str().unwrap(), "logs"));
-            },
-            Err(_) => {}
-        }
-        capture_injector::stop_injecting_capture();
+        let open_log_dir = || {
+
+            match std::env::current_dir() {
+                Ok(dir) => {
+                    let _ = open::that(format!("{}/{}", dir.to_str().unwrap(), "logs"));
+                },
+                Err(_) => {}
+            }
+
+        };
+
         error!("Panic: {:?}", panic_info);
+        capture_injector::stop_injecting_capture();
+        message(None::<&tauri::Window>, "ChaTOR Crash", "ChaTOR has crashed. Please check the logs for more information.");
+
+        /*
+            TODO: Figure out a good method to supply crash reports. Maybe a discord webhook, or a service call?
+            let answer: bool = ask(Some(window), "Crash report", "Submit crash to dakstrum?");
+            if answer {
+                return;
+            }
+        */
+
+        open_log_dir();
 
     }));
 
@@ -143,7 +160,7 @@ fn setup_panic_hook() {
 
 #[tauri::command]
 fn open_link(link: String) {
-    let _ = open::that(link);
+    panic!("opening link panic");
 }
 
 #[tauri::command]
