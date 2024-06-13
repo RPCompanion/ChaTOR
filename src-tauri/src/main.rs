@@ -160,10 +160,14 @@ fn setup_panic_hook() {
 
 #[tauri::command]
 fn open_link(link: String) {
-    panic!("opening link panic");
+
+    let _ = open::that(link);
+
 }
 
 #[tauri::command]
 fn get_version() -> String {
+
     env!("CARGO_PKG_VERSION").to_string()
+    
 }
