@@ -5,6 +5,8 @@ use rusqlite::Error;
 
 use super::swtor_message::SwtorMessage;
 
+pub mod datetags;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Message {
     pub chat_log_id: i32,
