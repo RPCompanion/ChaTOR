@@ -17,7 +17,10 @@ pub struct AppSettings {
     pub opacity: i32,
 
     #[serde(default = "default_show_background_image")]
-    pub show_background_image: bool
+    pub show_background_image: bool,
+
+    #[serde(default = "default_show_page_header")]
+    pub show_page_header: bool
 
 }
 
@@ -39,6 +42,10 @@ fn default_show_background_image() -> bool {
     false
 }
 
+fn default_show_page_header() -> bool {
+    true
+}
+
 impl AppSettings {
 
     pub fn default() -> AppSettings {
@@ -55,7 +62,8 @@ impl AppSettings {
             show_window_decorations: false,
             always_on_top: false,
             opacity: 100,
-            show_background_image: false
+            show_background_image: false,
+            show_page_header: true
 
         }
 

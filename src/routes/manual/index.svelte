@@ -135,8 +135,11 @@
         {#if automated_posting}
             <StandardMenuButton text="Post all" on:click={on_post_all}/>
         {/if}
-        <div class="h-6"></div>
-        <CustomEmotesList/>
+        
+        {#if $settings.chat.show_favourite_emotes}
+            <div class="h-6"></div>
+            <CustomEmotesList/>
+        {/if}
     </div>
 </PageFormatting>
 <ConfirmationModal {show_modal} on:no={on_no_confirmation} on:yes={submit_messages}>

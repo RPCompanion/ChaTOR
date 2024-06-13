@@ -25,4 +25,7 @@
             <SettingsRangeSlider bind:value={($settings.app.opacity)} max={100} min={60} on:value_change={on_value_change} />
         </Setting>
     {/if}
+    <Setting setting="Show page headers" sub_text="For a more minimalist look">
+        <SettingsToggle bind:checked={$settings.app.show_page_header}></SettingsToggle>
+    </Setting>
 </SettingSection>

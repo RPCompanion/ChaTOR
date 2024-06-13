@@ -19,6 +19,7 @@ export interface IChatSettings {
     clear_chat_after_posting: boolean;
     remove_starting_pronouns: boolean;
     starting_characters_are_lowercase: boolean;
+    show_favourite_emotes: boolean;
 }
 
 export interface IChatLogWindow {
@@ -47,6 +48,7 @@ export interface IAppSettings {
     opacity: number;
     always_on_top: boolean;
     show_background_image: boolean;
+    show_page_header: boolean;
 }
 
 export interface ISettings {
@@ -69,7 +71,8 @@ export function default_settings(): ISettings {
             show_window_decorations: false,
             opacity: 100,
             always_on_top: false,
-            show_background_image: false
+            show_background_image: false,
+            show_page_header: true
         },
         chat: {
             confirmation_before_posting: true,
@@ -78,6 +81,7 @@ export function default_settings(): ISettings {
             clear_chat_after_posting: false,
             remove_starting_pronouns: false,
             starting_characters_are_lowercase: true,
+            show_favourite_emotes: true
         },
         chat_log: {
             capture_chat_log: false,

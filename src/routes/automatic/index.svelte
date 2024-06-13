@@ -12,9 +12,9 @@
     import CustomEmotesList from "../../components/emotes_list/_CustomEmotesList.svelte";
     import ChatLogWindow from "../../lib/_ChatLogWindow.svelte";
     import CustomCommand from "../../components/_CustomCommand.svelte";
-  import { None, type Option } from "../../lib/option";
-  import { SwtorChannel } from "../../lib/network/swtor_channel";
-  import { unicode_escape } from "../../lib/utils";
+    import { None, type Option } from "../../lib/option";
+    import { SwtorChannel } from "../../lib/network/swtor_channel";
+    import { unicode_escape } from "../../lib/utils";
 
     let message: string     = "";
     let messages: string[]  = [];
@@ -108,8 +108,10 @@
             <CustomCommand/>
         </div>
         <StandardMenuButton text="Post" on:click={enable_confirmation_modal}/>
-        <div class="h-6"></div>
-        <CustomEmotesList/>
+        {#if $settings.chat.show_favourite_emotes}
+            <div class="h-6"></div>
+            <CustomEmotesList/>
+        {/if}
     </div>
 </PageFormatting>
 <AutomaticConfirmation bind:messages={messages} {show_modal} on:cancel={() => { show_modal = false; }} on:submitted={on_submitted}/>

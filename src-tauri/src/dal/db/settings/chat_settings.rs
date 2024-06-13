@@ -23,6 +23,9 @@ pub struct ChatSettings {
     #[serde(default = "default_starting_characters_are_lowercase")]
     pub starting_characters_are_lowercase: bool,
 
+    #[serde(default = "default_show_favourite_emotes")]
+    pub show_favourite_emotes: bool
+
 }
 
 pub fn default_confirmation_before_posting() -> bool {
@@ -49,6 +52,10 @@ pub fn default_starting_characters_are_lowercase() -> bool {
     true
 }
 
+pub fn default_show_favourite_emotes() -> bool {
+    true
+}
+
 impl ChatSettings {
 
     pub fn default() -> ChatSettings {
@@ -60,6 +67,7 @@ impl ChatSettings {
             clear_chat_after_posting: false,
             remove_starting_pronouns: false,
             starting_characters_are_lowercase: true,
+            show_favourite_emotes: true
         }
 
     }
