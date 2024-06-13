@@ -5,8 +5,6 @@ use std::path::Path;
 use crate::dal;
 use rusqlite::Connection;
 
-const TABLES: &str = include_str!("../../sql/tables.sql");
-
 pub mod custom_emote;
 pub mod settings;
 pub mod chat_log;
@@ -26,6 +24,14 @@ pub fn get_connection() -> Connection {
 
 }
 
+pub fn get_sql_file(partial_path: &str) -> Result<String, std::io::Error> {
+
+    let path_str = format!("./sql/{}", partial_path);
+    let path = Path::new(&path_str);
+    fs::read_to_string(path)
+
+}
+
 fn database_exists() -> bool {
 
     let em_dirs = dal::get_em_dirs();
@@ -40,8 +46,12 @@ pub fn init() {
 
     let existing_database = database_exists();
 
+    let tables = get_sql_file("tables.sql")
+        .expect("Error reading tables.sql");
+
     let conn = get_connection();
-    conn.execute_batch(TABLES).expect("Error creating tables");
+    conn.execute_batch(&tables)
+        .expect("Error creating tables");
 
     let migration = Migration::new(conn);
 
