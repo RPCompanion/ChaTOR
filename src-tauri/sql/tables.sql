@@ -1,4 +1,7 @@
-
+/*
+    CustomEmotes.order_index is used to keep track of the order of the emotes. Uniqueness is not enforced and
+    favourites and non-favourites may share similar indices.
+*/
 CREATE TABLE IF NOT EXISTS CustomEmotes
 (
     custom_emote_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -7,11 +10,6 @@ CREATE TABLE IF NOT EXISTS CustomEmotes
     favourite BOOLEAN NOT NULL DEFAULT(FALSE),
     order_index INTEGER NOT NULL
 );
-
-/*
-    CustomEmotes.order_index is used to keep track of the order of the emotes. Uniqueness is not enforced and
-    favourites and non-favourites may share similar indices.
-*/
 
 CREATE TABLE IF NOT EXISTS CustomCategory
 (
@@ -49,6 +47,13 @@ CREATE TABLE IF NOT EXISTS ChatLog
     character_id INTEGER NOT NULL REFERENCES Characters(character_id),
     timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     message VARCHAR(1024) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ChatLog_DateTags
+(
+    chat_log_date_tag_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp DATE UNIQUE NOT NULL
+    tags TEXT NOT NULL -- json string array
 );
 
 CREATE TABLE IF NOT EXISTS UsersChatLog
