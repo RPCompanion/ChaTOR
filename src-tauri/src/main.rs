@@ -127,8 +127,16 @@ fn setup_sigterm_handler() {
 fn setup_panic_hook() {
 
     std::panic::set_hook(Box::new(|panic_info| {
+
+        match std::env::current_dir() {
+            Ok(dir) => {
+                let _ = open::that(format!("{}/{}", dir.to_str().unwrap(), "logs"));
+            },
+            Err(_) => {}
+        }
         capture_injector::stop_injecting_capture();
         error!("Panic: {:?}", panic_info);
+
     }));
 
 }
