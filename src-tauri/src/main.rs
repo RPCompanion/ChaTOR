@@ -67,6 +67,7 @@ fn main() {
             dal::db::chat_log::datetags::save_date_tag,
             capture_injector::start_injecting_capture,
             capture_injector::stop_injecting_capture,
+            get_version
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -85,4 +86,9 @@ fn setup_sigterm_handler() {
 #[tauri::command]
 fn open_link(link: String) {
     let _ = open::that(link);
+}
+
+#[tauri::command]
+fn get_version() -> String {
+    env!("CARGO_PKG_VERSION").to_string()
 }

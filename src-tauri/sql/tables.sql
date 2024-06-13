@@ -52,8 +52,8 @@ CREATE TABLE IF NOT EXISTS ChatLog
 CREATE TABLE IF NOT EXISTS ChatLog_DateTags
 (
     chat_log_date_tag_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    timestamp DATE UNIQUE NOT NULL
-    favourite BOOLEAN NOT NULL DEFAULT(FALSE)
+    timestamp DATE UNIQUE NOT NULL,
+    favourite BOOLEAN NOT NULL DEFAULT(FALSE),
     tags TEXT NOT NULL -- json string array
 );
 

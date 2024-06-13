@@ -1,10 +1,10 @@
 
 use rusqlite::params;
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 
 use crate::dal::db;
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct DateTag {
     pub date: String,
     pub favourite: bool,
