@@ -19,43 +19,6 @@ pub struct ChatLog {
 
 impl ChatLog {
 
-    pub fn default() -> ChatLog {
-
-        let conn = db::get_connection();
-        const SELECT_MESSAGES: &str =
-        "
-            SELECT
-                chat_log_id,
-                character_id,
-                datetime(timestamp, 'localtime'),
-                message
-            FROM
-                ChatLog
-            ORDER BY chat_log_id ASC;
-        ";
-
-        let mut stmt = conn.prepare(SELECT_MESSAGES).unwrap();
-        let message_iter = stmt.query_map([], |row| {
-
-            let raw_message: String = row.get(3)?;
-            let message: SwtorMessage = serde_json::from_str(&raw_message)
-                .map_err(|e| Error::ToSqlConversionFailure(Box::new(e)))?;
-
-            Ok(Message {
-                chat_log_id: row.get(0)?,
-                character_id: row.get(1)?,
-                timestamp: row.get(2)?,
-                message
-            })
-
-        });
-
-        ChatLog {
-            messages: message_iter.unwrap().map(|m| m.unwrap()).collect()
-        }
-
-    }
-
     pub fn from_date(date: String) -> ChatLog {
 
         let conn = db::get_connection();
@@ -91,28 +54,6 @@ impl ChatLog {
         ChatLog {
             messages: message_iter.unwrap().map(|m| m.unwrap()).collect()
         }
-
-    }
-
-    pub fn get_todays_hashes() -> Vec<u64> {
-
-        let conn = db::get_connection();
-        const SELECT_MESSAGES: &str = 
-        "
-            SELECT
-                chat_hash
-            FROM
-                ChatLog
-            WHERE
-                date(timestamp, 'localtime') = date('now', 'localtime');
-        ";
-
-        let mut stmt = conn.prepare(SELECT_MESSAGES).unwrap();
-        let message_iter = stmt.query_map([], |row| {
-            Ok(row.get(0)?)
-        });
-
-        message_iter.unwrap().map(|m: Result<i64, Error>| m.unwrap() as u64).collect()
 
     }
 
