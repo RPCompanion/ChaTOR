@@ -187,8 +187,12 @@ fn start_logging_propagation(window: tauri::Window) {
 #[tauri::command]
 pub fn stop_injecting_capture() {
 
-    println!("Stopping injection");
+    if !INJECTED.load(Ordering::Relaxed) {
+        return;
+    }
+
     CONTINUE_LOGGING.store(false, Ordering::Relaxed);
+    
     while INJECTED.load(Ordering::Relaxed) {
         thread::sleep(Duration::from_secs(1));
     }
