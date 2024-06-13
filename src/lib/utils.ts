@@ -1,4 +1,6 @@
 
+import { toast } from "@zerodevx/svelte-toast";
+
 export function deep_copy<T>(obj: T): T {
     return JSON.parse(JSON.stringify(obj));
 }
@@ -37,5 +39,16 @@ export function get_time_elapsed_since(date: Date): string {
     } else {
         return `${seconds} ` + (seconds === 1 ? "second" : "seconds") + " ago";
     }
+
+}
+
+export function toast_error(message: string) {
+
+    toast.push(message, {
+        theme: {
+            "--toastBackground": "#ff0000",
+            "--toastColor": "#ffffff"
+        }
+    });
 
 }
