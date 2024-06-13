@@ -15,10 +15,6 @@ pub struct Color {
 
 impl Color {
 
-    pub fn new(r: u8, g: u8, b: u8) -> Color {
-        Color { r, g, b }
-    }
-
     pub fn from_hex(hex: &str) -> Color {
 
         let hex = hex.trim_start_matches("#");
@@ -27,10 +23,6 @@ impl Color {
         let b = u8::from_str_radix(&hex[4..6], 16).unwrap();
         Color { r, g, b }
 
-    }
-
-    pub fn to_hex(&self) -> String {
-        format!("#{:02X}{:02X}{:02X}", self.r, self.g, self.b)
     }
 
 }
@@ -116,22 +108,6 @@ impl Character {
 
         Err("Could not find ChatColors in file")
 
-    }
-
-    pub fn get_emote_channel_color(&self) -> Option<&Color> {
-        self.channel_colors.get(2)
-    }
-
-    pub fn get_yell_channel_color(&self) -> Option<&Color> {
-        self.channel_colors.get(1)
-    }
-
-    pub fn get_say_channel_color(&self) -> Option<&Color> {
-        self.channel_colors.get(0)
-    }
-
-    pub fn get_whisper_channel_color(&self) -> Option<&Color> {
-        self.channel_colors.get(3)
     }
 
 }
