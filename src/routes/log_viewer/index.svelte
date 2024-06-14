@@ -17,7 +17,8 @@
     import { type IListElem } from "../../components/select_list";
     import PageFormatting from "../../components/_PageFormatting.svelte";
     import { unicode_unescape } from "../../lib/utils";
-    import { get_all_date_tag_favourites, type IDateTag } from "../../lib/network/datetags";
+    import { date_tag_new, get_all_date_tag_favourites, type IDateTag } from "../../lib/network/datetags";
+    import Favourite from "./_Favourite.svelte";
 
     let container: HTMLElement | undefined   = undefined;
     let last_message: HTMLElement | undefined = undefined;
@@ -54,6 +55,14 @@
         }
 
         date_tags = response.unwrap();
+        dates.forEach((date) => {
+
+            let date_tag = date_tags.find((tag) => tag.date == date);
+            if (date_tag == undefined) {
+                date_tags.push(date_tag_new(date));
+            }
+
+        });
 
     }
 
@@ -159,8 +168,13 @@
     </div>
     {#if filtered_messages.length > 0}
         <div class="h-6"></div>
-        <div class="flex flex-row gap-1">
-            <SmallButton on:click={on_export}>Export</SmallButton>
+        <div class="grid grid-cols-2 w-full">
+            <div class="w-full">
+                <Favourite date_tag={date_tags.find((dt) => dt.date == active_date)}/>
+            </div>
+            <div class="flex flex-row-reverse w-full">
+                <SmallButton on:click={on_export}>Export</SmallButton>
+            </div>
         </div>
     {/if}
 </PageFormatting>

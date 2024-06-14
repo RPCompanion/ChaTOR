@@ -8,6 +8,16 @@ export interface IDateTag {
     tags: string[];
 }
 
+export function date_tag_new(date: string): IDateTag {
+
+    return {
+        date: date,
+        favourite: false,
+        tags: []
+    }
+    
+}
+
 export async function get_all_date_tag_favourites(): Promise<Result<IDateTag[], string>> {
 
     let result;
