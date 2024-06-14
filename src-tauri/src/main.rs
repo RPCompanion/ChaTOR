@@ -5,7 +5,7 @@
 use std::path::Path;
 
 use open;
-use tauri::{api::dialog::blocking::message, Manager, PhysicalSize, WindowEvent};
+use tauri::{api::dialog::blocking::ask, Manager, PhysicalSize, WindowEvent};
 use tracing::{error, info};
 use tracing_subscriber::{self, fmt, prelude::*};
 use tracing_appender::{self, non_blocking::WorkerGuard};
@@ -19,6 +19,9 @@ mod capture_injector;
 mod share;
 mod utils;
 mod swtor;
+mod crash_reporter;
+
+use crash_reporter::CrashReporter;
 
 fn main() {
 
@@ -143,17 +146,13 @@ fn setup_panic_hook() {
 
         error!("Panic: {:?}", panic_info);
         capture_injector::stop_injecting_capture();
-        message(None::<&tauri::Window>, "ChaTOR Crash", "ChaTOR has crashed. Please check the logs for more information.");
+        let response = ask(None::<&tauri::Window>, "ChaTOR Crash", "ChaTOR has crashed. Send a crash report?");
 
-        /*
-            TODO: Figure out a good method to supply crash reports. Maybe a discord webhook, or a service call?
-            let answer: bool = ask(Some(window), "Crash report", "Submit crash to dakstrum?");
-            if answer {
-                return;
-            }
-        */
-
-        open_log_dir();
+        if response {
+            CrashReporter::new(format!("{:?}", panic_info)).submit()
+        } else {
+            open_log_dir();
+        }        
 
     }));
 

@@ -37,6 +37,7 @@ chrono = {version = "0.4", features = ["serde"] }
 tokio = {version = "1", features = ["time"] }
 int-enum = "1.1"
 ctrlc = "3.4.4"
+reqwest = { version = "0.12", features = ["blocking"] }
 
 lazy_static = "1.4.0"
 clipboard-win = "5.0.0"
