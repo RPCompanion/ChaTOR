@@ -16,6 +16,7 @@
     import PlayerFilter from "../../components/_PlayerFilter.svelte";
     import { type IListElem } from "../../components/select_list";
     import PageFormatting from "../../components/_PageFormatting.svelte";
+  import { unicode_unescape } from "../../lib/utils";
 
     let container: HTMLElement | undefined   = undefined;
     let last_message: HTMLElement | undefined = undefined;
@@ -133,14 +134,18 @@
                 </span>
                 {#each message.get_message_fragments() as fragment}
                     {#if fragment.startsWith("\"") && fragment.endsWith("\"")}
-                        <span class="break-words " style="color: white;">{fragment}</span>
+                        <span class="break-words " style="color: white;">{unicode_unescape(fragment)}</span>
                     {:else}
-                        <span class="break-words " style="color: {$active_character?.get_channel_color(message.channel.type).to_hex()}">{fragment}</span>
+                        <span class="break-words " style="color: {$active_character?.get_channel_color(message.channel.type).to_hex()}">{unicode_unescape(fragment)}</span>
                     {/if}
                 {/each}
             </div>
         {/each}
     </div>
-    <div class="h-6"></div>
-    <SmallButton on:click={on_export}>Export</SmallButton>
+    {#if filtered_messages.length > 0}
+        <div class="h-6"></div>
+        <div class="flex flex-row gap-1">
+            <SmallButton on:click={on_export}>Export</SmallButton>
+        </div>
+    {/if}
 </PageFormatting>
