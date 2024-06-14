@@ -194,7 +194,7 @@
     {#if date_tags.filter((dt) => dt.favourite).length > 0}
         <div class="h-2"></div>
         <div class="">
-            <Checkbox size="small" on:checked={on_change_show_favourites}>Show only favorites</Checkbox>
+            <Checkbox size="small" on:checked={on_change_show_favourites}>Show only favorite dates</Checkbox>
         </div>
     {/if}
     <div class="h-6"></div>
