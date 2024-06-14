@@ -19,23 +19,34 @@
     import { unicode_unescape } from "../../lib/utils";
     import { date_tag_new, get_all_date_tag_favourites, type IDateTag } from "../../lib/network/datetags";
     import Favourite from "./_Favourite.svelte";
+    import Checkbox from "../../lib/Checkbox.svelte";
 
     let container: HTMLElement | undefined   = undefined;
     let last_message: HTMLElement | undefined = undefined;
 
     let channel_filters: number[] = get_all_channel_ids();
+
+    /* 
+        all_dates contains all distinct dates in the database. Not to be changed once set.
+    */
+    let all_dates: string[] = [];
     let dates: string[] = [];
+
     let date_messages: SwtorMessage[]     = [];
     let players: IListElem<string>[]      = [];
     let filtered_messages: SwtorMessage[] = [];
     let active_date: string | undefined   = undefined;
     let date_tags: IDateTag[] = [];
 
+    let show_only_favourites: boolean = false;
+    $: show_only_favourites = date_tags.filter((dt) => dt.favourite).length > 0 ? show_only_favourites : false;
+
     async function init_dates(callback?: () => void) {
 
         invoke("get_distinct_dates").then((response) => {
 
-            dates = response as string[];
+            all_dates = response as string[];
+            dates     = response as string[];
 
             if (callback != undefined) {
                 callback();
@@ -94,6 +105,14 @@
 
     }
 
+    function reset_messages() {
+
+        date_messages     = [];
+        filtered_messages = [];
+        players           = [];
+
+    }
+
     function scroll_to_last_message() {
 
         if (last_message == undefined) {
@@ -122,6 +141,33 @@
 
     }
 
+    function on_date_tag_change(e: CustomEvent<IDateTag>) {
+
+        date_tags = date_tags
+            .map((dt) => {
+
+                if (dt.date == e.detail.date) {
+                    return e.detail;
+                }
+
+                return dt;
+
+            });
+
+    }
+
+    function on_change_show_favourites(e: CustomEvent<boolean>) {
+
+        show_only_favourites = e.detail;
+        if (show_only_favourites) {
+            dates = date_tags.filter((dt) => dt.favourite).map((dt) => dt.date);
+        } else {
+            dates = all_dates;
+        }
+        reset_messages();
+
+    }
+
     $: if (channel_filters || players) {
         set_filtered_messages();
     }
@@ -145,6 +191,12 @@
             <PlayerFilter bind:elems={players}/>
         </div>
     </div>
+    {#if date_tags.filter((dt) => dt.favourite).length > 0}
+        <div class="h-2"></div>
+        <div class="">
+            <Checkbox size="small" on:checked={on_change_show_favourites}>Show only favorites</Checkbox>
+        </div>
+    {/if}
     <div class="h-6"></div>
     <div bind:this={container} class="flex flex-col h-96 rounded-tr-md border-2 border-slate-700 overflow-y-auto scrollbar scrollbar-thumb-sky-800 scrollbar-track-slate-100 chat-container-background">
         {#each filtered_messages as message}
@@ -170,7 +222,7 @@
         <div class="h-6"></div>
         <div class="grid grid-cols-2 w-full">
             <div class="w-full">
-                <Favourite date_tag={date_tags.find((dt) => dt.date == active_date)}/>
+                <Favourite date_tag={date_tags.find((dt) => dt.date == active_date)} on:change={on_date_tag_change}/>
             </div>
             <div class="flex flex-row-reverse w-full">
                 <SmallButton on:click={on_export}>Export</SmallButton>
