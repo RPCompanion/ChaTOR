@@ -2,13 +2,13 @@
 import { invoke } from "@tauri-apps/api";
 import { Result, Ok, Err } from "../result";
 
-export interface DateTag {
+export interface IDateTag {
     date: string;
     favourite: boolean;
     tags: string[];
 }
 
-export async function get_all_date_tag_favourites(): Promise<Result<DateTag[], string>> {
+export async function get_all_date_tag_favourites(): Promise<Result<IDateTag[], string>> {
 
     let result;
     try {
@@ -17,11 +17,11 @@ export async function get_all_date_tag_favourites(): Promise<Result<DateTag[], s
         return Err(e as string)
     }
 
-    return Ok(result as DateTag[]);
+    return Ok(result as IDateTag[]);
 
 }
 
-export async function save_date_tag(date_tag: DateTag): Promise<Result<[], string>> {
+export async function save_date_tag(date_tag: IDateTag): Promise<Result<[], string>> {
 
     try {
         await invoke("save_date_tag", { dateTag: date_tag });

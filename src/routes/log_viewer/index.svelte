@@ -16,7 +16,8 @@
     import PlayerFilter from "../../components/_PlayerFilter.svelte";
     import { type IListElem } from "../../components/select_list";
     import PageFormatting from "../../components/_PageFormatting.svelte";
-  import { unicode_unescape } from "../../lib/utils";
+    import { unicode_unescape } from "../../lib/utils";
+    import { get_all_date_tag_favourites, type IDateTag } from "../../lib/network/datetags";
 
     let container: HTMLElement | undefined   = undefined;
     let last_message: HTMLElement | undefined = undefined;
@@ -26,8 +27,10 @@
     let date_messages: SwtorMessage[]     = [];
     let players: IListElem<string>[]      = [];
     let filtered_messages: SwtorMessage[] = [];
+    let active_date: string | undefined   = undefined;
+    let date_tags: IDateTag[] = [];
 
-    function init_dates(callback?: () => void) {
+    async function init_dates(callback?: () => void) {
 
         invoke("get_distinct_dates").then((response) => {
 
@@ -38,6 +41,19 @@
             }
 
         });
+
+        await init_date_tags();
+
+    }
+
+    async function init_date_tags() {
+
+        let response = await get_all_date_tag_favourites();
+        if (response.is_error()) {
+            return;
+        }
+
+        date_tags = response.unwrap();
 
     }
 
@@ -51,8 +67,8 @@
 
     function on_change(e: CustomEvent<HookProps>) {
 
-        let date = e.detail[1];
-        invoke("get_chat_log_from_date", {date}).then((response) => {
+        active_date = e.detail[1];
+        invoke("get_chat_log_from_date", {date: active_date}).then((response) => {
 
             date_messages = (response as IChatLogMessage[]).map((m) => new SwtorMessage(m.message));
             
@@ -111,7 +127,6 @@
 
 
 <PageFormatting title="Log Viewer">
-
     <div class="grid grid-cols-2 w-full">
         <div class="w-full">
             <Flatpickr options={{ enable: dates }} on:change={on_change} name="date" placeholder="Select a date" class="outline-none border-2 border-slate-700 rounded-md px-2 text-xl"/>
