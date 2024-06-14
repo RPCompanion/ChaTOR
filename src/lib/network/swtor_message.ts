@@ -126,8 +126,6 @@ export interface ISwtorMessage {
     message: string;
 }
 
-export const swtor_messages = writable<SwtorMessage[]>([]);
-
 export function init_swtor_message_listener() {
 
     listen("swtor_messages", (messages: any) => {

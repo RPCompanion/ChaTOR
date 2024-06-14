@@ -7,7 +7,9 @@
     import { 
         SwtorChatTabMessages, 
         swtor_channel_messages,
-        set_swtor_channel_messages_to_read 
+        set_swtor_channel_messages_to_read, 
+        restore_todays_messages
+
     } from "./network/swtor_message/swtor_chat_tab_messages";
     
     import { afterUpdate, onMount } from "svelte";
@@ -18,7 +20,8 @@
     import ChatTabs from "./chat_log_window/_ChatTabs.svelte";
     import { players_filter } from "./network/players";
     import PlayerFilter from "../components/_PlayerFilter.svelte";
-  import { unicode_unescape } from "./utils";
+    import { unicode_unescape } from "./utils";
+    import VariableSizeButton from "./buttons/VariableSizeButton.svelte";
 
     let auto_scroll: boolean = true;
     let container: HTMLElement | undefined = undefined;
@@ -68,6 +71,10 @@
 
     }
 
+    function on_restore_posts() {
+        restore_todays_messages();
+    }
+
     $: if ($swtor_channel_messages.length > 0) {
         set_swtor_channel_messages_to_read(get_active_chat_tab_name($active_chat_tab_index));
     }
@@ -106,8 +113,9 @@
 </script>
 
 <div class="w-full grid grid-cols-2">
-    <div>
+    <div class="flex flex-row gap-1 w-full">
         <Checkbox bind:checked={auto_scroll} size="small">Auto scroll</Checkbox>
+        <VariableSizeButton my_classes="bg-slate-500 text-white text-md px-2 rounded-md hover:text-gray-400" on:click={on_restore_posts}>Restore today's posts</VariableSizeButton>
     </div>
     <div class="flex flex-row-reverse relative">
         <PlayerFilter bind:elems={$players_filter}/>

@@ -1,4 +1,5 @@
 
+use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
 use crate::dal::db;
 use rusqlite::Error;
@@ -20,6 +21,16 @@ pub struct ChatLog {
 }
 
 impl ChatLog {
+
+    pub fn from_today() -> ChatLog {
+
+        let date: String = Utc::now()
+            .date_naive()
+            .to_string();
+
+        ChatLog::from_date(date)
+
+    }
 
     pub fn from_date(date: String) -> ChatLog {
 
@@ -79,6 +90,11 @@ impl ChatLog {
 
     }
 
+}
+
+#[tauri::command]
+pub fn get_todays_chat_log() -> Vec<Message> {
+    ChatLog::from_today().messages
 }
 
 #[tauri::command]

@@ -1,8 +1,11 @@
 
+import { invoke } from "@tauri-apps/api";
 import { settings } from "../settings";
-import { SwtorMessage } from "../swtor_message";
+import { SwtorMessage, type ISwtorMessage } from "../swtor_message";
 import { writable, get } from "svelte/store";
 import { Result, Ok, Err } from "../../result";
+import { add_player } from "../players";
+import type { IChatLogMessage } from "../chat_log_message";
 
 export class SwtorChatTabMessages {
     
@@ -123,5 +126,32 @@ export function clear_swtor_channel_messages(chat_tab_name: string) {
 
     t_chat_tab.messages = [];
     swtor_channel_messages.set(t_scm);
+
+}
+
+export function restore_todays_messages() {
+
+    invoke("get_todays_chat_log").then((response) => {
+
+        let temp  = (response as IChatLogMessage[])
+            .map((message) => message.message);
+            
+        let t_scm = get(swtor_channel_messages);
+
+        t_scm.forEach((chat_tab) => {
+            chat_tab.messages = [];
+        })
+
+        swtor_channel_messages.set(t_scm);
+
+        temp.map((message) => new SwtorMessage(message)).forEach((message) => {
+
+            add_swtor_channel_message(message);
+            add_player(message.from);
+
+        });  
+
+
+    });
 
 }

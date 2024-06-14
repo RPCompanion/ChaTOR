@@ -68,6 +68,7 @@ fn main() {
             dal::characters::get_all_characters,
             dal::db::chat_log::get_chat_log_from_date,
             dal::db::chat_log::get_distinct_dates,
+            dal::db::chat_log::get_todays_chat_log,
             dal::db::chat_log::datetags::get_all_date_tag_favourites,
             dal::db::chat_log::datetags::save_date_tag,
             capture_injector::start_injecting_capture,

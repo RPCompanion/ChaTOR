@@ -17,7 +17,7 @@
     import { type IListElem } from "../../components/select_list";
     import PageFormatting from "../../components/_PageFormatting.svelte";
 
-    let container: HTMLElement | undefined    = undefined;
+    let container: HTMLElement | undefined   = undefined;
     let last_message: HTMLElement | undefined = undefined;
 
     let channel_filters: number[] = get_all_channel_ids();
