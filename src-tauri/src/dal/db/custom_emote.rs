@@ -1,10 +1,10 @@
 
 use rusqlite::params;
 use serde::{Deserialize, Serialize};
+use tracing::error;
 
 use crate::dal::db;
 
-use super::log::log_error;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CustomEmote {
@@ -232,7 +232,7 @@ pub fn update_custom_emotes_batch(custom_emotes: Vec<CustomEmote>) -> Result<(),
             Ok(_) => {},
             Err(e) => {
 
-                log_error(&e);
+                error!("Error saving custom emote {:?}", e);
                 CustomEmote::clean_up_order_index_gaps()?;
                 return Err("Error saving custom emotes");
                 

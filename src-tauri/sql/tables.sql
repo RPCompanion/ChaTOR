@@ -72,13 +72,6 @@ CREATE TABLE IF NOT EXISTS UsersChatLogCharacter
     character_id INTEGER NOT NULL REFERENCES Characters(character_id)
 );
 
-CREATE TABLE IF NOT EXISTS Log_Errors
-(
-    log_error_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    error_message TEXT NOT NULL,
-    error_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
 CREATE TABLE IF NOT EXISTS DB_Version
 (
     db_version_id INTEGER PRIMARY KEY AUTOINCREMENT,

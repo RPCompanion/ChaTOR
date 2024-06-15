@@ -9,14 +9,14 @@ use std::thread;
 use std::time::Duration;
 
 
+use tracing::error;
+
 use tauri::Window;
 use serde_json::json;
 use windows::Win32::Foundation::{BOOL, HWND, LPARAM, MAX_PATH};
 use windows::Win32::UI::WindowsAndMessaging::{EnumWindows, GetForegroundWindow, GetWindowTextW, GetWindowThreadProcessId};
 use windows::core::PWSTR;
 use windows::Win32::System::Threading::{OpenProcess, QueryFullProcessImageNameW, PROCESS_NAME_FORMAT, PROCESS_QUERY_INFORMATION};
-
-use crate::dal::db::log::log_error;
 
 pub mod post;
 pub mod message_hash_container;
@@ -40,7 +40,7 @@ unsafe fn set_process_checksum() {
 
     let handle = OpenProcess(PROCESS_QUERY_INFORMATION, false, pid);
     if handle.is_err() {
-        log_error(&handle.err().unwrap().to_string());
+        error!("Error opening process: {}", handle.err().unwrap().to_string());
         return;
     }
 

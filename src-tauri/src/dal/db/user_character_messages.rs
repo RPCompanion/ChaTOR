@@ -3,8 +3,8 @@
 use regex::Regex;
 use rusqlite::params;
 use serde::{Deserialize, Serialize};
+use tracing::error;
 use crate::dal::db;
-use crate::dal::db::log::log_error;
 use crate::utils::StringUtils;
 
 pub struct CommandMessage {
@@ -100,7 +100,7 @@ impl UserCharacterMessages {
             });
 
             if response.is_err() {
-                log_error(format!("UserCharacterMessages::new() - Error inserting message {:?}", response.err()).as_str());
+                error!("UserCharacterMessages::store() - Error inserting message {:?}", response.err());
                 continue;
             }
 
