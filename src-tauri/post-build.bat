@@ -9,6 +9,7 @@ mkdir "chator"
 REM Copying the directories and files
 xcopy ".\sql" "chator\sql" /E /I
 
+copy ".\config.toml" "chator\config.toml"
 copy ".\ChaTOR.exe" "chator\ChaTOR.exe"
 copy ".\swtor_chat_capture.dll" "chator\swtor_chat_capture.dll"
 copy ".\misc\blauncher.exe" "chator\blauncher.exe"
