@@ -126,7 +126,7 @@ fn init_system() {
 fn setup_config() {
 
     /* 
-        Probably the only hard exit. If the user modified their config file in an invalid way, we need to exit.
+        If the user modified their config file in an invalid way, we need to exit.
     */
     if let Err(e) = config::init() {
 
