@@ -24,7 +24,7 @@ impl ChatLog {
 
     pub fn from_today() -> ChatLog {
 
-        let date: String = Utc::now()
+        let date: String = Local::now()
             .date_naive()
             .to_string();
 
