@@ -1,5 +1,6 @@
 
 <script lang="ts">
+    
     import { ESwtorChannel } from "../lib/network/swtor_channel";
     import { active_chat_tab_index } from "../lib/chat_log_window/chat_log_window_store";
     import { settings } from "../lib/network/settings";

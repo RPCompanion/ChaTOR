@@ -64,6 +64,11 @@ export class AutoMessageSplitter {
             return None();
         }
 
+        // Support for OOC comments.
+        if (message.startsWith("((") && custom_command.is_none()) {
+            return Some("/say")
+        }
+
         let reg = new RegExp("^\/([a-zA-Z0-9]+)");
         let match = message.match(reg);
 
