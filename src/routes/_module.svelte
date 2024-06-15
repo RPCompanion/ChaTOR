@@ -32,8 +32,4 @@
     .background-img {
         background-image: url("../assets//watercolor.webp");
     }
-
-    .background-color {
-        background-color: #205c89;
-    }
 </style>

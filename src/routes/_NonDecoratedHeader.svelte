@@ -53,13 +53,3 @@
         </button>
     </div>
 </body>
-
-<style>
-    .titlebar-button {
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        width: 30px;
-        height: 30px;
-    }
-</style>
