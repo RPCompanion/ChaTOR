@@ -347,6 +347,7 @@ dependencies = [
  "tauri",
  "tauri-build",
  "tokio",
+ "toml 0.8.14",
  "tracing",
  "tracing-appender",
  "tracing-subscriber",

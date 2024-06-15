@@ -3,7 +3,7 @@ use tracing::error;
 use serde::{Deserialize, Serialize};
 use reqwest::blocking::Client;
 
-const CRASH_REPORTER_URL: &str = "https://apiv2.rpcompanion.com/crash_reports/chator";
+use crate::config::config;
 
 #[derive(Serialize, Deserialize)]
 pub struct CrashReporter {
@@ -23,7 +23,7 @@ impl CrashReporter {
     pub fn submit(&self) {
 
         let client = Client::new();
-        let response = client.post(CRASH_REPORTER_URL)
+        let response = client.post(config().crash_reporter_url.as_str())
             .header("Content-Type", "application/json")
             .body(self.as_json())
             .send();

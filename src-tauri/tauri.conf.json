@@ -55,6 +55,7 @@
                 "signingIdentity": null
             },
             "resources": [
+                "./config.toml",
                 "./sql",
                 "./misc/.itch.toml",
                 "./post-build.bat"

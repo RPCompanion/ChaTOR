@@ -5,7 +5,8 @@
 use std::path::Path;
 
 use open;
-use tauri::{api::dialog::blocking::ask, Manager, PhysicalSize, WindowEvent};
+use tauri::{Manager, PhysicalSize, WindowEvent};
+use tauri::api::dialog::blocking::{ask, message};
 use tracing::{error, info};
 use tracing_subscriber::{self, fmt, prelude::*};
 use tracing_appender::{self, non_blocking::WorkerGuard};
@@ -20,6 +21,7 @@ mod share;
 mod utils;
 mod swtor;
 mod crash_reporter;
+mod config;
 
 use crash_reporter::CrashReporter;
 
@@ -114,9 +116,26 @@ fn init_system() {
 
     setup_panic_hook();
     setup_sigterm_handler();
+    setup_config();
+
     dal::init();
     dal::db::settings::init();
     
+}
+
+fn setup_config() {
+
+    /* 
+        Probably the only hard exit. If the user modified their config file, we need to exit.
+    */
+    if let Err(e) = config::init() {
+
+        error!("Error initializing config: {:?}", e);
+        message(None::<&tauri::Window>, "ChaTOR Error", "Error initializing config file. Have you modified it?");
+        std::process::exit(1);
+
+    }
+
 }
 
 fn setup_sigterm_handler() {
