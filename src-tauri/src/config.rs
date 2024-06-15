@@ -13,13 +13,21 @@ static CONFIG: OnceLock<Config> = OnceLock::new();
 
 impl Config {
 
-    pub fn new() -> Result<Self, &'static str> {
+    pub fn new() -> Result<Self, String> {
 
         const PATH: &str = "config.toml";
         match std::fs::read_to_string(PATH) {
 
-            Ok(contents) => Ok(toml::from_str(&contents).unwrap()),
-            Err(_) => Err("Error reading config file.")
+            Ok(contents) => {
+
+                let config = 
+                    toml::from_str(&contents)
+                        .map_err(|e| e.to_string())?;
+
+                Ok(config)
+
+            },
+            Err(_) => Err("Error reading config file.".to_string())
 
         }
 
@@ -27,7 +35,7 @@ impl Config {
 
 }
 
-pub fn init() -> Result<(), &'static str> {
+pub fn init() -> Result<(), String> {
 
     if CONFIG.get().is_some() {
 
