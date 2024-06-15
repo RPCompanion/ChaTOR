@@ -1,27 +1,66 @@
 # SWTOR-Chat
 
-A third-party chat client for the MMORPG, Star Wars: The Old Republic. Presently in alpha.
+A third-party chat client for Star Wars: The Old Republic. This software is presently in alpha.
 
-![image](https://github.com/Davenport-Physics/SWTOR-Chat/assets/1410579/3c3ebc9d-a81e-482c-a32d-14bb61b2d662)
-
-## Features
+## Current features
 
 - Chat notifications
-- Chat Logging
+- Chat Logging (Disabled by default)
 - Auto formatting of posts longer than 255 characters
-    - Manual formatting available. Up to 3 posts at a time, for a total of 765 characters.
-- Save custom emotes for future use. Then, press a button to activate them.
-
-![image](https://github.com/Davenport-Physics/SWTOR-Chat/assets/1410579/f55e69f4-74e2-45fe-bba9-7b228357f2b5)
-
+    - Manual formatting available. Up to 5 posts at a time, up to 1275 characters.
+    - If chat logging is enabled, dynamically set your default channel per chat tab.
+- Save custom emotes for future use.
+    - Mark certain emotes as favorites and have them appear directly on the chat page
+    - Press a button to activate them.
+- Roleplay beacons
+- Chat log viewer to revisit past scenes (If chat logging is enabled)
+    - Export scenes to a .txt file
+    - Mark specific days as favorites for easier navigation
 
 ## Planned Features
 
+- Clan recruitment posts
 - Character sheet integration
 - Dice Rolling
-- Roleplay beacons
-- Clan recruitment posts
 
-# License
+## Interested in the project?
+
+Consider joining our [discord](https://discord.gg/TwfBK94ree)
+
+## Contributing
+
+Before you make a pull request, please consider opening an issue or discussion. We want to ensure that the change aligns with the project's direction, or that specific technical details are covered.
+All contributions are to be licensed under the AGPLv3
+
+## Building this software
+
+### Build Dependencies
+
+- [Node](https://nodejs.org/en)
+- [rust](https://www.rust-lang.org/) nightly
+
+### Run steps
+
+Assuming you've set up node.js and the rust nightly compiler, use the following steps to run the software
+
+Install local npm packages
+```sh
+npm i
+```
+
+Use npm to start the tauri app
+```sh
+npm run tauri dev
+```
+
+### Build steps
+
+Assuming you've installed the local npm packages (if not, see Run steps)
+
+```sh
+npm run tauri build
+```
+
+## Project License
 
 Licensed under the AGPLv3
