@@ -19,7 +19,7 @@
     import { players_filter } from "./network/players";
     import PlayerFilter from "../components/_PlayerFilter.svelte";
     import { unicode_unescape } from "./utils";
-  import RestorePosts from "./chat_log_window/_RestorePosts.svelte";
+    import RestorePosts from "./chat_log_window/_RestorePosts.svelte";
 
     let auto_scroll: boolean = true;
     let container: HTMLElement | undefined = undefined;

@@ -7,6 +7,7 @@
     import { get_all_channel_ids } from "../../lib/network/swtor_channel";
     import SmallButton from "../../lib/buttons/SmallButton.svelte";
     import { click_outside_handler } from "../../lib/click_outside";
+    import Tooltip from "../../components/_Tooltip.svelte";
 
     export let channel_filters: number[] = [];
     let show_filters: boolean = false;
@@ -46,9 +47,11 @@
 
 </script>
 
-<button class="hover:text-gray-400 text-white" on:click={toggle_show_filters} on:mouseenter={() => { mouse_over = true }} on:mouseleave={() => { mouse_over = false }}>
-    <Funnel size={24}/>
-</button>
+<Tooltip tooltip_text="Filter out by channels" placement="left">
+    <button class="hover:text-gray-400 text-white" on:click={toggle_show_filters} on:mouseenter={() => { mouse_over = true }} on:mouseleave={() => { mouse_over = false }}>
+        <Funnel size={26}/>
+    </button>
+</Tooltip>
 {#if show_filters}
     <div class="absolute top-10 z-10 bg-slate-600 p-2 rounded-md shadow-md" transition:fade|local="{{ duration: 250 }}" use:click_outside_handler={click_outside}>
         <ChannelList bind:channels={channel_filters} on:channel_input={on_channel_input}/>

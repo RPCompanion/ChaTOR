@@ -7,6 +7,7 @@
     import { type IListElem } from "./select_list";
     import { UserList } from "phosphor-svelte";
     import { click_outside_handler } from "../lib/click_outside";
+    import Tooltip from "./_Tooltip.svelte";
 
     export let elems: IListElem<string>[];
     
@@ -56,9 +57,11 @@
 
 </script>
 
-<button class="hover:text-gray-400 text-white" on:click={toggle_show_filters} on:mouseenter={() => {mouse_over = true}} on:mouseleave={() => {mouse_over = false}}>
-    <UserList size={24}/>
-</button>
+<Tooltip placement="left" tooltip_text="Filter out players">
+    <button class="hover:text-gray-400 text-white" on:click={toggle_show_filters} on:mouseenter={() => {mouse_over = true}} on:mouseleave={() => {mouse_over = false}}>
+        <UserList size={26}/>
+    </button>
+</Tooltip>
 
 {#if show_filters}
     <div class="absolute top-10 z-10 bg-slate-600 p-2 rounded-md shadow-md " transition:fade|local="{{ duration: 250 }}" use:click_outside_handler={click_outside}>
