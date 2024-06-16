@@ -137,7 +137,7 @@
            return `[${m.timestamp}] ${m.get_message_from()} ${m.get_message_fragments().join(" ")}`;
         });
 
-        await writeTextFile(filepath, temp.join("\n"));
+        await writeTextFile(filepath, temp.join("\n\n"));
 
     }
 
