@@ -198,7 +198,7 @@
         </div>
     {/if}
     <div class="h-6"></div>
-    <div bind:this={container} class="flex flex-col h-96 rounded-tr-md border-2 border-slate-700 overflow-y-auto scrollbar scrollbar-thumb-sky-800 scrollbar-track-slate-100 chat-container-background">
+    <div bind:this={container} class="flex flex-col h-96 resize-y max-h-full rounded-tr-md border-2 border-slate-700 overflow-y-auto scrollbar scrollbar-thumb-sky-800 scrollbar-track-slate-100 chat-container-background">
         {#each filtered_messages as message}
 
             <div bind:this={last_message} class="w-full opacity-100">

@@ -48,7 +48,9 @@ dll-syringe = "0.15.2"
 ctor = "0.2.8"
 windows = { version = "0.52", features = ["Data_Xml_Dom", "Win32_Foundation", "Win32_Security", "Win32_System_Threading", "Win32_System_LibraryLoader", "Win32_UI_WindowsAndMessaging", "Win32_UI_Input_KeyboardAndMouse", "Win32_System_ProcessStatus", "Win32_UI_WindowsAndMessaging"] }
 em-libs = { git = "https://github.com/Davenport-Physics/EmLibs"}
+chator-macros = { git = "https://github.com/RPCompanion/chator-macros" }
 directories = "5.0.1"
+
 
 # logging
 tracing = "0.1"

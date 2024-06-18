@@ -1,23 +1,19 @@
 
-use serde::{Deserialize, Serialize};
-use serde_json::{Deserializer, Value};
-
 use std::{io::{ErrorKind, Read, Write}, net::{TcpListener, TcpStream}, sync::{atomic::{AtomicBool, Ordering}, Arc, Mutex}, time::Duration};
 use std::thread;
 
+use serde::{Deserialize, Serialize};
+use serde_json::{Deserializer, Value};
 use dll_syringe::{process::OwnedProcess, Syringe};
+use chator_macros::sha256_to_array;
 
 use crate::swtor_hook::{self};
 use crate::dal::db::swtor_message::SwtorMessage;
 
+pub mod message_container;
 use self::message_container::MessageContainer;
 
-pub mod message_container;
-
-const SUPPORTED_SWTOR_CHECKSUM: [u8; 32] = [
-    0x8D, 0x29, 0x47, 0xD1, 0x87, 0x27, 0x0E, 0x54, 0x10, 0xFA, 0x41, 0xAD, 0x79, 0x07, 0xC8, 0xEE,
-    0xCA, 0x89, 0x83, 0x25, 0xBE, 0x97, 0x4B, 0x6A, 0x32, 0x33, 0xCC, 0x77, 0x7A, 0x14, 0xCD, 0xFD
-];
+const SUPPORTED_SWTOR_CHECKSUM: [u8; 32] = sha256_to_array!("8D2947D187270E5410FA41AD7907C8EECA898325BE974B6A3233CC777A14CDFD");
 
 lazy_static! {
     static ref INJECTED: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));

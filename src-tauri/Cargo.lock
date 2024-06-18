@@ -326,6 +326,7 @@ checksum = "fd16c4719339c4530435d38e511904438d07cce7950afa3718a84ac36c10e89e"
 name = "chator"
 version = "0.1.7"
 dependencies = [
+ "chator-macros",
  "chrono",
  "clipboard-win",
  "ctor",
@@ -352,6 +353,15 @@ dependencies = [
  "tracing-appender",
  "tracing-subscriber",
  "windows 0.52.0",
+]
+
+[[package]]
+name = "chator-macros"
+version = "0.1.0"
+source = "git+https://github.com/RPCompanion/chator-macros#2a077eb27c2458e4355f83c7f525fb8e1aaa7cb1"
+dependencies = [
+ "quote",
+ "syn 2.0.66",
 ]
 
 [[package]]
