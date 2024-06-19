@@ -12,7 +12,7 @@ A third-party chat client for Star Wars: The Old Republic. This software is pres
 - Save custom emotes for future use.
     - Mark certain emotes as favorites and have them appear directly on the chat page
     - Press a button to activate them.
-- Roleplay beacons
+- View roleplay beacons from both the Star Forge RP Server and our own [discord](https://discord.gg/TwfBK94ree)
 - Chat log viewer to revisit past scenes (If chat logging is enabled)
     - Export scenes to a .txt file
     - Mark specific days as favorites for easier navigation
@@ -37,7 +37,7 @@ All contributions are to be licensed under the AGPLv3
 ### Build Dependencies
 
 - [Node](https://nodejs.org/en)
-- [rust](https://www.rust-lang.org/) nightly
+- [rust](https://www.rust-lang.org/) nightly compiler
 
 ### Run steps
 
