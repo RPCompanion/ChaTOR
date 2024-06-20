@@ -36,6 +36,9 @@ jobs:
         toolchain: nightly
         override: true
 
+    - name: Configure Git to Use CLI for Cargo
+      run: git config --global net.git-fetch-with-cli true
+
     - run: npm ci
     - run: npm run tauri build
     - name: Upload Artifacts
