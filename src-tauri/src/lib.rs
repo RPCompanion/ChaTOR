@@ -26,6 +26,7 @@ use windows::core::PCSTR;
 
 static_detour! {
     static ChatHook: extern "C" fn(*mut u64, *const *const i8, *const *const i8, i32, *const *const i8) -> i64;
+    static UpdateFriendsListHook: extern "C" fn(*const u64, *const i8, i8, *const u64) -> i64;
 }
 
 #[macro_use]
@@ -36,7 +37,8 @@ lazy_static! {
     static ref QUIT: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
 }
 
-const CHAT_RELATIVE_ADDRESS: isize = 0x03f3740;
+const CHAT_RELATIVE_ADDRESS: isize       = 0x03f3740;
+const UPDATE_FRIENDS_LIST_ADDRESS: isize = 0x03f3b80;
 
 #[ctor::ctor]
 fn detour_init() {
@@ -124,7 +126,7 @@ fn begin_detour(address: isize) {
     unsafe {
 
         let target: extern "C" fn(*mut u64, *const *const i8, *const *const i8, i32, *const *const i8) -> i64 = mem::transmute(address);
-        match ChatHook.initialize(target, my_detour) {
+        match ChatHook.initialize(target, receive_chat_message_detour) {
             Ok(_) => {
                 submit_message(MessageType::Info, "Detour initialized");
                 ChatHook.enable().unwrap();
@@ -138,7 +140,7 @@ fn begin_detour(address: isize) {
 
 }
 
-fn my_detour(param_1: *mut u64, from: *const *const i8, to: *const *const i8, channel_id: i32, chat_message: *const *const i8) -> i64 {
+fn receive_chat_message_detour(param_1: *mut u64, from: *const *const i8, to: *const *const i8, channel_id: i32, chat_message: *const *const i8) -> i64 {
 
     unsafe {
 
@@ -154,6 +156,22 @@ fn my_detour(param_1: *mut u64, from: *const *const i8, to: *const *const i8, ch
         }).to_string());
 
         return ChatHook.call(param_1, from, to, channel_id, chat_message);
+
+    }
+
+}
+
+fn update_friends_list_detour(param_1: *const u64, character: *const i8, login_code: i8, param_2: *const u64) -> i64 {
+
+    unsafe {
+
+        let t_character = CStr::from_ptr(character).to_str().unwrap();
+        // 2 for logged in, 1 for logged out
+        let logged_in: bool = login_code == 2;
+
+        todo!("UpdateFriendsListHook");
+
+        return UpdateFriendsListHook.call(param_1, character, login_code, param_2);
 
     }
 
