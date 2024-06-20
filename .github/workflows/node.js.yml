@@ -33,6 +33,9 @@ jobs:
         toolchain: nightly
         override: true
 
+    - name: Enable Git CLI for fetch
+      run: git config --global net.git-fetch-with-cli true
+
     - run: npm ci
     - run: npm run tauri build
     - name: Upload Artifacts
