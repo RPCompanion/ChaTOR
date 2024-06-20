@@ -1,6 +1,9 @@
 # SWTOR-Chat
 
-A third-party chat client for Star Wars: The Old Republic. This software is presently in alpha.
+A third-party chat client for Star Wars: The Old Republic. 
+
+> [!WARNING]
+> This software is presently in alpha and is subject to change rapidly until stabilized.
 
 ## Current features
 
@@ -34,9 +37,9 @@ All contributions are to be licensed under the AGPLv3
 
 ## Building this software
 
-### Build Dependencies
+### Build Environment
 
-- [Node](https://nodejs.org/en)
+- [Node](https://nodejs.org/en) v18.0+
 - [rust](https://www.rust-lang.org/) nightly compiler
 
 ### Run steps
