@@ -6,7 +6,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
-    pub crash_reporter_url: String
+    pub crash_reporter_url: String,
+    pub microsoft_webview2_url: String
 }
 
 static CONFIG: OnceLock<Config> = OnceLock::new();

@@ -31,7 +31,8 @@ fn main() {
     init_system();
     info!("Starting ChaTOR");
 
-    tauri::Builder::default()
+    let tauri_response = 
+        tauri::Builder::default()
         .on_window_event(|event| {
 
             match event.event() {
@@ -80,8 +81,18 @@ fn main() {
             capture_injector::stop_injecting_capture,
             get_version
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .run(tauri::generate_context!());
+
+    if let Err(e) = tauri_response {
+            
+        error!("Error starting Tauri: {:?}", e);
+        let response = ask(None::<&tauri::Window>, "ChaTOR Error", "Error starting Tauri. You may need to install or reinstall Microsoft's Webview2. Do you want to open the download page?");
+
+        if response {
+            open_link(config::config().microsoft_webview2_url.clone());
+        }
+        
+    }
 
     info!("Thanks for using ChaTOR");
 
