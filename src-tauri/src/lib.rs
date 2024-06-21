@@ -165,11 +165,14 @@ fn update_friends_list_detour(param_1: *const u64, character: *const i8, login_c
 
     unsafe {
 
-        let t_character = CStr::from_ptr(character).to_str().unwrap();
-        // 2 for logged in, 1 for logged out
-        let logged_in: bool = login_code == 2;
+        // Sometimes t_character is empty. Perhaps the user hasn't fetched the friends list yet?
+        if let Ok(character_name) = CStr::from_ptr(character).to_str() {
 
-        todo!("UpdateFriendsListHook");
+            // 2 for logged in, 1 for logged out
+            let logged_in: bool = login_code == 2;
+            todo!("UpdateFriendsListHook");
+
+        }
 
         return UpdateFriendsListHook.call(param_1, character, login_code, param_2);
 
