@@ -11,14 +11,14 @@ use crate::swtor_hook::{self};
 use crate::dal::db::swtor_message::SwtorMessage;
 
 pub mod message_container;
-use self::message_container::MessageContainer;
+use self::message_container::SwtorMessageContainer;
 
 const SUPPORTED_SWTOR_CHECKSUM: [u8; 32] = sha256_to_array!("8D2947D187270E5410FA41AD7907C8EECA898325BE974B6A3233CC777A14CDFD");
 
 lazy_static! {
     static ref INJECTED: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
     static ref CONTINUE_LOGGING: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
-    static ref MESSAGE_CONTAINER: Arc<Mutex<MessageContainer>> = Arc::new(Mutex::new(MessageContainer::new()));
+    static ref MESSAGE_CONTAINER: Arc<Mutex<SwtorMessageContainer>> = Arc::new(Mutex::new(SwtorMessageContainer::new()));
 }
 
 #[derive(Deserialize, Serialize)]

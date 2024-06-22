@@ -7,41 +7,38 @@ use crate::utils::StringUtils;
 
 use crate::dal::db::swtor_message::SwtorMessage;
 
-pub struct MessageContainer {
+pub struct SwtorMessageContainer {
     pub unstored_messages: Vec<SwtorMessage>
 }
 
-impl MessageContainer {
+impl SwtorMessageContainer {
 
-    pub fn new() -> MessageContainer {
+    pub fn new() -> SwtorMessageContainer {
 
-        MessageContainer {
+        SwtorMessageContainer {
             unstored_messages: Vec::new()
         }
 
     }
 
-    pub fn push(&mut self, message: RawSwtorMessage) {
+    pub fn push(&mut self, capture_message: CaptureMessage) {
 
-        match message.message_type {
-            MessageType::Info => { return; },
-            _ => {}
+        if let CaptureMessage::Chat(swtor_message) = capture_message {
+
+            if settings::get_settings().chat_log.retry_message_submission {
+
+                let channel = match SwtorChannel::try_from(swtor_message.channel) {
+                    Ok(channel) => channel,
+                    Err(_) => SwtorChannel::EMOTE
+                };
+
+                post::push_incoming_message_hash(channel, swtor_message.get_parsed_message().as_u64_hash());
+
+            }
+
+            self.unstored_messages.push(swtor_message);
+
         }
-
-        let swtor_message: SwtorMessage = serde_json::from_str(&message.message).unwrap();
-
-        if settings::get_settings().chat_log.retry_message_submission {
-
-            let channel = match SwtorChannel::try_from(swtor_message.channel) {
-                Ok(channel) => channel,
-                Err(_) => SwtorChannel::EMOTE
-            };
-
-            post::push_incoming_message_hash(channel, swtor_message.get_parsed_message().as_u64_hash());
-
-        }
-
-        self.unstored_messages.push(swtor_message);
 
     }
 

@@ -14,8 +14,7 @@ pub struct SwtorMessage {
     pub timestamp: DateTime<Utc>,
     pub from: String,
     pub to: String,
-    pub message: String,
-    
+    pub message: String, 
 }
 
 fn default_timestamp() -> DateTime<Utc> {
@@ -24,12 +23,28 @@ fn default_timestamp() -> DateTime<Utc> {
 
 impl SwtorMessage {
 
+    pub fn new(channel: i32, from: String, to: String, message: String) -> SwtorMessage {
+
+        SwtorMessage {
+            channel, 
+            timestamp: Utc::now(), 
+            from, 
+            to, 
+            message 
+        }
+
+    }
+
     pub fn as_json_str(&self) -> String {
+
         serde_json::to_string(self).unwrap()
+
     }
 
     pub fn as_u64_hash(&self) -> u64 {
+
         self.as_json_str().as_u64_hash()
+        
     }
 
     pub fn get_parsed_message(&self) -> String {

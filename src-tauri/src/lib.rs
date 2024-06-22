@@ -1,5 +1,8 @@
 
 mod share;
+mod dal;
+mod swtor;
+mod utils;
 
 use std::io::prelude::*;
 use std::net::TcpListener;
@@ -14,11 +17,10 @@ use std::str;
 use std::thread;
 use std::time::Duration;
 
+use dal::db::swtor_message::SwtorMessage;
 use retour::static_detour;
 
-use serde_json::json;
-use share::MessageType;
-use share::RawSwtorMessage;
+use share::CaptureMessage;
 use std::mem;
 
 use windows::Win32::System::LibraryLoader::GetModuleHandleA;
@@ -78,9 +80,9 @@ fn start_tcp_messager() -> Result<(), &'static str> {
 
 }
 
-fn submit_message(message_type: MessageType, message: &str) {
+fn submit_message(capture_message: CaptureMessage) {
 
-    MESSAGES.lock().unwrap().push(RawSwtorMessage::new(message_type, message.to_string()).as_json_str());
+    MESSAGES.lock().unwrap().push(capture_message.as_json_str());
 
 }
 
@@ -108,12 +110,12 @@ fn begin_hook() {
 
         match GetModuleHandleA(PCSTR(b"swtor.exe\0".as_ptr())) {
             Ok(hmodule) => {
-                submit_message(MessageType::Info, "Found module");
-                submit_message(MessageType::Info, &format!("Module handle: {:?}", hmodule));
+                submit_message(CaptureMessage::Info("Found module".to_string()));
+                submit_message(CaptureMessage::Info(format!("Module handle: {:?}", hmodule)));
                 begin_detour(hmodule.0 + CHAT_RELATIVE_ADDRESS);
             },
             Err(_) => {
-                submit_message(MessageType::Info, "Failed to find module");
+                submit_message(CaptureMessage::Info("Failed to find module".to_string()));
             }
         }
 
@@ -128,11 +130,11 @@ fn begin_detour(address: isize) {
         let target: extern "C" fn(*mut u64, *const *const i8, *const *const i8, i32, *const *const i8) -> i64 = mem::transmute(address);
         match ChatHook.initialize(target, receive_chat_message_detour) {
             Ok(_) => {
-                submit_message(MessageType::Info, "Detour initialized");
+                submit_message(CaptureMessage::Info("Detour initialized".to_string()));
                 ChatHook.enable().unwrap();
             },
             Err(_) => {
-                submit_message(MessageType::Info, "Failed to initialize detour");
+                submit_message(CaptureMessage::CaptureError("Failed to initialize detour".to_string()));
             }
         }
 
@@ -148,12 +150,7 @@ fn receive_chat_message_detour(param_1: *mut u64, from: *const *const i8, to: *c
         let t_to           = CStr::from_ptr(*to).to_str().unwrap();
         let t_chat_message = CStr::from_ptr(*chat_message).to_str().unwrap();
 
-        submit_message(MessageType::Chat, &json!({
-            "from": t_from,
-            "to": t_to,
-            "channel": channel_id,
-            "message": t_chat_message
-        }).to_string());
+        submit_message(CaptureMessage::Chat(SwtorMessage::new(channel_id, t_from.to_string(), t_from.to_string(), t_chat_message.to_string())));
 
         return ChatHook.call(param_1, from, to, channel_id, chat_message);
 
