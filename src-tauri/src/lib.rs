@@ -4,6 +4,8 @@ mod dal;
 mod swtor;
 mod utils;
 
+mod lib_only;
+
 use std::io::prelude::*;
 use std::net::TcpListener;
 use std::net::TcpStream;
@@ -40,7 +42,6 @@ lazy_static! {
 }
 
 const CHAT_RELATIVE_ADDRESS: isize       = 0x03f3740;
-const UPDATE_FRIENDS_LIST_ADDRESS: isize = 0x03f3b80;
 
 #[ctor::ctor]
 fn detour_init() {
@@ -150,28 +151,9 @@ fn receive_chat_message_detour(param_1: *mut u64, from: *const *const i8, to: *c
         let t_to           = CStr::from_ptr(*to).to_str().unwrap();
         let t_chat_message = CStr::from_ptr(*chat_message).to_str().unwrap();
 
-        submit_message(CaptureMessage::Chat(SwtorMessage::new(channel_id, t_from.to_string(), t_from.to_string(), t_chat_message.to_string())));
+        submit_message(CaptureMessage::Chat(SwtorMessage::new(channel_id, t_from.to_string(), t_to.to_string(), t_chat_message.to_string())));
 
         return ChatHook.call(param_1, from, to, channel_id, chat_message);
-
-    }
-
-}
-
-fn update_friends_list_detour(param_1: *const u64, character: *const i8, login_code: i8, param_2: *const u64) -> i64 {
-
-    unsafe {
-
-        // Sometimes t_character is empty. Perhaps the user hasn't fetched the friends list yet?
-        if let Ok(character_name) = CStr::from_ptr(character).to_str() {
-
-            // 2 for logged in, 1 for logged out
-            let logged_in: bool = login_code == 2;
-            todo!("UpdateFriendsListHook");
-
-        }
-
-        return UpdateFriendsListHook.call(param_1, character, login_code, param_2);
 
     }
 
