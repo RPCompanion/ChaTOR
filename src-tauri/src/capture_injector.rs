@@ -7,7 +7,7 @@ use serde_json::{Deserializer, Value};
 use dll_syringe::{process::OwnedProcess, Syringe};
 use chator_macros::sha256_to_array;
 
-use crate::swtor_hook::{self};
+use crate::{share::CaptureMessage, swtor_hook};
 use crate::dal::db::swtor_message::SwtorMessage;
 
 pub mod message_container;
@@ -108,7 +108,6 @@ fn start_injecting_thread(swtor_pid: u32, window: tauri::Window) {
 
 fn start_tcp_listener_loop() {
 
-    let msg_container = Arc::clone(&MESSAGE_CONTAINER);
     let listener = TcpListener::bind("127.0.0.1:4592").unwrap();
     let mut stream = listener.accept().unwrap().0;
 
@@ -135,9 +134,7 @@ fn start_tcp_listener_loop() {
 
                 if let Ok(message) = serde_json::from_value(value) {
 
-                    msg_container.lock()
-                        .unwrap()
-                        .push(message)
+                    handle_message(message);
 
                 }
 
@@ -152,6 +149,24 @@ fn start_tcp_listener_loop() {
         stream.write(b"stop").unwrap();
     }
     thread::sleep(Duration::from_secs(1));
+
+}
+
+fn handle_message(message: CaptureMessage) {
+
+    match message {
+
+        CaptureMessage::Panic(panic_message) => {
+            panic!("{}", panic_message);
+        },
+        _ => {
+            MESSAGE_CONTAINER
+                .lock()
+                .unwrap()
+                .push(message);
+        }
+
+    }
 
 }
 

@@ -7,6 +7,7 @@ use crate::dal::db::swtor_message::SwtorMessage;
 pub enum CaptureMessage {
     Info(String),
     CaptureError(String),
+    Panic(String),
     Chat(SwtorMessage)
 }
 

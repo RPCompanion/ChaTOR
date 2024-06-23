@@ -42,6 +42,7 @@ fn detour_init() {
         Err(_) => { return; }
     }
 
+    set_panic_hook();
     start_quit_listener();
 
     unsafe {
@@ -71,6 +72,14 @@ fn start_tcp_messager() -> Result<(), &'static str> {
 
     });
     Ok(())
+
+}
+
+fn set_panic_hook() {
+
+    std::panic::set_hook(Box::new(|panic_info| {
+        submit_message(CaptureMessage::Panic(format!("Panic: {panic_info:?}")));
+    }));
 
 }
 
