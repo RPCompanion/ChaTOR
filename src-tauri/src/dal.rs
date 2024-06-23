@@ -16,3 +16,10 @@ pub fn init() {
     db::settings::init();
 
 }
+
+#[tauri::command]
+pub fn open_db_dir() {
+
+    let _ = open::that(get_em_dirs().get_data_dir_path(""));
+
+}
