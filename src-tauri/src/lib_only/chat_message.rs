@@ -3,8 +3,8 @@ use std::ffi::CStr;
 use std::mem;
 use retour::static_detour;
 
-use crate::dal::db::swtor_message::SwtorMessage;
 use crate::lib_only::submit_message;
+use crate::share::raw_swtor_message::RawSwtorMessage;
 use crate::share::CaptureMessage;
 
 const CHAT_RELATIVE_ADDRESS: isize = 0x03f3740;
@@ -40,8 +40,7 @@ pub fn receive_chat_message_detour(param_1: *mut u64, from: *const *const i8, to
         let t_to           = CStr::from_ptr(*to).to_str().unwrap();
         let t_chat_message = CStr::from_ptr(*chat_message).to_str().unwrap();
 
-        submit_message(CaptureMessage::Chat(SwtorMessage::new(channel_id, t_from.to_string(), t_to.to_string(), t_chat_message.to_string())));
-
+        submit_message(CaptureMessage::Chat(RawSwtorMessage::new(channel_id, t_from.to_string(), t_to.to_string(), t_chat_message.to_string())));
         return ChatHook.call(param_1, from, to, channel_id, chat_message);
 
     }

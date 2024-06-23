@@ -1,14 +1,15 @@
 
+use raw_swtor_message::RawSwtorMessage;
 use serde::{Deserialize, Serialize};
 
-use crate::dal::db::swtor_message::SwtorMessage;
+pub mod raw_swtor_message;
 
 #[derive(Deserialize, Serialize)]
 pub enum CaptureMessage {
     Info(String),
     CaptureError(String),
     Panic(String),
-    Chat(SwtorMessage)
+    Chat(RawSwtorMessage)
 }
 
 impl CaptureMessage {

@@ -130,7 +130,6 @@ fn init_system() {
     setup_config();
 
     dal::init();
-    dal::db::settings::init();
     
 }
 

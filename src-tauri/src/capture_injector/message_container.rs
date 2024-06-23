@@ -23,10 +23,11 @@ impl SwtorMessageContainer {
 
     pub fn push(&mut self, capture_message: CaptureMessage) {
 
-        if let CaptureMessage::Chat(swtor_message) = capture_message {
+        if let CaptureMessage::Chat(raw_swtor_message) = capture_message {
 
+            let swtor_message = SwtorMessage::from_raw(raw_swtor_message);  
             if settings::get_settings().chat_log.retry_message_submission {
-
+                              
                 let channel = match SwtorChannel::try_from(swtor_message.channel) {
                     Ok(channel) => channel,
                     Err(_) => SwtorChannel::EMOTE

@@ -1,6 +1,5 @@
 
 mod share;
-mod dal;
 mod swtor;
 mod utils;
 

@@ -2,6 +2,7 @@
 use chrono::prelude::*;
 use rusqlite::params;
 use serde::{Deserialize, Serialize};
+use crate::share::raw_swtor_message::RawSwtorMessage;
 use crate::swtor::SwtorChannel;
 use crate::utils::StringUtils;
 
@@ -31,6 +32,18 @@ impl SwtorMessage {
             from, 
             to, 
             message 
+        }
+
+    }
+
+    pub fn from_raw(raw_swtor_message: RawSwtorMessage) -> SwtorMessage {
+
+        SwtorMessage {
+            channel: raw_swtor_message.channel,
+            timestamp: raw_swtor_message.timestamp,
+            from: raw_swtor_message.from,
+            to: raw_swtor_message.to,
+            message: raw_swtor_message.message
         }
 
     }
