@@ -12,9 +12,9 @@
     import { active_chat_tab_index } from "./chat_log_window_store";
     import type { IChatTab } from "../network/settings";
     import { dragHandle } from "svelte-dnd-action";
-    import { onDestroy } from "svelte";
     import { ArrowsOutCardinal } from "phosphor-svelte";
     import { fade } from "svelte/transition";
+    import { deep_copy } from "../utils";
 
     export let chat_tab: IChatTab;
     export let index: number;
@@ -129,7 +129,7 @@
         </div>
     {/if}
     {#if show_edit_modal}
-        <EditModal {chat_tab} {index} on:save={on_modal_save} on:cancel={on_modal_cancel}/>
+        <EditModal chat_tab={deep_copy(chat_tab)} {index} on:save={on_modal_save} on:cancel={on_modal_cancel}/>
     {/if}
 </div>
 
