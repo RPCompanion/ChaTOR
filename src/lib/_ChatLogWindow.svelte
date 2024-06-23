@@ -88,10 +88,9 @@
             return;
         }
 
-        update_scheduled = false;
-
         setTimeout(() => {
             scroll_to_last_message();
+            update_scheduled = false;
         }, 1);
 
     });
