@@ -25,10 +25,23 @@
     let container: HTMLElement | undefined = undefined;
     let last_message: HTMLElement | undefined = undefined;
 
+    let cache_swtor_msg_length: number = 0;
+    let update_scheduled: boolean = false;
+
     let swtor_messages: SwtorMessage[] = [];
     $: swtor_messages = get_swtor_channel_messages($swtor_channel_messages, $active_chat_tab_index);
+
     $: if ($players_filter) {
         swtor_messages = get_swtor_channel_messages($swtor_channel_messages, $active_chat_tab_index);
+    }
+
+    $: if ($swtor_channel_messages.length > 0) {
+        set_swtor_channel_messages_to_read(get_active_chat_tab_name($active_chat_tab_index));
+    }
+
+    $: if (cache_swtor_msg_length != swtor_messages.length) {
+        cache_swtor_msg_length = swtor_messages.length;
+        update_scheduled = true;
     }
 
     const dispatch = createEventDispatcher();
@@ -61,20 +74,26 @@
         return $settings.chat_log.window.chat_tabs[index].name;
     }
 
-    function get_swtor_channel_messages(t_channel_messages: SwtorChatTabMessages[], index: number): SwtorMessage[] {
+    function get_swtor_channel_messages(t_channel_messages: SwtorChatTabMessages[], chat_tab_index: number): SwtorMessage[] {
 
         return t_channel_messages
-            .find((c) => c.chat_tab_name == get_active_chat_tab_name(index))?.messages
+            .find((c) => c.chat_tab_name == get_active_chat_tab_name(chat_tab_index))?.messages
             .filter((m) => $players_filter.find((p) => p.value == m.from)?.selected) ?? [];
 
     }
 
-    $: if ($swtor_channel_messages.length > 0) {
-        set_swtor_channel_messages_to_read(get_active_chat_tab_name($active_chat_tab_index));
-    }
-
     afterUpdate(() => {
-        scroll_to_last_message();
+
+        if (!update_scheduled) {
+            return;
+        }
+
+        update_scheduled = false;
+
+        setTimeout(() => {
+            scroll_to_last_message();
+        }, 1);
+
     });
 
     onMount(() => {
