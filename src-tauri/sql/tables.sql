@@ -17,6 +17,13 @@ CREATE TABLE IF NOT EXISTS CustomCategory
     category_name VARCHAR(255) UNIQUE NOT NULL  
 );
 
+CREATE TABLE IF NOT EXISTS CustomChannel
+(
+    custom_channel_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    channel_name VARCHAR(255) UNIQUE NOT NULL,
+    channel_number INTEGER UNIQUE NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS CustomEmoteCategory
 (
     custom_emote_category_id INTEGER PRIMARY KEY AUTOINCREMENT,
