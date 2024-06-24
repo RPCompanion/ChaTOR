@@ -22,39 +22,10 @@ export function init_custom_channels() {
 
 export async function custom_channel_save(custom: CustomChannel): Promise<Result<[], string>> {
 
+    let returned_channel: CustomChannel;
     try {
 
-        let returned_channel = await invoke("save_custom_channel", { customChannel: custom }) as CustomChannel;
-
-        if (custom.custom_channel_id) {
-
-            // updating existing
-            let t_custom_channels = get(custom_channels);
-            let index = t_custom_channels
-                .findIndex((x) => x.custom_channel_id === custom.custom_channel_id);
-
-            if (index != -1) {
-
-                t_custom_channels[index] = custom;
-                custom_channels.set(t_custom_channels);
-
-            } else {
-
-                return Err("Custom channel not found");
-
-            }
-
-        } else {
-
-            // adding new
-            custom_channels.update((store) => {
-                store.push(returned_channel);
-                return store;
-            });
-
-        }
-
-        return Ok([]);
+        returned_channel = await invoke("save_custom_channel", { customChannel: custom }) as CustomChannel;
 
     } catch (e) {
 
@@ -62,6 +33,36 @@ export async function custom_channel_save(custom: CustomChannel): Promise<Result
         return Err(temp);
 
     }
+
+    if (custom.custom_channel_id) {
+
+        // updating existing
+        let t_custom_channels = get(custom_channels);
+        let index = t_custom_channels
+            .findIndex((x) => x.custom_channel_id === custom.custom_channel_id);
+
+        if (index != -1) {
+
+            t_custom_channels[index] = custom;
+            custom_channels.set(t_custom_channels);
+
+        } else {
+
+            return Err("Custom channel not found");
+
+        }
+
+    } else {
+
+        // adding new
+        custom_channels.update((store) => {
+            store.push(returned_channel);
+            return store;
+        });
+
+    }
+
+    return Ok([]);
 
 }
 

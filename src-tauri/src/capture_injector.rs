@@ -2,6 +2,8 @@
 use std::{io::{ErrorKind, Read, Write}, net::{TcpListener, TcpStream}, sync::{atomic::{AtomicBool, Ordering}, Arc, Mutex}, time::Duration};
 use std::thread;
 
+use tracing::{error, info};
+
 use serde::{Deserialize, Serialize};
 use serde_json::{Deserializer, Value};
 use dll_syringe::{process::OwnedProcess, Syringe};
@@ -71,22 +73,20 @@ fn start_injecting_thread(swtor_pid: u32, window: tauri::Window) {
         start_logging_propagation(window);
 
         let injected_payload = if cfg!(debug_assertions) {
-            syringe.inject("./target/debug/swtor_chat_capture.dll")
+            syringe.find_or_inject("./target/debug/swtor_chat_capture.dll")
         } else {
-            syringe.inject("./swtor_chat_capture.dll")
+            syringe.find_or_inject("./swtor_chat_capture.dll")
         };
 
         match injected_payload {
             Ok(_) => {    
-                println!("Payload injected");
+                info!("Payload injected");
             },
             Err(err) => {
-
-                println!("Error injecting payload: {:?}", err);
+                error!("Error injecting payload: {:?}", err);
                 INJECTED.store(false, Ordering::Relaxed);
                 CONTINUE_LOGGING.store(false, Ordering::Relaxed);
                 return;
-
             }
         }
 
@@ -95,9 +95,9 @@ fn start_injecting_thread(swtor_pid: u32, window: tauri::Window) {
         tcp_thread.join().unwrap();
 
         if let Err(err) = syringe.eject(injected_payload) {
-            println!("Error ejecting payload: {:?}", err);
+            error!("Error ejecting payload: {:?}", err);
         } else {
-            println!("Payload ejected");
+            info!("Payload ejected");
         }
         CONTINUE_LOGGING.store(false, Ordering::Relaxed);
         INJECTED.store(false, Ordering::Relaxed);
@@ -113,7 +113,7 @@ fn start_tcp_listener_loop() {
 
     stream.set_read_timeout(Some(Duration::from_millis(1000))).unwrap();
 
-    println!("Listening for messages");
+    info!("Listening for messages");
     let mut buffer: [u8; 2048] = [0; 2048];
     while CONTINUE_LOGGING.load(Ordering::Relaxed) {
 
@@ -123,7 +123,7 @@ fn start_tcp_listener_loop() {
                 continue;
             },
             Err(err) => {
-                println!("Error reading from stream: {:?}", err);
+                error!("Error reading from stream: {:?}", err);
                 break;
             }
         }
@@ -143,7 +143,7 @@ fn start_tcp_listener_loop() {
         });
         buffer = [0; 2048];
     }
-    println!("Stopped listening for messages");
+    info!("Stopped listening for messages");
 
     if let Ok(mut stream) = TcpStream::connect("127.0.0.1:4593") {
         stream.write(b"stop").unwrap();

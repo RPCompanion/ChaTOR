@@ -36,9 +36,8 @@ lazy_static! {
 #[ctor::ctor]
 fn detour_init() {
 
-    match start_tcp_messager() {
-        Ok(_) => {},
-        Err(_) => { return; }
+    if let Err(_) = start_tcp_messager() {
+        return;
     }
 
     set_panic_hook();
@@ -50,20 +49,57 @@ fn detour_init() {
 
 }
 
+fn should_quit() -> bool {
+    QUIT.load(Ordering::Relaxed)
+}
+
 fn start_tcp_messager() -> Result<(), &'static str> {
 
-    let mut stream = TcpStream::connect("127.0.0.1:4592").unwrap();
+    let stream_connector = || -> Result<TcpStream, &'static str> {
+
+        loop {
+
+            if should_quit() {
+                return Err("Quitting");
+            }
+
+            match TcpStream::connect("127.0.0.1:4592") {
+                Ok(stream) => { return Ok(stream); },
+                Err(_) => { thread::sleep(Duration::from_millis(1000)); }
+            }
+
+        }
+
+    };
+
+    let mut stream = stream_connector()?;
 
     thread::spawn(move || {
 
         loop {
 
-            if QUIT.load(Ordering::Relaxed) {
+            if should_quit() {
                 break;
             }
 
             for message in drain_messages() {
-                stream.write(message.as_bytes()).unwrap();
+
+                if let Err(_) = stream.write(message.as_bytes()) {
+
+                    if should_quit() {
+                        break;
+                    }
+
+                    if let Ok(s) = stream_connector() {
+                        stream = s;
+                    } else {
+                        return;
+                    }
+
+                    stream.write(message.as_bytes()).unwrap();
+
+                }
+
             }
             thread::sleep(Duration::from_millis(100));
 
