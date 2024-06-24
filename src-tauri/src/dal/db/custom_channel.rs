@@ -43,7 +43,7 @@ impl CustomChannel {
 
     }
 
-    pub fn save(&self) -> Result<(), rusqlite::Error> {
+    pub fn save(mut self) -> Result<CustomChannel, rusqlite::Error> {
 
         if let Some(_) = self.custom_channel_id {
             return self.update();
@@ -55,14 +55,18 @@ impl CustomChannel {
             INSERT INTO 
                 CustomChannel (channel_name, channel_number)
             VALUES 
-                (?, ?);
+                (?, ?)
+            RETURNING custom_channel_id;
         ";
-        conn.execute(QUERY, params![self.channel_name, self.channel_number])?;
-        return Ok(())
+        let custom_channel_id: i32 = conn
+            .query_row(QUERY, params![self.channel_name, self.channel_number], |row| row.get(0))?;
+        
+        self.custom_channel_id = Some(custom_channel_id);
+        return Ok(self)
 
     }
 
-    fn update(&self) -> Result<(), rusqlite::Error> {
+    fn update(self) -> Result<CustomChannel, rusqlite::Error> {
 
         let conn = get_connection();
         const QUERY: &str =
@@ -77,7 +81,7 @@ impl CustomChannel {
         ";
 
         conn.execute(QUERY, params![self.channel_name, self.channel_number, self.custom_channel_id])?;
-        return Ok(())
+        return Ok(self)
 
     }
 
@@ -109,7 +113,7 @@ pub fn get_all_custom_channels() -> Vec<CustomChannel> {
 }
 
 #[tauri::command]
-pub fn save_custom_channel(custom_channel: CustomChannel) -> Result<(), &'static str> {
+pub fn save_custom_channel(custom_channel: CustomChannel) -> Result<CustomChannel, &'static str> {
 
     custom_channel.save().map_err(|_| "Unable to save emote")
 

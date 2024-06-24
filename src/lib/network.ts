@@ -9,6 +9,7 @@ import { init_settings } from "./network/settings";
 import { init_swtor_message_listener } from "./network/swtor_message";
 import { init_active_character } from "./network/characters";
 import { settings } from "./network/settings";
+import { init_custom_channels } from "./network/custom_channels";
 
 export type MessageType = "ButtonEmote" | "ChatMessage";
 
@@ -29,6 +30,7 @@ export function init_network() {
     init_hook();
     init_swtor_message_listener();
     init_custom_emotes();
+    init_custom_channels();
 
 }
 
