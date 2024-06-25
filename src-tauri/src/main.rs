@@ -1,15 +1,11 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-
-use std::path::Path;
-
 use open;
 use tauri::{Manager, PhysicalSize, WindowEvent};
 use tauri::api::dialog::blocking::{ask, message};
 use tracing::{error, info};
-use tracing_subscriber::{self, fmt, prelude::*};
-use tracing_appender::{self, non_blocking::WorkerGuard};
+
 
 #[macro_use]
 extern crate lazy_static;
@@ -22,12 +18,13 @@ mod utils;
 mod swtor;
 mod crash_reporter;
 mod config;
+mod logging;
 
 use crash_reporter::CrashReporter;
 
 fn main() {
 
-    let _guard = init_logging();
+    let _guard = logging::init();
     init_system();
     info!("Starting ChaTOR");
 
@@ -99,31 +96,6 @@ fn main() {
     }
 
     info!("Thanks for using ChaTOR");
-
-}
-
-fn init_logging() -> WorkerGuard {
-
-    let path = Path::new("./logs");
-    if !path.exists() {
-
-        std::fs::create_dir("./logs")
-            .expect("error while creating logs directory");
-
-    }
-
-    let file_appender = tracing_appender::rolling::hourly("./logs", "chator.log");
-    let (non_blocking, guard) = tracing_appender::non_blocking(file_appender);
-
-    tracing_subscriber::registry()
-        .with(fmt::layer()
-            .with_writer(non_blocking)
-            .with_level(true)
-            .with_ansi(false)
-        )
-        .init();
-
-    guard
 
 }
 
