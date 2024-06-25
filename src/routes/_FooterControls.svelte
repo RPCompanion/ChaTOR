@@ -31,7 +31,7 @@
 </script>
 
 {#if version_string != undefined}
-    <div class="text-white text-xl text-end px-2">{version_string}</div>
+    <div class="text-white text-xl text-end px-1">{version_string}</div>
 {/if}
 <div class="relative w-full grid grid-cols-2 px-1 pb-1">
     <div class="flex flex-row gap-1"> 
