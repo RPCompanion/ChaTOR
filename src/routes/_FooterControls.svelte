@@ -8,6 +8,8 @@
     import { GithubLogo, DiscordLogo, Folder } from 'phosphor-svelte'
     import { open_link } from '../lib/network';
 
+    let version_string: string | undefined = undefined;
+
     $: if ($settings.app.always_on_top) {
         appWindow.setAlwaysOnTop(true);
     } else {
@@ -18,8 +20,19 @@
         invoke('open_db_dir');
     }
 
+    function set_version_string() {
+        invoke("get_version").then((response) => {
+            version_string = 'v' + response as string;
+        });
+    }
+
+    set_version_string();
+
 </script>
 
+{#if version_string != undefined}
+    <div class="text-white text-xl text-end px-2">{version_string}</div>
+{/if}
 <div class="relative w-full grid grid-cols-2 px-1 pb-1">
     <div class="flex flex-row gap-1"> 
         <div class="flex flex-row gap-1">
