@@ -3,10 +3,14 @@ use tracing::error;
 use serde::{Deserialize, Serialize};
 use reqwest::blocking::Client;
 
+mod sys_info;
+
+use sys_info::SysInfo;
 use crate::config::config;
 
 #[derive(Serialize, Deserialize)]
 pub struct CrashReporter {
+    pub sys_info: SysInfo,
     pub crash_report: String
 }
 
@@ -15,6 +19,7 @@ impl CrashReporter {
     pub fn new(crash_report: String) -> Self {
 
         Self {
+            sys_info: SysInfo::default(),
             crash_report: crash_report
         }
 

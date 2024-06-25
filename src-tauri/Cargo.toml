@@ -40,6 +40,7 @@ tokio = {version = "1", features = ["time"] }
 int-enum = "1.1"
 ctrlc = "3.4.4"
 reqwest = { version = "0.12", features = ["blocking"] }
+sysinfo = "0.30"
 
 lazy_static = "1.4.0"
 clipboard-win = "5.0.0"
