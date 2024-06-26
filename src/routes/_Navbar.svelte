@@ -61,6 +61,11 @@
                 link: "/log_viewer"
             });
 
+            chat_section.elements?.push({
+                name: "Add/Edit Custom Channels",
+                link: "/custom_channels"
+            })
+
         }
 
         return chat_section;

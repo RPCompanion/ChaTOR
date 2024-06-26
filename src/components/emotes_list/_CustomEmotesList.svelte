@@ -29,7 +29,7 @@
 </script>
 
 {#if items.length > 0}
-    <div class="bg-gray-500 text-white text-xl text-center border-t-2 border-b-2 border-slate-500">Favourite Emotes</div>
+    <div class="bg-gray-500 text-white text-xl text-center border-t-2 border-b-2 border-slate-500 select-none">Favourite Emotes</div>
     <div class="flex flex-row flex-wrap gap-2 max-h-56 overflow-y-auto" use:dndzone="{{items, dropFromOthersDisabled: true}}" on:consider={on_consider} on:finalize={on_finalize}>
         {#each items as emote(emote.id)}
             <CustomEmoteElem {emote} favourite={true}/>

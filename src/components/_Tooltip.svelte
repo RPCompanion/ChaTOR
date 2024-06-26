@@ -73,6 +73,6 @@
     <div
         transition:fade|local="{{duration: 500}}"
         bind:this={tooltip} 
-        class="text-white text-md absolute bg-slate-600 rounded-md px-2">{tooltip_text}
+        class="text-white text-md absolute bg-slate-600 rounded-md px-2 select-none">{tooltip_text}
     </div>
 {/if}

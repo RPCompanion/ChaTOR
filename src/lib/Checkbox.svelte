@@ -11,7 +11,7 @@
 </script>
 
 
-<label class="text-white bg-slate-500 rounded-md shadow-lg p-1 cursor-pointer" class:text-md={size == "small"} class:text-xl={size == "normal"}>
+<label class="text-white bg-slate-500 rounded-md shadow-lg p-1 cursor-pointer select-none" class:text-md={size == "small"} class:text-xl={size == "normal"}>
     <input type="checkbox" bind:checked={checked} class="ml-2 scale-150 cursor-pointer"/>
     <slot></slot>
 </label>

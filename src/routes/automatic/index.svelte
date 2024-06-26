@@ -104,7 +104,7 @@
                 bind:value={message} 
                 on:keydown={on_key_down}
             />
-            <div class="absolute bottom-1 right-2 text-white">{unicode_escape(message).length}</div>
+            <div class="absolute bottom-1 right-2 text-white select-none">{unicode_escape(message).length}</div>
             {#if $settings.chat_log.capture_chat_log && $settings.chat_log.window.show_chat_log_window}
                 <CustomCommand/>
             {/if}

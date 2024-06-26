@@ -75,7 +75,7 @@
         {/each}
     </div>
     <div class="relative">
-        <button type="button" class="chat-container-background text-white text-xl px-2 rounded-t-md hover:text-gray-400" on:click={on_new_chat_tab}>+</button>
+        <button type="button" class="chat-container-background text-white text-xl px-2 rounded-t-md hover:text-gray-400 select-none" on:click={on_new_chat_tab}>+</button>
         {#if show_edit_modal}
             <EditModal on:save={on_modal_save} on:cancel={on_modal_cancel} />
         {/if}
