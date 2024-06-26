@@ -25,7 +25,7 @@ impl SwtorMessageContainer {
 
         if let CaptureMessage::Chat(raw_swtor_message) = capture_message {
 
-            let swtor_message = SwtorMessage::from_raw(raw_swtor_message);  
+            let swtor_message = SwtorMessage::from(raw_swtor_message);  
             if settings::get_settings().chat_log.retry_message_submission {
                               
                 let channel = match SwtorChannel::try_from(swtor_message.channel) {

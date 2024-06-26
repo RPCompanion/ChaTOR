@@ -36,18 +36,6 @@ impl SwtorMessage {
 
     }
 
-    pub fn from_raw(raw_swtor_message: RawSwtorMessage) -> SwtorMessage {
-
-        SwtorMessage {
-            channel: raw_swtor_message.channel,
-            timestamp: raw_swtor_message.timestamp,
-            from: raw_swtor_message.from,
-            to: raw_swtor_message.to,
-            message: raw_swtor_message.message
-        }
-
-    }
-
     pub fn as_json_str(&self) -> String {
 
         serde_json::to_string(self).unwrap()
@@ -145,6 +133,22 @@ impl SwtorMessage {
             SwtorChannel::PVP => false,
             SwtorChannel::TRADE => false,
             _ => true
+        }
+
+    }
+
+}
+
+impl From<RawSwtorMessage> for SwtorMessage {
+
+    fn from(raw_swtor_message: RawSwtorMessage) -> Self {
+
+        SwtorMessage {
+            channel: raw_swtor_message.channel,
+            timestamp: raw_swtor_message.timestamp,
+            from: raw_swtor_message.from,
+            to: raw_swtor_message.to,
+            message: raw_swtor_message.message
         }
 
     }
