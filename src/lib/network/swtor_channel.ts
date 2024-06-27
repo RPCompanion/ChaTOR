@@ -14,6 +14,7 @@ export enum ESwtorChannel {
     OPS_ANNOUNCEMENT = 56,
     GUILD = 57,
     GUILD_OFFICER = 58,
+    CUSTOM_CHANNEL = 60
 }
 
 export class SwtorChannel {

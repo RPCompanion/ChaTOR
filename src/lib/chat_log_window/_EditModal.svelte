@@ -110,7 +110,7 @@
     <div transition:fly|global="{{ duration: 500, y: -1000 }}" class="w-72 min-h-48 bg-slate-700 p-2 border-2 border-slate-800 fixed z-20 modal-position flex flex-col gap-1">
         <input type="text" bind:value={chat_tab.name} maxlength="12" class=" outline-none border-2 border-slate-800 text-xl" placeholder="tab name">
         <p class="text-white text-xl"><b>Channel subscriptions</b></p>
-        <ChannelList bind:channels={chat_tab.channels}/>
+        <ChannelList bind:channels={chat_tab.channels} show_custom_channels={true}/>
         <div class="flex flex-row gap-1">
             <button type="button" class="text-white border-slate-800 border-2 rounded-md w-1/2 text-xl" on:click={on_save}>Save</button>
             <button type="button" on:click={on_cancel} class="text-white border-slate-800 border-2 rounded-md w-1/2 text-xl" on:click={on_cancel}>Cancel</button>
