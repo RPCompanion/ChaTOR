@@ -1,13 +1,12 @@
 
 <script lang="ts">
 
-    import { Result, Ok, Err } from "../../lib/result";
-    import { custom_channels, custom_channel_save, type ICustomChannel } from "../../lib/network/custom_channels";
+    import { custom_channels, custom_channel_save } from "../../lib/network/custom_channels";
     import { fly } from "svelte/transition";
     import { createEventDispatcher } from "svelte";
     import VariableSizeButton from "../../lib/buttons/VariableSizeButton.svelte";
     import { toast_error } from "../../lib/utils";
-  import { channel_name_valid, MAX_CHANNEL_NAME_LENGTH } from "./custom_channels";
+    import { channel_name_valid, MAX_CHANNEL_NAME_LENGTH } from "./custom_channels";
 
     const dispatch = createEventDispatcher();
 
