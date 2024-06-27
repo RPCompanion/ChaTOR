@@ -8,9 +8,11 @@
         type ICustomChannel 
     } from "../../lib/network/custom_channels";
     import XButton from "../../lib/buttons/XButton.svelte";
-    import { toast_error } from "../../lib/utils";
+    import { deep_copy, toast_error } from "../../lib/utils";
+    import { channel_name_valid } from "./custom_channels";
 
     export let channel: ICustomChannel;
+    let channel_cache = deep_copy(channel);
 
     function get_available_channels(existing_channel_number: number): number[] {
 
@@ -34,13 +36,35 @@
 
     }
 
+    async function on_change() {
+
+        let valid = channel_name_valid(channel.channel_name);
+        if (valid.is_error()) {
+
+            toast_error(valid.unwrap_error());
+            channel.channel_name = channel_cache.channel_name;
+            return;
+
+        }
+
+        let result = await custom_channel_save(channel);
+        if (result.is_error()) {
+
+            toast_error(result.unwrap_error());
+            
+        }
+
+        channel_cache = deep_copy(channel);
+
+    }
+
 </script>
 
-<div class="flex flex-row gap-2 w-full justify-center px-10">
-    <input type="text" bind:value={channel.channel_name} class="rounded-md outline-slate-700 border-2 border-slate-700 px-2"/>
+<div class="flex flex-row gap-2 w-full justify-center px-10 select-none">
+    <input type="text" bind:value={channel.channel_name} class="rounded-md outline-slate-700 border-2 border-slate-700 px-2" on:focusout={on_change}/>
     <div class="flex flex-row gap-2">
         <div class="text-white text-xl">Channel Number</div>
-        <select id="" bind:value={channel.channel_number} class="rounded-md outline-slate-700 border-2 border-slate-700 px-2">
+        <select id="" bind:value={channel.channel_number} on:change={on_change} class="rounded-md outline-slate-700 border-2 border-slate-700 px-2">
             {#each get_available_channels(channel.channel_number) as number}
                 <option value={number}>{number}</option>
             {/each}

@@ -7,9 +7,8 @@
     import { createEventDispatcher } from "svelte";
     import VariableSizeButton from "../../lib/buttons/VariableSizeButton.svelte";
     import { toast_error } from "../../lib/utils";
+  import { channel_name_valid, MAX_CHANNEL_NAME_LENGTH } from "./custom_channels";
 
-    const MIN_CHANNEL_NAME_LENGTH: number = 1;
-    const MAX_CHANNEL_NAME_LENGTH: number = 16;
     const dispatch = createEventDispatcher();
 
     let channel_name = "";
@@ -24,25 +23,9 @@
 
     }
 
-    function channel_name_valid(): Result<[], string> {
-
-        channel_name = channel_name.trim();
-
-        if (channel_name.length == 0) {
-            return Err("Channel name cannot be empty");
-        }
-
-        if (channel_name.length > MAX_CHANNEL_NAME_LENGTH) {
-            return Err("Channel name cannot exceed 16 characters");
-        }
-
-        return Ok([]);
-
-    }
-
     async function on_save() {
 
-        let result = channel_name_valid();
+        let result = channel_name_valid(channel_name);
 
         if (result.is_error()) {
             toast_error(result.unwrap_error());
