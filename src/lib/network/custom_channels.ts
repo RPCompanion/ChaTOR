@@ -3,29 +3,29 @@ import { writable, get } from "svelte/store";
 import { invoke } from "@tauri-apps/api";
 import { Result, Ok, Err } from "../result";
 
-export interface CustomChannel {
+export interface ICustomChannel {
     custom_channel_id?: number;
     channel_name: string;
     channel_number: number;
 }
 
-export const custom_channels = writable<CustomChannel[]>([]);
+export const custom_channels = writable<ICustomChannel[]>([]);
 
 export function init_custom_channels() {
 
     invoke("get_all_custom_channels").then((result) => {
-        let temp = result as CustomChannel[];
+        let temp = result as ICustomChannel[];
         custom_channels.set(temp);
     });
 
 }
 
-export async function custom_channel_save(custom: CustomChannel): Promise<Result<[], string>> {
+export async function custom_channel_save(custom: ICustomChannel): Promise<Result<[], string>> {
 
-    let returned_channel: CustomChannel;
+    let returned_channel: ICustomChannel;
     try {
 
-        returned_channel = await invoke("save_custom_channel", { customChannel: custom }) as CustomChannel;
+        returned_channel = await invoke("save_custom_channel", { customChannel: custom }) as ICustomChannel;
 
     } catch (e) {
 
@@ -66,7 +66,7 @@ export async function custom_channel_save(custom: CustomChannel): Promise<Result
 
 }
 
-export async function custom_channel_delete(custom: CustomChannel): Promise<Result<[], string>> {
+export async function custom_channel_delete(custom: ICustomChannel): Promise<Result<[], string>> {
 
     try {
 
