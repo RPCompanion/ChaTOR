@@ -2,9 +2,13 @@
 <script lang="ts">
 
     import { 
-        custom_channels, 
+        custom_channels,
+        custom_channel_delete,
+        custom_channel_save,
         type ICustomChannel 
     } from "../../lib/network/custom_channels";
+    import XButton from "../../lib/buttons/XButton.svelte";
+    import { toast_error } from "../../lib/utils";
 
     export let channel: ICustomChannel;
 
@@ -19,6 +23,16 @@
 
     }
 
+    async function on_delete() {
+
+        let result = await custom_channel_delete(channel);
+        if (result.is_error()) {
+
+            toast_error(result.unwrap_error());
+
+        }
+
+    }
 
 </script>
 
@@ -31,5 +45,6 @@
                 <option value={number}>{number}</option>
             {/each}
         </select>
+        <XButton on:click={on_delete}/>
     </div>
 </div>
