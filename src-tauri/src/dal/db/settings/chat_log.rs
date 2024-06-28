@@ -4,6 +4,8 @@ use serde::{Deserialize, Serialize};
 pub mod window;
 pub mod chat_tab;
 
+use window::ChatLogWindow;
+
 #[derive(Deserialize, Serialize, Clone)]
 pub struct ChatLogSettings {
 
@@ -15,8 +17,8 @@ pub struct ChatLogSettings {
     pub retry_message_submission: bool,
     pub character_ini_to_pull_from: Option<String>,
 
-    #[serde(default = "window::ChatLogWindow::default")]
-    pub window: window::ChatLogWindow
+    #[serde(default = "ChatLogWindow::default")]
+    pub window: ChatLogWindow
 
 }
 
@@ -32,9 +34,9 @@ pub fn default_log_global_chat() -> bool {
     false
 }
 
-impl ChatLogSettings {
+impl Default for ChatLogSettings {
     
-    pub fn default() -> ChatLogSettings {
+    fn default() -> ChatLogSettings {
 
         ChatLogSettings {
             capture_chat_log: false,

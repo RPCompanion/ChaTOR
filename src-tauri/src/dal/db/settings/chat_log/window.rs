@@ -15,7 +15,7 @@ pub struct ChatLogWindow {
     show_chat_log_window: bool,
     #[serde(default = "ChatTab::default_tabs")]
     chat_tabs: Vec<ChatTab>,
-    #[serde(default = "default_window")]
+    #[serde(default = "WidthHeight::default")]
     window: WidthHeight
 
 }
@@ -28,25 +28,15 @@ fn default_show_chat_log_window() -> bool {
     false
 }
 
-fn default_window() -> WidthHeight {
-    WidthHeight {
-        width: 0,
-        height: 176
-    }
-}
+impl Default for ChatLogWindow {
 
-impl ChatLogWindow {
-
-    pub fn default() -> ChatLogWindow {
+    fn default() -> ChatLogWindow {
 
         ChatLogWindow {
             show_unknown_ids: false,
             show_chat_log_window: false,
             chat_tabs: ChatTab::default_tabs(),
-            window: WidthHeight {
-                width: 0,
-                height: 176
-            }
+            window: WidthHeight::default()
         }
 
     }

@@ -21,12 +21,8 @@ pub struct Settings {
     #[serde(default = "AppSettings::default")]
     pub app: AppSettings,
     pub chat: ChatSettings,
-    #[serde(default = "default_chat_log_settings")]
+    #[serde(default = "ChatLogSettings::default")]
     pub chat_log: ChatLogSettings
-}
-
-fn default_chat_log_settings() -> ChatLogSettings {
-    ChatLogSettings::default()
 }
 
 lazy_static! {
@@ -34,16 +30,6 @@ lazy_static! {
 }
 
 impl Settings {
-
-    pub fn default() -> Settings {
-
-        Settings {
-            app: AppSettings::default(),
-            chat: ChatSettings::default(),
-            chat_log: ChatLogSettings::default()
-        }
-
-    }
 
     pub fn get() -> Settings {
 
@@ -81,6 +67,19 @@ impl Settings {
 
     }
 
+}
+
+impl Default for Settings {
+
+    fn default() -> Self {
+
+        Self {
+            app: AppSettings::default(),
+            chat: ChatSettings::default(),
+            chat_log: ChatLogSettings::default()
+        }
+
+    }
 }
 
 #[tauri::command]

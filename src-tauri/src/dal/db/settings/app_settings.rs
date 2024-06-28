@@ -46,9 +46,9 @@ fn default_show_page_header() -> bool {
     true
 }
 
-impl AppSettings {
+impl Default for AppSettings {
 
-    pub fn default() -> AppSettings {
+    fn default() -> AppSettings {
 
         let conf: serde_json::Value = serde_json::from_str(TAURI_CONFIG_FILE).unwrap();
         let windows = conf["tauri"]["windows"][0].clone();
