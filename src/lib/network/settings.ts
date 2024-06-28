@@ -6,10 +6,14 @@ import { hooked_in } from "../network";
 import { ESwtorChannel } from "./swtor_channel";
 import { set_initial_swtor_channels } from "./swtor_message/swtor_chat_tab_messages";
 
+export type ChannelDispatcher =
+    | { RegularDispatch: number }
+    | { CustomDispatch: string };
+
 export interface IChatTab {
     name: string;
-    channels: number[];
-    default_channel?: number;
+    channels: ChannelDispatcher[];
+    default_channel?: ChannelDispatcher;
 }
 
 export interface IChatSettings {
@@ -94,12 +98,21 @@ export function default_settings(): ISettings {
                 chat_tabs: [
                     {
                         name: "Global",
-                        channels: [ESwtorChannel.GLOBAL, ESwtorChannel.PVP, ESwtorChannel.TRADE],
-                        default_channel: ESwtorChannel.GLOBAL
+                        channels: [
+                            { RegularDispatch: ESwtorChannel.GLOBAL},
+                            { RegularDispatch: ESwtorChannel.PVP },
+                            { RegularDispatch: ESwtorChannel.TRADE }
+                        ],
+                        default_channel: { RegularDispatch: ESwtorChannel.GLOBAL } 
                     },
                     {
                         name: "Local",
-                        channels: [ESwtorChannel.EMOTE, ESwtorChannel.SAY, ESwtorChannel.YELL, ESwtorChannel.WHISPER],
+                        channels: [
+                            { RegularDispatch: ESwtorChannel.EMOTE},
+                            { RegularDispatch: ESwtorChannel.SAY},
+                            { RegularDispatch: ESwtorChannel.YELL},
+                            { RegularDispatch: ESwtorChannel.WHISPER}
+                        ],
                         default_channel: undefined
                     }
                 ],

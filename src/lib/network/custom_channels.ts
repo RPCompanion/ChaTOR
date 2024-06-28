@@ -2,6 +2,7 @@
 import { writable, get } from "svelte/store";
 import { invoke } from "@tauri-apps/api";
 import { Result, Ok, Err } from "../result";
+import { Option, Some, None } from "../option";
 
 export interface ICustomChannel {
     custom_channel_id?: number;
@@ -10,6 +11,19 @@ export interface ICustomChannel {
 }
 
 export const custom_channels = writable<ICustomChannel[]>([]);
+
+export function get_custom_channel_number(channel_name: string): Option<number> {
+
+    let t_custom_channels = get(custom_channels);
+    let channel = t_custom_channels.find((x) => x.channel_name === channel_name);
+
+    if (channel) {
+        return Some(channel.channel_number);
+    }
+
+    return None();
+
+}
 
 export function init_custom_channels() {
 

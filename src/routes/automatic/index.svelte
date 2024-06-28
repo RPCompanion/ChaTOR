@@ -12,9 +12,10 @@
     import CustomEmotesList from "../../components/emotes_list/_CustomEmotesList.svelte";
     import ChatLogWindow from "../../lib/_ChatLogWindow.svelte";
     import CustomCommand from "../../components/_CustomCommand.svelte";
-    import { None, type Option } from "../../lib/option";
+    import { None, type Option, Some } from "../../lib/option";
     import { SwtorChannel } from "../../lib/network/swtor_channel";
     import { unicode_escape } from "../../lib/utils";
+    import { get_custom_channel_number } from "../../lib/network/custom_channels";
 
     let message: string     = "";
     let messages: string[]  = [];
@@ -40,6 +41,33 @@
 
     }
 
+    function get_custom_command(): Option<string> {
+
+        let default_channel = $settings.chat_log.window.chat_tabs[$active_chat_tab_index].default_channel;
+        
+        if (default_channel == undefined) {
+            return None();
+        }
+
+        let custom_command: Option<string> = None();
+        if ("RegularDispatch" in default_channel) {
+
+            custom_command = new SwtorChannel(default_channel.RegularDispatch).get_command();
+
+        } else {
+
+            get_custom_channel_number(default_channel.CustomDispatch).is_some_cb((channel_number) => {
+
+                custom_command = Some("/" + channel_number);
+                
+            });
+
+        }
+
+        return custom_command;
+
+    }
+
     function enable_confirmation_modal() {
 
         if (message.trim().length == 0) {
@@ -47,11 +75,7 @@
             return;
         }
 
-        let default_channel = $settings.chat_log.window.chat_tabs[$active_chat_tab_index].default_channel;
-        let custom_command: Option<string> = None();
-        if (default_channel != undefined) {
-            custom_command = new SwtorChannel(default_channel).get_command();
-        }
+        let custom_command = get_custom_command();
 
         let response = new AutoMessageSplitter(unicode_escape(message), undefined, custom_command).split();
         if (response.is_error()) {

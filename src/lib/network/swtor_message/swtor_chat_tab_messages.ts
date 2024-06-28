@@ -6,6 +6,7 @@ import { writable, get } from "svelte/store";
 import { Result, Ok, Err } from "../../result";
 import { add_player } from "../players";
 import type { IChatLogMessage } from "../chat_log_message";
+import { ESwtorChannel } from "../swtor_channel";
 
 export class SwtorChatTabMessages {
     
@@ -84,7 +85,25 @@ export function add_swtor_channel_message(message: SwtorMessage) {
     let t_settings = get(settings);
 
     let relevant_chat_tabs: string[] = t_settings.chat_log.window.chat_tabs
-        .filter((chat_tab) => chat_tab.channels.includes(message.channel.type))
+        .filter((chat_tab) => {
+
+            if (message.channel.type == ESwtorChannel.CUSTOM_CHANNEL) {
+
+                return chat_tab.channels
+                    .filter((c): c is { CustomDispatch: string } => "CustomDispatch" in c)
+                    .map((c) => c.CustomDispatch.toLocaleLowerCase())
+                    .includes(message.to.replace("Usr.", ""));
+
+            } else {
+ 
+                return chat_tab.channels
+                    .filter((c): c is { RegularDispatch: number } => "RegularDispatch" in c)
+                    .map((c) => c.RegularDispatch)
+                    .includes(message.channel.type);
+
+            }
+
+        })
         .map((chat_tab) => chat_tab.name);
     
     t_scm.forEach((chat_tab_messages) => {
