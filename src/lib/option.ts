@@ -11,8 +11,20 @@ export class Option<T> {
         return this.value !== undefined;
     }
 
+    is_some_cb(callback: (value: T) => void) {
+        if (this.value !== undefined) {
+            callback(this.value);
+        }
+    }
+
     is_none(): boolean {
         return this.value === undefined;
+    }
+
+    is_none_cb(callback: () => void) {
+        if (this.value === undefined) {
+            callback();
+        }
     }
 
     unwrap(): T {

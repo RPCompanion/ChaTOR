@@ -18,8 +18,20 @@ export class Result<Ok, Error> {
         return this.ok !== null;
     }
 
+    is_ok_cb(callback: (value: Ok) => void) {
+        if (this.ok !== null) {
+            callback(this.ok);
+        }
+    }
+
     is_error(): boolean {
         return this.error !== null;
+    }
+
+    is_error_cb(callback: (value: Error) => void) {
+        if (this.error !== null) {
+            callback(this.error);
+        }
     }
 
     unwrap(): Ok {
