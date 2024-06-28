@@ -13,7 +13,7 @@ pub mod swtor_message;
 pub mod migration;
 pub mod custom_channel;
 
-use migration::Migration;
+use migration::{Migration, run_non_sql_migrations};
 use custom_emote::CustomEmote;
 
 pub fn get_connection() -> Connection {
@@ -51,6 +51,16 @@ pub fn init() {
     conn.execute_batch(&tables)
         .expect("Error creating tables");
 
+    run_migrations();
+    finalize_init();
+
+}
+
+fn run_migrations() {
+
+    let conn = get_connection();
+
+    run_non_sql_migrations();    
     let migration = Migration::new(conn);
 
     if !database_exists() {
@@ -59,11 +69,10 @@ pub fn init() {
 
     } else if migration.should_migrate() {
 
-        migration.migrate().expect("Error migrating database");
+        migration.migrate()
+            .expect("Error migrating database");
 
     }
-
-    finalize_init();
 
 }
 

@@ -3,13 +3,13 @@ use serde::{Deserialize, Serialize};
 
 use crate::swtor::SwtorChannel;
 
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
 pub enum ChannelDispatcher {
     RegularDispatch(i32),
     CustomDispatch(String)
 }
 
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct ChatTab {
     pub name: String,
     pub channels: Vec<ChannelDispatcher>,

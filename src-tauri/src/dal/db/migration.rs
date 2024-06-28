@@ -2,8 +2,12 @@
 use std::io;
 use std::fs::{self, DirEntry};
 
+use tracing::error;
 use rusqlite::{Row, Batch, params, Connection};
 
+mod chat_tab_migration;
+
+use self::chat_tab_migration::OldChatTab;
 use crate::utils::get_file;
 
 static VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -63,6 +67,15 @@ fn get_migration_scripts() -> Vec<(DatabaseVersion, String)> {
 
 	scripts.sort_by(|a, b| a.0.cmp(&b.0));
 	scripts
+
+}
+
+/// Run non-SQL migrations. To be deleted in the future.
+pub fn run_non_sql_migrations() {
+
+	if let Err(err) = OldChatTab::migrate() {
+		error!("Error migrating chat tabs: {}", err);
+	}
 
 }
 

@@ -33,17 +33,26 @@ impl Settings {
 
     pub fn get() -> Settings {
 
+        match Settings::get_json() {
+            Ok(settings) => serde_json::from_value(settings).unwrap(),
+            Err(_) => Settings::default()
+        }
+
+    }
+
+    pub fn get_json() -> Result<serde_json::Value, &'static str> {
+
         let conn = get_connection();
         let response = conn.query_row("SELECT settings FROM Settings LIMIT 1", params![], |row| {
 
-            let settings: Settings = serde_json::from_str(&row.get::<_, String>(0).unwrap()).unwrap();
+            let settings: serde_json::Value = serde_json::from_str(&row.get::<_, String>(0).unwrap()).unwrap();
             Ok(settings)
 
         });
 
         match response {
-            Ok(settings) => settings,
-            Err(_) => Settings::default()
+            Ok(settings) => Ok(settings),
+            Err(_) => Err("No settings found")
         }
 
     }
