@@ -51,10 +51,6 @@
 
     }
 
-    function on_change() {
-        console.log(value, typeof value);
-    }
-
     set_value();
 
 </script>
@@ -62,7 +58,6 @@
 <div>
     <select 
         bind:value={value}
-        on:change={on_change}
         class="rounded-md outline-none border-none bg-slate-600 text-white px-1 select-none">
         <option value={undefined}>none</option>
         {#each channels as channel}
