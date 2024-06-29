@@ -1,4 +1,5 @@
 import { type Option, None, Some } from "../option";
+import type { ChannelDispatcher } from "./settings";
 
 export enum ESwtorChannel {
     SAY = 1,
@@ -69,6 +70,13 @@ export function get_all_channel_ids(): number[] {
     return Object.keys(ESwtorChannel)
         .filter((key) => !isNaN(Number(key)))
         .map((key) => Number(key));
+
+}
+
+export function get_all_channel_dispatch(): ChannelDispatcher[] {
+
+    return get_all_channel_ids()
+        .map((id) => { return { RegularDispatch: id } });
 
 }
 

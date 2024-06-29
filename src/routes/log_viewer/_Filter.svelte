@@ -8,8 +8,9 @@
     import SmallButton from "../../lib/buttons/SmallButton.svelte";
     import { click_outside_handler } from "../../lib/click_outside";
     import Tooltip from "../../components/_Tooltip.svelte";
+    import type { ChannelDispatcher } from "../../lib/network/settings";
 
-    export let channel_filters: number[] = [];
+    export let channel_filters: ChannelDispatcher[] = [];
     let show_filters: boolean = false;
     let mouse_over: boolean = false;
 
@@ -29,7 +30,8 @@
 
     function select_all_channels() {
 
-        channel_filters = get_all_channel_ids();
+        channel_filters = get_all_channel_ids()
+            .map((id) => { return { RegularDispatch: id }});
 
     }
 
@@ -39,7 +41,7 @@
 
     }
 
-    function on_channel_input(e: CustomEvent<{channels: number[]}>) {
+    function on_channel_input(e: CustomEvent<{channels: ChannelDispatcher[]}>) {
 
         channel_filters = e.detail.channels;
 

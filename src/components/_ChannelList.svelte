@@ -11,6 +11,8 @@
 
     let select_channel_numbers: number[]   = [];
     let selected_custom_channels: string[] = [];
+    let channel_strings: string[] = Object.keys(ESwtorChannel).filter((key) => isNaN(Number(key)));;
+    $: channels, channel_strings  = Object.keys(ESwtorChannel).filter((key) => isNaN(Number(key)));
 
     $: select_channel_numbers = channels
         .filter((c): c is { RegularDispatch: number } => "RegularDispatch" in c)
@@ -60,7 +62,7 @@
 
 </script>
 
-{#each Object.keys(ESwtorChannel).filter((key) => isNaN(Number(key))) as channel}
+{#each channel_strings as channel}
     <div class="flex flex-row gap-1">
         <input 
             type="checkbox" 

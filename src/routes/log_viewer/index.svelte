@@ -11,7 +11,7 @@
     import { SwtorMessage } from "../../lib/network/swtor_message";
     import { afterUpdate } from "svelte";
     import SmallButton from "../../lib/buttons/SmallButton.svelte";
-    import { get_all_channel_ids } from "../../lib/network/swtor_channel";
+    import { get_all_channel_dispatch, get_all_channel_ids } from "../../lib/network/swtor_channel";
     import Filter from "./_Filter.svelte";
     import PlayerFilter from "../../components/_PlayerFilter.svelte";
     import { type IListElem } from "../../components/select_list";
@@ -20,11 +20,16 @@
     import { date_tag_new, get_all_date_tag_favourites, type IDateTag } from "../../lib/network/datetags";
     import Favourite from "./_Favourite.svelte";
     import Checkbox from "../../lib/Checkbox.svelte";
+    import type { ChannelDispatcher } from "../../lib/network/settings";
 
     let container: HTMLElement | undefined   = undefined;
     let last_message: HTMLElement | undefined = undefined;
 
-    let channel_filters: number[] = get_all_channel_ids();
+    let channel_filters: ChannelDispatcher[] = get_all_channel_dispatch();
+    let channel_numbers: number[] = [];
+    $: channel_numbers = channel_filters
+        .filter((c): c is { RegularDispatch: number } => "RegularDispatch" in c)
+        .map((c) => c.RegularDispatch);
 
     /* 
         all_dates contains all distinct dates in the database. Not to be changed once set.
@@ -80,7 +85,7 @@
     function set_filtered_messages() {  
 
         filtered_messages = date_messages
-            .filter((m) => channel_filters.includes(m.channel.type))
+            .filter((m) => channel_numbers.includes(m.channel.type))
             .filter((m) => players.find((p) => p.value == m.from)?.selected);
 
     }
