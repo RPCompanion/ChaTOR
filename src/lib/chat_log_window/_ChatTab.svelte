@@ -128,10 +128,10 @@
             {/if}
         </div>
     {/if}
-    {#if show_edit_modal}
-        <EditModal chat_tab={deep_copy(chat_tab)} {index} on:save={on_modal_save} on:cancel={on_modal_cancel}/>
-    {/if}
 </div>
+{#if show_edit_modal}
+    <EditModal chat_tab={deep_copy(chat_tab)} {index} on:save={on_modal_save} on:cancel={on_modal_cancel}/>
+{/if}
 
 <style>
     .active-tab {
