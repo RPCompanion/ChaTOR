@@ -87,7 +87,7 @@
                 name={channel.channel_name} 
                 value={channel.channel_name} 
                 checked={selected_custom_channels.includes(channel.channel_name)}
-                on:input={() => { on_custom_channel_input(channel.channel_name) }}
+                on:input={() => {on_custom_channel_input(channel.channel_name) }}
                 class="text-xl">
             <label for={channel.channel_name} class="text-white text-xl">{channel.channel_name}</label>
         </div>
