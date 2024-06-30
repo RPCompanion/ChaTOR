@@ -156,26 +156,42 @@ function chat_log_subscriber() {
 
 function init_injecting_capture() {
 
+    let shown_unsupported_version = false;
+
+    let handle_capture_error = (e: CaptureError) => {
+        
+        if (e == "UnsupportedVersion") {
+
+            if (!shown_unsupported_version) {
+                toast.push("Unsupported version of SWTOR detected. Chat log capture will not work.");
+                shown_unsupported_version = true;
+            }
+
+        } else if (e == "AlreadyInjected") {
+
+            chat_log_active.set(true);
+
+        } else if (e != "NotYetFullyReady") {
+
+            toast.push("Failed to start chat log capture: " + e);
+            
+        }
+
+    }
+
     settings.subscribe((value) => {
 
         let t_chat_log_active = get(chat_log_active);
         let t_hooked_in       = get(hooked_in);
         if (value.chat_log.capture_chat_log && !t_chat_log_active && t_hooked_in) {
 
-            invoke("start_injecting_capture")
-                .then(() => {
-                    toast.push("Chat logging active");
+            invoke("start_injecting_capture").then(() => {
                     chat_log_active.set(true);
+                    toast.push("Chat logging active");
                 })
-                .catch((e: CaptureError) => {
+                .catch(handle_capture_error);
 
-                    if (e != "AlreadyInjected" && e != "NotYetFullyReady") {
-                        toast.push("Failed to start chat log capture: " + e);
-                    }
-
-                });
-
-        } else {
+        } else if ((!value.chat_log.capture_chat_log && t_chat_log_active) || !t_hooked_in) {
 
             invoke("stop_injecting_capture");
             chat_log_active.set(false);

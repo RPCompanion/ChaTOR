@@ -19,7 +19,9 @@ export interface IGenericAPIError {
     message: string;
 }
 
-// This function could throw a exception if the fetch fails; it's up to the caller to handle it.
+/** 
+ * This function could throw a exception if the fetch fails; it's up to the caller to handle it.
+ */
 export async function http_get<T, E>(endpoint: string | Request): Promise<Result<T, E>> {
 
     let request: Request;

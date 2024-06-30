@@ -67,7 +67,7 @@ export class SwtorMessage {
 
     }
 
-    /*
+    /**
         This function will split the message into fragments, where each fragment is a string that
         starts with a quotation mark and ends with a quotation mark. This is useful for the chat
         log window, as it will allow us to highlight the text between the quotation marks as a

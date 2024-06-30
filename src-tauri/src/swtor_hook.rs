@@ -143,7 +143,7 @@ pub fn get_hwnd() -> Option<HWND> {
 pub fn checksum_match(checksum: &[u8; 32]) -> Result<bool, &'static str> {
 
     if let Some(process_checksum) = PROCESS_CHECKSUM.get() {
-        return Ok(process_checksum == checksum);
+        return Ok(checksum.iter().eq(process_checksum.iter()));
     }
     return Err("PROCESS_CHECKSUM not yet initialized");
 
