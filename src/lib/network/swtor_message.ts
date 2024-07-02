@@ -58,6 +58,10 @@ export class SwtorMessage {
             return `[to ${this.to}]`;
         }
 
+        if (this.channel.type == ESwtorChannel.CUSTOM_CHANNEL) {
+            return `[${this.to.replace("Usr.", "")}] ${this.from}:`;
+        }
+
         let channel_text = this.channel.get_name();
         if (channel_text.is_some()) {
             return `[${channel_text.unwrap()}] ${this.from}:`;
