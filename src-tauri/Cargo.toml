@@ -1,6 +1,6 @@
 [package]
 name = "chator"
-version = "0.1.13"
+version = "0.1.14"
 description = "A Chat system for Star Wars: The Old Republic."
 authors = ["Emma Davenport"]
 license = ""
