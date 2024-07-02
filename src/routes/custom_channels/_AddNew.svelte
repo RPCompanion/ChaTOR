@@ -24,12 +24,7 @@
 
 {#if $custom_channels.length < 7}
 
-    {#if $custom_channels.length == 0}
-        <div class="h-52"></div>
-    {:else}
-        <div class="h-4"></div>
-    {/if}
-    
+    <div class="h-4"></div>
     <div class="w-full flex flex-row justify-center">
         <VariableSizeButton on:click={add_new}>Add New</VariableSizeButton>
     </div>
