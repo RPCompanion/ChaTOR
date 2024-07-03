@@ -15,12 +15,12 @@ export class Hyperlink {
     parse(): Result<HyperlinkType, string> {
 
         const re: RegExp = /<HL LID="([^"]+)">/g;
-        let match = this.hyperlink.match(re);
+        let match = re.exec(this.hyperlink);
         if (match == null) {
             return Err("Somehow received a malformed hyperlink?")
         }
 
-        return new HyperlinkParser(match[0]).parse();
+        return new HyperlinkParser(match[1]).parse();
 
     }
 
@@ -99,7 +99,7 @@ class HyperlinkParser {
             type: "quest",
             id: this.read_id(),
             const1: this.read_int(),
-            questStep: this.read_int(),
+            quest_step: this.read_int(),
             remainder: this.get_remainder()
         }
 
@@ -176,7 +176,7 @@ class HyperlinkParser {
     private read_chars(length: number | bigint): string {
 
         this.pos += Number(length);
-        return this.text.slice(this.pos - Number(length), this.pos);
+        return this.text.substring(this.pos - Number(length), this.pos);
 
     }
 
@@ -257,7 +257,7 @@ export interface HyperLinkQuest {
     type: "quest";
     id: bigint;
     const1: bigint;
-    questStep: bigint;
+    quest_step: bigint;
     remainder?: string;
 }
 
