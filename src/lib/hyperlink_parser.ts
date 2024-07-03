@@ -3,26 +3,15 @@ import { Result, Ok, Err } from "./result";
 
 const BASE64_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
-export class Hyperlink {
+export function parse_hyperlink(hyperlink: string): Result<HyperlinkType, string> {
 
-    private hyperlink: string;
-    constructor(hyperlink: string) {
-
-        this.hyperlink = hyperlink;
-
+    const re: RegExp = /<HL LID="([^"]+)">/g;
+    let match = re.exec(hyperlink);
+    if (match == null) {
+        return Err("Somehow received a malformed hyperlink?")
     }
 
-    parse(): Result<HyperlinkType, string> {
-
-        const re: RegExp = /<HL LID="([^"]+)">/g;
-        let match = re.exec(this.hyperlink);
-        if (match == null) {
-            return Err("Somehow received a malformed hyperlink?")
-        }
-
-        return new HyperlinkParser(match[1]).parse();
-
-    }
+    return new HyperlinkParser(match[1]).parse();
 
 }
 

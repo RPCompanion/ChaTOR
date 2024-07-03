@@ -6,6 +6,7 @@ import { SwtorChannel, ESwtorChannel } from "./swtor_channel";
 import { add_swtor_channel_message } from "./swtor_message/swtor_chat_tab_messages";
 import { active_character } from "./characters";
 import { add_player } from "./players";
+import { parse_hyperlink } from "../hyperlink_parser";
 
 export class SwtorMessage {
 
@@ -39,13 +40,34 @@ export class SwtorMessage {
 
     private static replace_html_tags(message: string): string {
 
-        if (get(settings).chat_log.window.show_unknown_ids) {
+        const show_unknown_ids: boolean = get(settings).chat_log.window.show_unknown_ids;
+        const re: RegExp = /<HL LID="([^"]+)">/g;
+
+        if (!show_unknown_ids) {
+
+            for (let obj of message.matchAll(re)) {
+                message = message.replace(obj[0], "<Unknown>");
+            }
+
             return message;
+
         }
 
-        const re: RegExp = /<HL LID="([^"]+)">/g;
         for (let obj of message.matchAll(re)) {
-            message = message.replace(obj[0], "<Unknown ID>");
+
+            let result = parse_hyperlink(obj[0]);
+            if (result.is_error()) {
+                message = message.replace(obj[0], "<Unknown>");
+                continue;
+            }
+            
+            let hyperlink = result.unwrap();
+            switch (hyperlink.type) {
+                case "guild":
+                    message = message.replace(obj[0], `<${hyperlink.name}>`); 
+                    break;
+            }
+
         }
 
         return message;

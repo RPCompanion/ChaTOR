@@ -1,6 +1,6 @@
 
 import { expect, test } from 'vitest';
-import { Hyperlink, type HyperlinkType } from './hyperlink_parser';
+import { parse_hyperlink } from './hyperlink_parser';
 import type { Result } from './result';
 
 test("hyperlink_parser jediapedia item case", () => {
@@ -20,7 +20,7 @@ test("hyperlink_parser jediapedia item case", () => {
         },
         error: null
     };
-    expect(new Hyperlink(hyperlink).parse()).toEqual(expected);
+    expect(parse_hyperlink(hyperlink)).toEqual(expected);
 
 });
 
@@ -36,7 +36,7 @@ test("hyerlink_parser jediapedia quest case", () => {
         },
         error: null
     }
-    expect(new Hyperlink(hyperlink).parse()).toEqual(expected);
+    expect(parse_hyperlink(hyperlink)).toEqual(expected);
 
 });
 
@@ -50,7 +50,7 @@ test("hyperlink_parser jediapedia url case", () => {
         },
         error: null
     }
-    expect(new Hyperlink(hyperlink).parse()).toEqual(expected);
+    expect(parse_hyperlink(hyperlink)).toEqual(expected);
 
 })
 
@@ -67,7 +67,7 @@ test("hyperlink_parser jediapedia achievement case", () => {
         },
         error: null
     }
-    expect(new Hyperlink(hyperlink).parse()).toEqual(expected);
+    expect(parse_hyperlink(hyperlink)).toEqual(expected);
 
 })
 
@@ -82,6 +82,6 @@ test("hyperlink_parser jediapedia guild case", () => {
         },
         error: null  
     }
-    expect(new Hyperlink(hyperlink).parse()).toEqual(expected);
+    expect(parse_hyperlink(hyperlink)).toEqual(expected);
 
 });
