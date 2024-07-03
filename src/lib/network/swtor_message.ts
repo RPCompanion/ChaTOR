@@ -6,7 +6,7 @@ import { SwtorChannel, ESwtorChannel } from "./swtor_channel";
 import { add_swtor_channel_message } from "./swtor_message/swtor_chat_tab_messages";
 import { active_character } from "./characters";
 import { add_player } from "./players";
-import { parse_hyperlink } from "../hyperlink_parser";
+import { parse_hyperlink, type HyperlinkType } from "../hyperlink_parser";
 
 export class SwtorMessage {
 
@@ -15,6 +15,7 @@ export class SwtorMessage {
     public readonly from: string;
     public readonly to: string;
     public readonly message: string;
+    public readonly message_fragments: (string | HyperlinkType)[] = [];
     public read: boolean = false;
     
     constructor(swtor_message: ISwtorMessage) {
@@ -23,7 +24,8 @@ export class SwtorMessage {
         this.timestamp = new Date(swtor_message.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit"});
         this.from      = swtor_message.from;
         this.to        = swtor_message.to;
-        this.message   = SwtorMessage.replace_html_tags(SwtorMessage.replace_html_entities(swtor_message.message));
+        this.message   = SwtorMessage.replace_html_entities(swtor_message.message);
+        this.message_fragments = this.get_message_fragments_v2();
 
     }
 
@@ -38,39 +40,44 @@ export class SwtorMessage {
 
     }
 
-    private static replace_html_tags(message: string): string {
+    private get_message_fragments_v2(): (string | HyperlinkType)[] {
 
-        const show_unknown_ids: boolean = get(settings).chat_log.window.show_unknown_ids;
         const re: RegExp = /<HL LID="([^"]+)">/g;
+        
+        if (!get(settings).chat_log.window.show_unknown_ids) {
 
-        if (!show_unknown_ids) {
-
-            for (let obj of message.matchAll(re)) {
-                message = message.replace(obj[0], "<Unknown>");
+            let temp = this.message.slice(0);
+            for (let obj of temp.matchAll(re)) {
+                temp = temp.replace(obj[0], "<Unknown>");
             }
-
-            return message;
+            return [temp];
 
         }
 
-        for (let obj of message.matchAll(re)) {
+        let start_idx: number = 0;
+        let fragments: (string | HyperlinkType)[] = [];
+        for (let obj of this.message.matchAll(re)) {
+            
+            if (obj.index != start_idx) {
+                fragments.push(this.message.slice(start_idx, obj.index));
+            }
 
             let result = parse_hyperlink(obj[0]);
             if (result.is_error()) {
-                message = message.replace(obj[0], "<Unknown>");
-                continue;
+                fragments.push("<Unknown>");
+            } else {
+                fragments.push(result.unwrap());
             }
-            
-            let hyperlink = result.unwrap();
-            switch (hyperlink.type) {
-                case "guild":
-                    message = message.replace(obj[0], `<${hyperlink.name}>`); 
-                    break;
-            }
+
+            start_idx = obj.index + obj[0].length + 1;
 
         }
 
-        return message;
+        if (start_idx < this.message.length) {
+            fragments.push(this.message.slice(start_idx));
+        }
+
+        return fragments;
 
     }
 
