@@ -48,7 +48,7 @@
                 <Square size={22}/>
             {/if}
         </button>
-        <button type="button" class="text-white hover:bg-slate-800 px-1" on:click={on_close}>
+        <button type="button" class="text-white hover:bg-red-800 px-1" on:click={on_close}>
             <X size={22}/>
         </button>
     </div>
