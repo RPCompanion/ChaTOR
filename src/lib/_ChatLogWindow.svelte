@@ -18,8 +18,8 @@
     import ChatTabs from "./chat_log_window/_ChatTabs.svelte";
     import { players_filter } from "./network/players";
     import PlayerFilter from "../components/_PlayerFilter.svelte";
-    import { unicode_unescape } from "./utils";
     import RestorePosts from "./chat_log_window/_RestorePosts.svelte";
+    import Message from "../components/_Message.svelte";
 
     let auto_scroll: boolean = true;
     let container: HTMLElement | undefined = undefined;
@@ -147,15 +147,7 @@
                 <span class="text-slate-200 cursor-pointer" on:click={() => {on_character_click(message)}}>
                     {message.get_message_from()}
                 </span>
-                {#each message.message_fragments as fragment}
-                    {#if typeof fragment == "string"}
-                         <span class="break-words " style="color: {$active_character?.get_channel_color(message.channel.type).to_hex()}">{unicode_unescape(fragment)}</span>
-                    {:else}
-                        {#if fragment.as_string().is_some()}
-                            <span class="break-words " style="color: {$active_character?.get_channel_color(message.channel.type).to_hex()}">{fragment}</span>
-                        {/if}
-                    {/if}
-                {/each}
+                <Message message={message}/>
             </div>
         {/each}
     </div>

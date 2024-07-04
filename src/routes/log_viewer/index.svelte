@@ -7,7 +7,6 @@
     import Flatpickr, { type HookProps } from 'svelte-flatpickr'
     import 'flatpickr/dist/flatpickr.css'
     import { type IChatLogMessage } from "../../lib/network/chat_log_message";
-    import { active_character } from "../../lib/network/characters";
     import { SwtorMessage } from "../../lib/network/swtor_message";
     import { afterUpdate } from "svelte";
     import SmallButton from "../../lib/buttons/SmallButton.svelte";
@@ -16,11 +15,11 @@
     import PlayerFilter from "../../components/_PlayerFilter.svelte";
     import { type IListElem } from "../../components/select_list";
     import PageFormatting from "../../components/_PageFormatting.svelte";
-    import { unicode_unescape } from "../../lib/utils";
     import { date_tag_new, get_all_date_tag_favourites, type IDateTag } from "../../lib/network/datetags";
     import Favourite from "./_Favourite.svelte";
     import Checkbox from "../../lib/Checkbox.svelte";
     import type { ChannelDispatcher } from "../../lib/network/settings";
+    import Message from "../../components/_Message.svelte";
 
     let container: HTMLElement | undefined   = undefined;
     let last_message: HTMLElement | undefined = undefined;
@@ -150,7 +149,7 @@
             });
 
             return `[${m.timestamp}] ${m.get_message_from()} ${flat_message.trim()}`;
-            
+
         });
 
         await writeTextFile(filepath, temp.join("\n\n"));
@@ -216,23 +215,12 @@
     <div class="h-6"></div>
     <div bind:this={container} class="flex flex-col h-96 resize-y max-h-full rounded-tr-md border-2 border-slate-700 overflow-y-auto scrollbar scrollbar-thumb-sky-800 scrollbar-track-slate-100 chat-container-background">
         {#each filtered_messages as message}
-
             <div bind:this={last_message} class="w-full opacity-100">
                 <span class="text-white">[{message.timestamp}]</span>
-                <!-- svelte-ignore a11y-click-events-have-key-events -->
-                <!-- svelte-ignore a11y-no-static-element-interactions -->
                 <span class="text-slate-200 cursor-pointer">
                     {message.get_message_from()}
                 </span>
-                {#each message.message_fragments as fragment}
-                    {#if typeof fragment == "string"}
-                         <span class="break-words " style="color: {$active_character?.get_channel_color(message.channel.type).to_hex()}">{unicode_unescape(fragment)}</span>
-                    {:else}
-                        {#if fragment.as_string().is_some()}
-                            <span class="break-words " style="color: {$active_character?.get_channel_color(message.channel.type).to_hex()}">{fragment}</span>
-                        {/if}
-                    {/if}
-                {/each}
+                <Message message={message}/>
             </div>
         {/each}
     </div>
