@@ -147,11 +147,13 @@
                 <span class="text-slate-200 cursor-pointer" on:click={() => {on_character_click(message)}}>
                     {message.get_message_from()}
                 </span>
-                {#each message.get_message_fragments() as fragment}
-                    {#if fragment.startsWith("\"") && fragment.endsWith("\"")}
-                        <span class="break-words " style="color: white;">{unicode_unescape(fragment)}</span>
+                {#each message.message_fragments as fragment}
+                    {#if typeof fragment == "string"}
+                         <span class="break-words " style="color: {$active_character?.get_channel_color(message.channel.type).to_hex()}">{unicode_unescape(fragment)}</span>
                     {:else}
-                        <span class="break-words " style="color: {$active_character?.get_channel_color(message.channel.type).to_hex()}">{unicode_unescape(fragment)}</span>
+                        {#if fragment.as_string().is_some()}
+                            <span class="break-words " style="color: {$active_character?.get_channel_color(message.channel.type).to_hex()}">{fragment}</span>
+                        {/if}
                     {/if}
                 {/each}
             </div>

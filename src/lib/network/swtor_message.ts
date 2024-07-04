@@ -29,7 +29,7 @@ export class SwtorMessage {
         this.from      = swtor_message.from;
         this.to        = swtor_message.to;
         this.message   = SwtorMessage.replace_html_entities(swtor_message.message);
-        this.message_fragments = this.get_message_fragments_v2();
+        this.message_fragments = this.get_message_fragments();
 
     }
 
@@ -44,7 +44,7 @@ export class SwtorMessage {
 
     }
 
-    private get_message_fragments_v2(): (string | Hyperlink)[] {
+    private get_message_fragments(): (string | Hyperlink)[] {
 
         if (!get(settings).chat_log.window.show_unknown_ids) {
             return this.get_fragments_with_unknown();
@@ -110,55 +110,6 @@ export class SwtorMessage {
         }
 
         return this.from;
-
-    }
-
-    /**
-        This function will split the message into fragments, where each fragment is a string that
-        starts with a quotation mark and ends with a quotation mark. This is useful for the chat
-        log window, as it will allow us to highlight the text between the quotation marks as a
-        different color.
-    */
-    public get_message_fragments(): string[] {
-
-        // TODO, make this a toggle in the settings
-        const COMPUTE_MESSAGE_FRAGMENTS: boolean = false;
-        if (!COMPUTE_MESSAGE_FRAGMENTS) {
-            return [this.message];
-        }
-
-        let idx = this.message.indexOf("\"");
-        if (idx == -1) {
-            return [this.message];
-        }
-
-        let fragments: string[] = [this.message.substring(0, idx)];
-        let temp: string        = this.message.substring(idx);
-
-        while (true) {
-
-            idx = temp.indexOf("\"", 1);
-            if (idx != -1) {
-
-                if (temp.startsWith("\"")) {
-                    fragments.push(temp.substring(0, idx + 1));
-                    temp = temp.substring(idx + 1);
-                } else {
-                    fragments.push(temp.substring(0, idx));
-                    temp = temp.substring(idx);
-                }
-
-            } else {
-                break;
-            }
-
-        }
-
-        if (temp.length > 0) {
-            fragments.push(temp);
-        }
-
-        return fragments;
 
     }
 

@@ -139,7 +139,18 @@
         }
 
         let temp: string[] = filtered_messages.map((m) => {
-           return `[${m.timestamp}] ${m.get_message_from()} ${m.get_message_fragments().join(" ")}`;
+
+            let flat_message = ""; 
+            m.message_fragments.forEach((f) => {
+                if (typeof f == "string") {
+                    flat_message += f + " ";
+                } else {
+                    flat_message += f.as_string().unwrap_or("");
+                }
+            });
+
+            return `[${m.timestamp}] ${m.get_message_from()} ${flat_message.trim()}`;
+            
         });
 
         await writeTextFile(filepath, temp.join("\n\n"));
@@ -213,11 +224,13 @@
                 <span class="text-slate-200 cursor-pointer">
                     {message.get_message_from()}
                 </span>
-                {#each message.get_message_fragments() as fragment}
-                    {#if fragment.startsWith("\"") && fragment.endsWith("\"")}
-                        <span class="break-words " style="color: white;">{unicode_unescape(fragment)}</span>
+                {#each message.message_fragments as fragment}
+                    {#if typeof fragment == "string"}
+                         <span class="break-words " style="color: {$active_character?.get_channel_color(message.channel.type).to_hex()}">{unicode_unescape(fragment)}</span>
                     {:else}
-                        <span class="break-words " style="color: {$active_character?.get_channel_color(message.channel.type).to_hex()}">{unicode_unescape(fragment)}</span>
+                        {#if fragment.as_string().is_some()}
+                            <span class="break-words " style="color: {$active_character?.get_channel_color(message.channel.type).to_hex()}">{fragment}</span>
+                        {/if}
                     {/if}
                 {/each}
             </div>
