@@ -7,9 +7,9 @@ import { add_swtor_channel_message } from "./swtor_message/swtor_chat_tab_messag
 import { active_character } from "./characters";
 import { add_player } from "./players";
 import { 
+    get_hyperlink_regex,
     parse_hyperlink, 
-    HYPERLINK_RE, 
-    type HyperlinkType 
+    type Hyperlink 
 } from "../hyperlink_parser";
 
 export class SwtorMessage {
@@ -19,7 +19,7 @@ export class SwtorMessage {
     public readonly from: string;
     public readonly to: string;
     public readonly message: string;
-    public readonly message_fragments: (string | HyperlinkType)[] = [];
+    public readonly message_fragments: (string | Hyperlink)[] = [];
     public read: boolean = false;
     
     constructor(swtor_message: ISwtorMessage) {
@@ -44,7 +44,7 @@ export class SwtorMessage {
 
     }
 
-    private get_message_fragments_v2(): (string | HyperlinkType)[] {
+    private get_message_fragments_v2(): (string | Hyperlink)[] {
 
         if (!get(settings).chat_log.window.show_unknown_ids) {
             return this.get_fragments_with_unknown();
@@ -54,10 +54,10 @@ export class SwtorMessage {
 
     }
     
-    private get_fragments_with_unknown(): (string | HyperlinkType)[] {
+    private get_fragments_with_unknown(): (string | Hyperlink)[] {
 
         let temp = this.message.slice(0);
-        for (let obj of temp.matchAll(HYPERLINK_RE)) {
+        for (let obj of temp.matchAll(get_hyperlink_regex())) {
             temp = temp.replace(obj[0], "<Unknown>");
         }
 
@@ -65,11 +65,11 @@ export class SwtorMessage {
 
     }
 
-    private get_fragments_with_hyperlinks(): (string | HyperlinkType)[] {
+    private get_fragments_with_hyperlinks(): (string | Hyperlink)[] {
 
         let start_idx: number = 0;
-        let fragments: (string | HyperlinkType)[] = [];
-        for (let obj of this.message.matchAll(HYPERLINK_RE)) {
+        let fragments: (string | Hyperlink)[] = [];
+        for (let obj of this.message.matchAll(get_hyperlink_regex())) {
             
             if (obj.index != start_idx) {
                 fragments.push(this.message.slice(start_idx, obj.index));

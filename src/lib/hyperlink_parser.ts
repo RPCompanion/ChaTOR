@@ -1,14 +1,28 @@
 
 import { Result, Ok, Err } from "./result";
+import { HyperLinkItem, type ItemCraftable } from "./hyperlink/item";
+import { HyperLinkQuest } from "./hyperlink/quest";
+import { HyperLinkURL } from "./hyperlink/url";
+import { HyperLinkAchievement } from "./hyperlink/achievement";
+import { HyperLinkGuild } from "./hyperlink/guild";
+import { HyperLinkPVP } from "./hyperlink/pvp";
+import { HyperLinkUnknown } from "./hyperlink/unknown";
 
-export const HYPERLINK_RE: RegExp = /<HL LID="([^"]+)">/g;
 const BASE64_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+export type Hyperlink = HyperLinkItem | HyperLinkQuest | HyperLinkURL | HyperLinkAchievement | HyperLinkGuild | HyperLinkPVP | HyperLinkUnknown;
 
-export function parse_hyperlink(hyperlink: string): Result<HyperlinkType, string> {
+export function get_hyperlink_regex(): RegExp {
+    return /<HL LID="([^"]+)">/g;
+}
 
-    let match = HYPERLINK_RE.exec(hyperlink);
+export function parse_hyperlink(hyperlink: string): Result<Hyperlink, string> {
+
+    const re = get_hyperlink_regex();
+
+    let match = re.exec(hyperlink);
     if (match == null) {
-        return Err("Somehow received a malformed hyperlink?")
+        console.log(hyperlink);
+        return Err("Somehow received a malformed hyperlink?");
     }
 
     return new HyperlinkParser(match[1]).parse();
@@ -26,7 +40,7 @@ class HyperlinkParser {
 
     }
 
-    parse(): Result<HyperlinkType, string> {
+    parse(): Result<Hyperlink, string> {
 
         let type = Number(this.read_int());
 
@@ -42,7 +56,7 @@ class HyperlinkParser {
 
     }
 
-    private get_item(): HyperlinkItem {
+    private get_item(): HyperLinkItem {
 
         let get_craftable = (): ItemCraftable | undefined => {
 
@@ -68,7 +82,7 @@ class HyperlinkParser {
 
         }
 
-        return {
+        return new HyperLinkItem({
             type: "item",
             id: this.read_id(),
             const_false: this.read_boolean() ? true : undefined,
@@ -78,63 +92,63 @@ class HyperlinkParser {
             mods: [...Array(Number(this.read_int()))].map(() => ({ id: this.read_id(), modifier: this.read_int(), unknown: this.read_int() })),
             final33: this.read_int(),
             remainder: this.get_remainder()
-        }
+        })
 
     }
 
     private get_quest(): HyperLinkQuest {
 
-        return {
+        return new HyperLinkQuest({
             type: "quest",
             id: this.read_id(),
             const1: this.read_int(),
             quest_step: this.read_int(),
             remainder: this.get_remainder()
-        }
+        })
 
     }
 
-    private get_url(): HyperlinkURL {
+    private get_url(): HyperLinkURL {
         
-        return { type: "url", index: this.read_int(), remainder: this.get_remainder()};
+        return new HyperLinkURL({ type: "url", index: this.read_int(), remainder: this.get_remainder()});
 
     }
 
-    private get_achievement(): HyperlinkAchievement {
+    private get_achievement(): HyperLinkAchievement {
         
-        return {
+        return new HyperLinkAchievement({
             type: "achievement",
             id: this.read_id(),
             character: this.read_string(),
             completed: this.read_boolean() && this.read_date(),
             objectives: this.read_final_int_list(),
             remainder: this.get_remainder()
-        }
+        })
 
     }
 
-    private get_guild(): HyperlinkGuild {
+    private get_guild(): HyperLinkGuild {
         
-        return { type: "guild", id: this.read_id(), name: this.read_string(), remainder: this.get_remainder() };
+        return new HyperLinkGuild({ type: "guild", id: this.read_id(), name: this.read_string(), remainder: this.get_remainder() });
 
     }
 
-    private get_pvp(): HyperlinkPVP {
+    private get_pvp(): HyperLinkPVP {
 
-        return { 
+        return new HyperLinkPVP({ 
             type: "pvp",
             char_name: this.read_string(),
             char_id: this.read_id(),
             discipline: this.read_id(),
             queue: ["arena", "warzone"][Number(this.read_int())] ?? "unknown",
             remainder: this.get_remainder()
-        }
+        })
 
     }
 
-    private get_unknown(): HyperlinkUnkown {
+    private get_unknown(): HyperLinkUnknown {
 
-        return { type: "unknown", remainder: this.get_remainder() };
+        return new HyperLinkUnknown({ type: "unknown", remainder: this.get_remainder() });
 
     }
 
@@ -217,73 +231,3 @@ class HyperlinkParser {
     }
 
 }
-
-export interface ItemCraftable {
-    schematic: bigint;
-    modifier?: bigint;
-    unknown?: bigint;
-}
-
-export interface ItemMod {
-    id: bigint;
-    modifier: bigint;
-    unknown: bigint;
-}
-
-export interface HyperlinkItem {
-    type: "item";
-    id: bigint;
-    augmented: bigint;
-    const_false?: true;
-    craftable?: ItemCraftable;
-    modifier?: bigint;
-    mods: ItemMod[];
-    final33: bigint;
-    remainder?: string;
-}
-
-export interface HyperLinkQuest {
-    type: "quest";
-    id: bigint;
-    const1: bigint;
-    quest_step: bigint;
-    remainder?: string;
-}
-
-export interface HyperlinkURL {
-    type: "url";
-    index: bigint;
-    remainder?: string;
-}
-
-export interface HyperlinkAchievement {
-    type: "achievement";
-    id: bigint;
-    character: string;
-    completed: false | Date;
-    objectives: bigint[];
-    remainder?: string;
-}
-
-export interface HyperlinkGuild {
-    type: "guild";
-    id: bigint;
-    name: string;
-    remainder?: string;
-}
-
-export interface HyperlinkPVP {
-    type: "pvp";
-    char_name: string;
-    char_id: bigint;
-    discipline: bigint;
-    queue: string;
-    remainder?: string;
-}
-
-export interface HyperlinkUnkown {
-    type: "unknown";
-    remainder?: string;
-}
-
-export type HyperlinkType = HyperlinkItem | HyperLinkQuest | HyperlinkURL | HyperlinkAchievement | HyperlinkGuild | HyperlinkPVP | HyperlinkUnkown;
