@@ -1,12 +1,16 @@
 
-import { get, writable } from "svelte/store";
+import { get } from "svelte/store";
 import { settings } from "./settings";
 import { listen } from "@tauri-apps/api/event";
 import { SwtorChannel, ESwtorChannel } from "./swtor_channel";
 import { add_swtor_channel_message } from "./swtor_message/swtor_chat_tab_messages";
 import { active_character } from "./characters";
 import { add_player } from "./players";
-import { parse_hyperlink, type HyperlinkType } from "../hyperlink_parser";
+import { 
+    parse_hyperlink, 
+    HYPERLINK_RE, 
+    type HyperlinkType 
+} from "../hyperlink_parser";
 
 export class SwtorMessage {
 
@@ -42,21 +46,30 @@ export class SwtorMessage {
 
     private get_message_fragments_v2(): (string | HyperlinkType)[] {
 
-        const re: RegExp = /<HL LID="([^"]+)">/g;
-        
         if (!get(settings).chat_log.window.show_unknown_ids) {
-
-            let temp = this.message.slice(0);
-            for (let obj of temp.matchAll(re)) {
-                temp = temp.replace(obj[0], "<Unknown>");
-            }
-            return [temp];
-
+            return this.get_fragments_with_unknown();
         }
+
+        return this.get_fragments_with_hyperlinks();
+
+    }
+    
+    private get_fragments_with_unknown(): (string | HyperlinkType)[] {
+
+        let temp = this.message.slice(0);
+        for (let obj of temp.matchAll(HYPERLINK_RE)) {
+            temp = temp.replace(obj[0], "<Unknown>");
+        }
+
+        return [temp];
+
+    }
+
+    private get_fragments_with_hyperlinks(): (string | HyperlinkType)[] {
 
         let start_idx: number = 0;
         let fragments: (string | HyperlinkType)[] = [];
-        for (let obj of this.message.matchAll(re)) {
+        for (let obj of this.message.matchAll(HYPERLINK_RE)) {
             
             if (obj.index != start_idx) {
                 fragments.push(this.message.slice(start_idx, obj.index));

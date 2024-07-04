@@ -1,12 +1,12 @@
 
 import { Result, Ok, Err } from "./result";
 
+export const HYPERLINK_RE: RegExp = /<HL LID="([^"]+)">/g;
 const BASE64_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 export function parse_hyperlink(hyperlink: string): Result<HyperlinkType, string> {
 
-    const re: RegExp = /<HL LID="([^"]+)">/g;
-    let match = re.exec(hyperlink);
+    let match = HYPERLINK_RE.exec(hyperlink);
     if (match == null) {
         return Err("Somehow received a malformed hyperlink?")
     }
