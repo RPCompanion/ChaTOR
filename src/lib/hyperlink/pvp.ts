@@ -1,4 +1,5 @@
 
+import { type Option, None, Some } from "../option";
 import { type HyperLinkBase } from "./base";
 
 export interface IHyperLinkPVP {
@@ -28,8 +29,8 @@ export class HyperLinkPVP implements HyperLinkBase {
         this.remainder = data.remainder;
     }
 
-    public as_string(): string {
-        throw new Error("Method not implemented.");
+    public as_string(): Option<string> {
+        return None();
     }
 
 }
