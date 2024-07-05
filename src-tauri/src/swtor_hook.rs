@@ -1,6 +1,7 @@
 
 use std::fs;
 use std::path::Path;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use sha2::{Sha256, Digest};
 
@@ -18,6 +19,8 @@ use windows::Win32::UI::WindowsAndMessaging::{EnumWindows, GetForegroundWindow, 
 use windows::core::PWSTR;
 use windows::Win32::System::Threading::{OpenProcess, QueryFullProcessImageNameW, PROCESS_NAME_FORMAT, PROCESS_QUERY_INFORMATION};
 
+use crate::dal::db::settings::get_settings;
+
 pub mod post;
 pub mod message_hash_container;
 
@@ -27,12 +30,30 @@ lazy_static! {
 }
 
 static PROCESS_CHECKSUM: OnceLock<Vec<u8>> = OnceLock::new();
+static PROCESS_IS_ACCESSIBLE: AtomicBool   = AtomicBool::new(true);
+const ACCESS_IS_DENIED: i32 = 0x80070005u32 as i32;
 
+fn should_attempt_to_get_checksum() -> bool {
 
+    if !PROCESS_IS_ACCESSIBLE.load(Ordering::Relaxed) {
+        return false;
+    }
+
+    if !get_settings().chat_log.capture_chat_log {
+        return false;
+    }
+
+    if PROCESS_CHECKSUM.get().is_some() {
+        return false;
+    }
+
+    true
+
+}
 
 unsafe fn set_process_checksum() {
 
-    if PROCESS_CHECKSUM.get().is_some() {
+    if !should_attempt_to_get_checksum() {
         return;
     }
 
@@ -40,8 +61,15 @@ unsafe fn set_process_checksum() {
 
     let handle = OpenProcess(PROCESS_QUERY_INFORMATION, false, pid);
     if handle.is_err() {
-        error!("Error opening process: {}", handle.err().unwrap().to_string());
+
+        let err = handle.unwrap_err();
+        if err.code().0 == ACCESS_IS_DENIED {
+            PROCESS_IS_ACCESSIBLE.store(false, Ordering::Relaxed);
+        }
+
+        error!("Error opening process: {}", err);
         return;
+
     }
 
     let mut buffer: [u16; MAX_PATH as usize + 1] = [0; MAX_PATH as usize + 1];
