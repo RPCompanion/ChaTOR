@@ -3,6 +3,7 @@ use em_libs::dal::em_dirs::EmDirs;
 
 pub mod db;
 pub mod characters;
+pub mod game_data;
 
 pub fn get_em_dirs() -> EmDirs {
 
@@ -14,6 +15,7 @@ pub fn init() {
 
     db::init();
     db::settings::init();
+    game_data::init();
 
 }
 

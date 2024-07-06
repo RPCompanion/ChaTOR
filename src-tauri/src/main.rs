@@ -78,6 +78,7 @@ fn main() {
             dal::db::chat_log::get_todays_chat_log,
             dal::db::chat_log::datetags::get_all_date_tag_favourites,
             dal::db::chat_log::datetags::save_date_tag,
+            dal::game_data::get_name_by_global_id,
             capture_injector::start_injecting_capture,
             capture_injector::stop_injecting_capture,
             get_version
