@@ -39,8 +39,6 @@ export class HyperLinkItem implements HyperLinkBase {
     public readonly final33: bigint;
     public readonly remainder?: string;
 
-    public name?: string;
-
     public constructor(data: IHyperLinkItem) {
         this.type = data.type;
         this.id = data.id;
@@ -51,19 +49,6 @@ export class HyperLinkItem implements HyperLinkBase {
         this.mods = data.mods;
         this.final33 = data.final33;
         this.remainder = data.remainder;
-        this.set_name();
-    }
-
-    private set_name() {
-
-        get_name_by_global_id(this.id).then((result) => {
-
-            if (result.is_ok()) {
-                this.name = result.unwrap();
-            }
-
-        });
-
     }
 
     public as_string(): Option<string> {

@@ -9,6 +9,9 @@
     import { HyperLinkItem } from "../../lib/hyperlink/item";
     import { HyperLinkQuest } from "../../lib/hyperlink/quest";
 
+    import ItemFragment from "./ItemFragment.svelte";
+    import QuestFragment from "./QuestFragment.svelte";
+
     export let fragment: string | Hyperlink
     export let channel_type: ESwtorChannel;
 
@@ -24,17 +27,9 @@
     {#if fragment instanceof HyperLinkGuild}
         <span class="break-words text-yellow-300">{fragment.as_string().unwrap()}</span>
     {:else if fragment instanceof HyperLinkItem}
-        {#if fragment.name != undefined}
-            <span class="break-words text-yellow-300">{ "{" + fragment.name + "}" }</span>
-        {:else}
-            <span class="break-words text-yellow-300">{"<Loading>"}</span>
-        {/if}
+        <ItemFragment fragment={fragment} />
     {:else if fragment instanceof HyperLinkQuest}
-        {#if fragment.name != undefined}
-            <span class="break-words text-yellow-300">{ "{" + fragment.name + "}" }</span>
-        {:else}
-            <span class="break-words text-yellow-300">{"<Loading>"}</span>
-        {/if}
+        <QuestFragment fragment={fragment} />
     {:else}
         <span class="break-words" style="color: {color_hex}">{"<Unknown>"}</span>
     {/if}

@@ -8,6 +8,7 @@ mkdir "chator"
 
 REM Copying the directories and files
 xcopy ".\sql" "chator\sql" /E /I
+xcopy ".\gamedata" "chator\gamedata" /E /I
 
 copy ".\config.toml" "chator\config.toml"
 copy ".\ChaTOR.exe" "chator\ChaTOR.exe"

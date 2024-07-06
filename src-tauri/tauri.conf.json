@@ -58,7 +58,8 @@
                 "./config.toml",
                 "./sql",
                 "./misc/.itch.toml",
-                "./post-build.bat"
+                "./post-build.bat",
+                "./gamedata"
             ],
             "shortDescription": "",
             "targets": "all",

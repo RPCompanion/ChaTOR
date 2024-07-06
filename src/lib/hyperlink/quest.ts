@@ -19,7 +19,6 @@ export class HyperLinkQuest implements HyperLinkBase {
     public readonly quest_step: bigint;
     public readonly remainder?: string;
 
-    public name?: string;
 
     public constructor(data: IHyperLinkQuest) {
         this.type = data.type;
@@ -27,19 +26,6 @@ export class HyperLinkQuest implements HyperLinkBase {
         this.const1 = data.const1;
         this.quest_step = data.quest_step;
         this.remainder = data.remainder;
-        this.set_name();
-    }
-
-    private set_name() {
-
-        get_name_by_global_id(this.id).then((result) => {
-
-            if (result.is_ok()) {
-                this.name = result.unwrap();
-            }
-            
-        });
-
     }
 
     public as_string(): Option<string> {
