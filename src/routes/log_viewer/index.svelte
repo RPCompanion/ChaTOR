@@ -19,7 +19,7 @@
     import Favourite from "./_Favourite.svelte";
     import Checkbox from "../../lib/Checkbox.svelte";
     import type { ChannelDispatcher } from "../../lib/network/settings";
-    import Message from "../../components/_Message.svelte";
+    import Messages from "../../components/_Messages.svelte";
 
     let container: HTMLElement | undefined   = undefined;
     let last_message: HTMLElement | undefined = undefined;
@@ -220,7 +220,7 @@
                 <span class="text-slate-200 cursor-pointer">
                     {message.get_message_from()}
                 </span>
-                <Message message={message}/>
+                <Messages message={message}/>
             </div>
         {/each}
     </div>

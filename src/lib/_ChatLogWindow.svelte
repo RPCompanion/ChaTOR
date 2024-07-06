@@ -19,7 +19,7 @@
     import { players_filter } from "./network/players";
     import PlayerFilter from "../components/_PlayerFilter.svelte";
     import RestorePosts from "./chat_log_window/_RestorePosts.svelte";
-    import Message from "../components/_Message.svelte";
+    import Messages from "../components/_Messages.svelte";
 
     let auto_scroll: boolean = true;
     let container: HTMLElement | undefined = undefined;
@@ -147,7 +147,7 @@
                 <span class="text-slate-200 cursor-pointer" on:click={() => {on_character_click(message)}}>
                     {message.get_message_from()}
                 </span>
-                <Message message={message}/>
+                <Messages message={message}/>
             </div>
         {/each}
     </div>
