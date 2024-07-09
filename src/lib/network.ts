@@ -87,3 +87,15 @@ export async function submit_post(message_type: MessageType, messages: string[])
 export function open_link(link: string) {
     invoke("open_link", { link: link });
 }
+
+export function fetch_content(url: string, callback: (result: Result<string, string>) => void) {
+
+    invoke("fetch_content", { url })
+        .then((response: any) => {
+            callback(Ok(response as string));
+        })
+        .catch((error: any) => {
+            callback(Err(error as string));
+        });
+
+}

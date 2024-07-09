@@ -19,6 +19,7 @@ mod swtor;
 mod crash_reporter;
 mod config;
 mod logging;
+mod network;
 
 use crash_reporter::CrashReporter;
 
@@ -81,6 +82,7 @@ fn main() {
             dal::game_data::get_name_by_global_id,
             capture_injector::start_injecting_capture,
             capture_injector::stop_injecting_capture,
+            network::fetch_content,
             get_version
         ])
         .run(tauri::generate_context!());
