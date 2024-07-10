@@ -44,6 +44,7 @@ pub fn init() {
     let mut game_data = GameData::new();
     game_data.extend_with_raw_data(get("./gamedata/items.json"));
     game_data.extend_with_raw_data(get("./gamedata/quests.json"));
+    game_data.extend_with_raw_data(get("./gamedata/achievements.json"));
     let _ = GAME_DATA.set(game_data);
 
 }

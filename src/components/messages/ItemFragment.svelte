@@ -5,14 +5,10 @@
     import { fetch_item } from "./utils";
 
     export let fragment: HyperLinkItem;
-    const URL = "https://swtor.jedipedia.net/en/itm/" + fragment.id;
     let name: string | undefined = undefined;
     let show_iframe: boolean = false;
 
-    const parser = new DOMParser();
     let doc: Document | undefined    = undefined;
-    let section: Element | undefined = undefined;
-
     let render_section: HTMLDivElement | undefined = undefined;
 
     function fetch_jediapedia_content() {
@@ -53,9 +49,9 @@
 {#if name != undefined}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
-    <span class="break-words text-yellow-300 cursor-pointer" on:click={on_click}>{"{" + name + "}"}</span>
+    <span class="break-words text-yellow-300 cursor-pointer select-none" on:click={on_click}>{"{" + name + "}"}</span>
 {:else}
-    <span class="break-words text-yellow-300">{"<Loading>"}</span>
+    <span class="break-words text-yellow-300 select-none">{"<Loading>"}</span>
 {/if}
 <div bind:this={render_section} class:hidden={!show_iframe}></div>
 

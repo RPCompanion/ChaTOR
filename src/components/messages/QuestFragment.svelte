@@ -1,5 +1,6 @@
 
 <script lang="ts">
+    
     import type { HyperLinkQuest } from "../../lib/hyperlink/quest";
     import { get_name_by_global_id } from "../../lib/game_data";
 
@@ -17,7 +18,7 @@
 </script>
 
 {#if name != undefined}
-    <span class="break-words text-yellow-300">{ "{" + name + "}" }</span>
+    <span class="break-words text-yellow-300 select-none">{ "{" + name + "}" }</span>
 {:else}
-    <span class="break-words text-yellow-300">{"<Loading>"}</span>
+    <span class="break-words text-yellow-300 select-none">{"<Loading>"}</span>
 {/if}
