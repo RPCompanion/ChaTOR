@@ -5,6 +5,8 @@ use reqwest::blocking::Client as BlockingClient;
 
 use base64::prelude::{Engine as _, BASE64_STANDARD};
 
+use crate::dal::db::cache::CacheJediapedia;
+
 #[tauri::command]
 pub async fn fetch_content(url: String) -> Result<String, &'static str> {
 
@@ -52,14 +54,16 @@ pub fn fetch_content_blocking(url: String) -> Result<Vec<u8>, &'static str> {
 #[tauri::command]
 pub async fn fetch_jediapedia_content(global_id: String, url: String) -> Result<String, &'static str> {
 
-    tokio::task::spawn_blocking(move || {
+    let global_id: u64 = global_id.parse().unwrap();
+    if let Some(content) = CacheJediapedia::new(global_id).get() {
+        return Ok(content);
+    }
 
-        let global_id: u64 = global_id.parse().unwrap();
-        // Check if the content is already cached
+    tokio::task::spawn_blocking(move || {
 
         let content = String::from_utf8(fetch_content_blocking(url)?).unwrap();
         let content = parse_content(content)?;
-
+        CacheJediapedia::new(global_id).save(&content);
         Ok(content)
 
     }).await.unwrap()

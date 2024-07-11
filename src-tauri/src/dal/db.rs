@@ -12,6 +12,7 @@ pub mod user_character_messages;
 pub mod swtor_message;
 pub mod migration;
 pub mod custom_channel;
+pub mod cache;
 
 use migration::{Migration, run_non_sql_migrations};
 use custom_emote::CustomEmote;
