@@ -27,7 +27,6 @@ export interface IChatSettings {
 }
 
 export interface IChatLogWindow {
-    show_unknown_ids: boolean;
     show_chat_log_window: boolean;
     chat_tabs: IChatTab[];
     window: IWidthHeight;
@@ -93,7 +92,6 @@ export function default_settings(): ISettings {
             retry_message_submission: false,
             character_ini_to_pull_from: undefined,
             window: {
-                show_unknown_ids: false,
                 show_chat_log_window: false,
                 chat_tabs: [
                     {

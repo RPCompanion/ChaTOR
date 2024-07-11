@@ -11,8 +11,5 @@
         <Setting setting="Show chat log window">
             <SettingsToggle bind:checked={$settings.chat_log.window.show_chat_log_window}></SettingsToggle>
         </Setting>
-        <Setting setting="Show unknown ids">
-            <SettingsToggle bind:checked={$settings.chat_log.window.show_unknown_ids}></SettingsToggle>
-        </Setting>
     </SettingSection>
 {/if}
