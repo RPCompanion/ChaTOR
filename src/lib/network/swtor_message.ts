@@ -12,6 +12,8 @@ import {
     type Hyperlink 
 } from "../hyperlink_parser";
 
+export type MessageFragment = string | Hyperlink;
+
 export class SwtorMessage {
 
     public readonly channel: SwtorChannel;
@@ -19,7 +21,7 @@ export class SwtorMessage {
     public readonly from: string;
     public readonly to: string;
     public readonly message: string;
-    public readonly message_fragments: (string | Hyperlink)[] = [];
+    public readonly message_fragments: MessageFragment[] = [];
     public read: boolean = false;
     
     constructor(swtor_message: ISwtorMessage) {
@@ -44,17 +46,13 @@ export class SwtorMessage {
 
     }
 
-    private get_message_fragments(): (string | Hyperlink)[] {
-
-        if (!get(settings).chat_log.window.show_unknown_ids) {
-            return this.get_fragments_with_unknown();
-        }
+    private get_message_fragments(): MessageFragment[] {
 
         return this.get_fragments_with_hyperlinks();
 
     }
     
-    private get_fragments_with_unknown(): (string | Hyperlink)[] {
+    private get_fragments_with_unknown(): MessageFragment[] {
 
         let temp = this.message.slice(0);
         for (let obj of temp.matchAll(get_hyperlink_regex())) {
@@ -65,10 +63,10 @@ export class SwtorMessage {
 
     }
 
-    private get_fragments_with_hyperlinks(): (string | Hyperlink)[] {
+    private get_fragments_with_hyperlinks(): MessageFragment[] {
 
         let start_idx: number = 0;
-        let fragments: (string | Hyperlink)[] = [];
+        let fragments: MessageFragment[] = [];
         for (let obj of this.message.matchAll(get_hyperlink_regex())) {
             
             if (obj.index != start_idx) {

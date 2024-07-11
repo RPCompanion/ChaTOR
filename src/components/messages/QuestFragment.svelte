@@ -18,7 +18,7 @@
 </script>
 
 {#if name != undefined}
-    <span class="break-words text-yellow-300 select-none">{ "{" + name + "}" }</span>
+    <span class="break-words text-yellow-300">{ "<" + name + ">" }</span>
 {:else}
     <span class="break-words text-yellow-300 select-none">{"<Loading>"}</span>
 {/if}
