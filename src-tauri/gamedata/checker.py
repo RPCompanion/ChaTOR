@@ -10,6 +10,9 @@ def main():
     with open("quests.json") as f:
         items.extend(json.load(f))
 
+    with open("achievements.json") as f:
+        items.extend(json.load(f))
+
     get_global_id = lambda x: int(x["global_id"])
     global_ids = list(map(get_global_id, items))
 
