@@ -99,3 +99,15 @@ export function fetch_content(url: string, callback: (result: Result<string, str
         });
 
 }
+
+export function fetch_jediapedia_content(global_id: string, url: string, callback: (result: Result<string, string>) => void) {
+
+    invoke("fetch_jediapedia_content", { globalId: global_id, url })
+        .then((response: any) => {
+            callback(Ok(response as string));
+        })
+        .catch((error: any) => {
+            callback(Err(error as string));
+        });
+
+}

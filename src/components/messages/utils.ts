@@ -1,5 +1,5 @@
 
-import { fetch_content } from "../../lib/network";
+import { fetch_content, fetch_jediapedia_content } from "../../lib/network";
 import { Result, Ok } from "../../lib/result";
 
 var cache: { [key: string]: string } = {};
@@ -23,15 +23,15 @@ function common_fetch(global_id: bigint, url: string, callback: (result: Result<
         return;
     }
 
-    fetch_content(`${url}/${global_id}`, (result) => {
+    fetch_jediapedia_content(global_id.toString(), `${url}/${global_id}`, (result) => {
 
         if (result.is_ok()) {
 
-            let parser  = new DOMParser();
-            let doc     = parser.parseFromString(result.unwrap(), 'text/html');
-            let section = doc.getElementsByClassName("con-inv")[0];
-            cache[global_id.toString()] = section.outerHTML
-            callback(Ok(section.outerHTML));
+            //let parser  = new DOMParser();
+            //let doc     = parser.parseFromString(result.unwrap(), 'text/html');
+            //let section = doc.getElementsByClassName("con-inv")[0];
+            cache[global_id.toString()] = result.unwrap();
+            callback(Ok(result.unwrap()));
 
         } else {
 

@@ -83,6 +83,7 @@ fn main() {
             capture_injector::start_injecting_capture,
             capture_injector::stop_injecting_capture,
             network::fetch_content,
+            network::fetch_jediapedia_content,
             get_version
         ])
         .run(tauri::generate_context!());

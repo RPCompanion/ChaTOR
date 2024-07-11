@@ -1,3 +1,12 @@
+
+CREATE TABLE IF NOT EXISTS Cache_GlobalId
+(
+    cache_global_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    cache_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    global_id INTEGER UNIQUE NOT NULL,
+    html TEXT NOT NULL
+);
+
 /*
     CustomEmotes.order_index is used to keep track of the order of the emotes. Uniqueness is not enforced and
     favourites and non-favourites may share similar indices.

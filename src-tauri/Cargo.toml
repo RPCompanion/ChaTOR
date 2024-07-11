@@ -38,6 +38,7 @@ tauri = { version = "1.6.2", features = ["fs-write-file", "window-all", "dialog-
 
 # Hashing
 sha2 = "0.10"
+base64 = "0.22"
 
 # Helpers
 int-enum = "1.1"
