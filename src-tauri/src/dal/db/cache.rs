@@ -1,4 +1,5 @@
 
+use tracing::error;
 use rusqlite::params;
 
 use crate::dal::db;
@@ -46,9 +47,15 @@ impl CacheJediapedia {
                 Cache_Jediapedia (global_id, html)
             VALUES
                 (?, ?)
+            ON CONFLICT (global_id) 
+            DO 
+                UPDATE SET html = excluded.html;
         ";
 
-        conn.execute(QUERY, params![self.global_id as i64, html]).expect("Error saving Jediapedia cache");
+        match conn.execute(QUERY, params![self.global_id as i64, html]) {
+            Ok(_) => (),
+            Err(e) => error!("Failed to save cache: {}", e)
+        }
 
     }
 
