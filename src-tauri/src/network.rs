@@ -68,7 +68,6 @@ pub async fn fetch_jediapedia_content(global_id: String, url: String) -> Result<
 
     }).await.unwrap()
 
-
 }
 
 fn parse_content(content: String) -> Result<String, &'static str> {

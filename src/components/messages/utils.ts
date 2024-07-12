@@ -27,9 +27,6 @@ function common_fetch(global_id: bigint, url: string, callback: (result: Result<
 
         if (result.is_ok()) {
 
-            //let parser  = new DOMParser();
-            //let doc     = parser.parseFromString(result.unwrap(), 'text/html');
-            //let section = doc.getElementsByClassName("con-inv")[0];
             cache[global_id.toString()] = result.unwrap();
             callback(Ok(result.unwrap()));
 

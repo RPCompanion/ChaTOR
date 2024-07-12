@@ -10,18 +10,19 @@
     let name: string | undefined = undefined;
     let show_iframe: boolean = false;
 
-    let doc: Document | undefined    = undefined;
+    let content_fetched: boolean = false;
     let render_section: HTMLDivElement | undefined = undefined;
 
     function fetch_jediapedia_content() {
 
-        if (doc != undefined) {
+        if (content_fetched) {
             return;
         }
 
         fetch_item(fragment.id, (result) => {
 
             if (result.is_ok()) {
+                content_fetched = true;
                 render_section!.innerHTML = DOMPurify.sanitize(result.unwrap());   
             }
 
