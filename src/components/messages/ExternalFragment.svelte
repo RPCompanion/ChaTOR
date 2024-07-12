@@ -109,7 +109,7 @@
 {/if}
 
 {#if show_content && content != undefined}
-    <div class="fixed top-0 left-0 w-full h-full z-10 flex flex-col items-center justify-center" transition:fly|local="{{ duration: 300, y: -1000 }}">
+    <div class="fixed top-0 left-0 w-full h-full z-10 flex flex-col items-center justify-center" transition:fly|local="{{ duration: 400, y: -1000 }}">
         <div class="relative w-96 h-96">
             <div bind:this={render_section}></div>
             <div class="absolute right-0 top-0">
