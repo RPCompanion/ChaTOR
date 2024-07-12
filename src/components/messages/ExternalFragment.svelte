@@ -2,12 +2,15 @@
 <script lang="ts">
 
     import DOMPurify from "isomorphic-dompurify";
+    import { fly } from 'svelte/transition';
+
     import { settings } from "../../lib/network/settings";
     import { HyperLinkItem } from "../../lib/hyperlink/item";
     import { HyperLinkAchievement } from "../../lib/hyperlink/achievement";
     import { get_name_by_global_id } from "../../lib/game_data";
     import { fetch_achievement, fetch_item } from "./utils";
     import type { Result } from "../../lib/result";
+    import XButton from "../../lib/buttons/XButton.svelte";
 
     type FetchType = (global_id: bigint, callback: (result: Result<string, string>) => void) => void;
 
@@ -15,10 +18,26 @@
     const fetch_function: FetchType = get_fetch_function();
 
     let name: string | undefined = undefined;
-    let show_iframe: boolean = false;
+    let show_content: boolean = false;
 
-    let content_fetched: boolean = false;
+    let content: string | undefined = undefined;
     let render_section: HTMLDivElement | undefined = undefined;
+
+    $: if (render_section != undefined) {
+        update_render_section();
+    }
+
+    function update_render_section() {
+
+        if (render_section == undefined) {
+            return;
+        }
+
+        if (render_section.innerHTML == "") {
+            render_section.innerHTML = content ?? "";
+        }
+
+    }
 
     function get_fetch_function(): FetchType {
 
@@ -32,15 +51,15 @@
 
     function fetch_jediapedia_content() {
 
-        if (content_fetched) {
+        if (content != undefined) {
             return;
         }
 
         fetch_function(fragment.id, (result) => {
 
             if (result.is_ok()) {
-                content_fetched = true;
-                render_section!.innerHTML = DOMPurify.sanitize(result.unwrap());   
+                content = DOMPurify.sanitize(result.unwrap());
+                update_render_section();
             }
 
         });
@@ -68,15 +87,18 @@
 
     function on_click() {
 
-        show_iframe = !show_iframe;
-        if (show_iframe) {
+        show_content = !show_content;
+        if (show_content) {
             fetch_jediapedia_content();
         }
 
     }
 
-</script>
+    function on_x() {
+        show_content = false;
+    }
 
+</script>
 
 {#if name != undefined}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -85,9 +107,20 @@
 {:else}
     <span class="break-words text-yellow-300 select-none">{"<Loading>"}</span>
 {/if}
-<div bind:this={render_section} class:hidden={!show_iframe}></div>
+
+{#if show_content && content != undefined}
+    <div class="fixed top-0 left-0 w-full h-full z-10 flex flex-col items-center justify-center" transition:fly|local="{{ duration: 300, y: -1000 }}">
+        <div class="relative w-96 h-96">
+            <div bind:this={render_section}></div>
+            <div class="absolute right-0 top-0">
+                <XButton on:click={on_x}></XButton>
+            </div>
+        </div>
+    </div>
+{/if}
 
 <style>
+
     :global(.con-inv) {
         padding: 5px 0 0 0;
         border: 0;
