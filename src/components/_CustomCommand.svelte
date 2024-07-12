@@ -5,6 +5,7 @@
     import { active_chat_tab_index } from "../lib/chat_log_window/chat_log_window_store";
     import { custom_channels } from "../lib/network/custom_channels";
     import { settings, type ChannelDispatcher } from "../lib/network/settings";
+    import Tooltip from "./_Tooltip.svelte";
 
     let channels: string[] = Object.keys(ESwtorChannel)
         .filter((key) => isNaN(Number(key)))
@@ -55,17 +56,19 @@
 
 </script>
 
-<div>
-    <select 
-        bind:value={value}
-        class="rounded-md outline-none border-none bg-slate-600 text-white px-1 select-none">
-        <option value={undefined}>none</option>
-        {#each channels as channel}
-            <option value={get_channel_number(channel)}>{channel.toLowerCase().replace("_", " ")}</option>
-        {/each}
-        <hr/>
-        {#each $custom_channels as channel}
-            <option value={channel.channel_name}>{channel.channel_name.toLowerCase()}</option>
-        {/each}
-    </select>
+<div class="flex flex-row gap-1">
+    <Tooltip tooltip_text="Set the default channel for current chat tab" placement="right">
+        <select 
+            bind:value={value}
+            class="rounded-md outline-none border-none bg-slate-600 text-white px-1 select-none cursor-pointer">
+            <option value={undefined}>none</option>
+            {#each channels as channel}
+                <option value={get_channel_number(channel)}>{channel.toLowerCase().replace("_", " ")}</option>
+            {/each}
+            <hr/>
+            {#each $custom_channels as channel}
+                <option value={channel.channel_name}>{channel.channel_name.toLowerCase()}</option>
+            {/each}
+        </select>
+    </Tooltip>
 </div>

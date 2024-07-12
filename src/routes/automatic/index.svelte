@@ -16,6 +16,7 @@
     import { SwtorChannel } from "../../lib/network/swtor_channel";
     import { unicode_escape } from "../../lib/utils";
     import { get_custom_channel_number } from "../../lib/network/custom_channels";
+  import Tooltip from "../../components/_Tooltip.svelte";
 
     let message: string     = "";
     let messages: string[]  = [];
