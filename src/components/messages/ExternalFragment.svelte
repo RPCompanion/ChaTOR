@@ -9,8 +9,10 @@
     import { fetch_achievement, fetch_item } from "./utils";
     import type { Result } from "../../lib/result";
 
+    type FetchType = (global_id: bigint, callback: (result: Result<string, string>) => void) => void;
+
     export let fragment: HyperLinkItem | HyperLinkAchievement;
-    const fetch_function: (global_id: bigint, callback: (result: Result<string, string>) => void) => void = get_fetch_function();
+    const fetch_function: FetchType = get_fetch_function();
 
     let name: string | undefined = undefined;
     let show_iframe: boolean = false;
@@ -18,7 +20,7 @@
     let content_fetched: boolean = false;
     let render_section: HTMLDivElement | undefined = undefined;
 
-    function get_fetch_function(): (global_id: bigint, callback: (result: Result<string, string>) => void) => void {
+    function get_fetch_function(): FetchType {
 
         if (fragment instanceof HyperLinkItem) {
             return fetch_item;
