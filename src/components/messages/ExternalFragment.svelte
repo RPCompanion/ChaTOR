@@ -1,17 +1,32 @@
+
 <script lang="ts">
 
     import DOMPurify from "isomorphic-dompurify";
     import { settings } from "../../lib/network/settings";
-    import type { HyperLinkItem } from "../../lib/hyperlink/item";
+    import { HyperLinkItem } from "../../lib/hyperlink/item";
+    import { HyperLinkAchievement } from "../../lib/hyperlink/achievement";
     import { get_name_by_global_id } from "../../lib/game_data";
-    import { fetch_item } from "./utils";
+    import { fetch_achievement, fetch_item } from "./utils";
+    import type { Result } from "../../lib/result";
 
-    export let fragment: HyperLinkItem;
+    export let fragment: HyperLinkItem | HyperLinkAchievement;
+    const fetch_function: (global_id: bigint, callback: (result: Result<string, string>) => void) => void = get_fetch_function();
+
     let name: string | undefined = undefined;
     let show_iframe: boolean = false;
 
     let content_fetched: boolean = false;
     let render_section: HTMLDivElement | undefined = undefined;
+
+    function get_fetch_function(): (global_id: bigint, callback: (result: Result<string, string>) => void) => void {
+
+        if (fragment instanceof HyperLinkItem) {
+            return fetch_item;
+        } else {
+            return fetch_achievement;
+        }
+
+    }
 
     function fetch_jediapedia_content() {
 
@@ -19,7 +34,7 @@
             return;
         }
 
-        fetch_item(fragment.id, (result) => {
+        fetch_function(fragment.id, (result) => {
 
             if (result.is_ok()) {
                 content_fetched = true;
@@ -59,6 +74,7 @@
     }
 
 </script>
+
 
 {#if name != undefined}
     <!-- svelte-ignore a11y-click-events-have-key-events -->

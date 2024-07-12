@@ -9,10 +9,9 @@
     import { HyperLinkItem } from "../../lib/hyperlink/item";
     import { HyperLinkQuest } from "../../lib/hyperlink/quest";
     import { HyperLinkAchievement } from "../../lib/hyperlink/achievement";
+    import ExternalFragment from "./ExternalFragment.svelte";
 
-    import ItemFragment from "./ItemFragment.svelte";
     import QuestFragment from "./QuestFragment.svelte";
-    import AchievementFragment from "./AchievementFragment.svelte";
 
     export let fragment: string | Hyperlink
     export let channel_type: ESwtorChannel;
@@ -29,11 +28,11 @@
     {#if fragment instanceof HyperLinkGuild}
         <span class="break-words text-yellow-300">{fragment.as_string().unwrap()}</span>
     {:else if fragment instanceof HyperLinkItem}
-        <ItemFragment fragment={fragment} />
+        <ExternalFragment fragment={fragment} />
     {:else if fragment instanceof HyperLinkQuest}
         <QuestFragment fragment={fragment} />
     {:else if fragment instanceof HyperLinkAchievement}
-        <AchievementFragment fragment={fragment} />
+        <ExternalFragment fragment={fragment} />
     {:else}
         <span class="break-words" style="color: {color_hex}">{"<Unknown>"}</span>
     {/if}
