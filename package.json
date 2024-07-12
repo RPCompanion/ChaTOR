@@ -37,6 +37,7 @@
     "@tauri-apps/api": "^1.5.4",
     "compromise": "^14.13.0",
     "flatpickr": "^4.6.13",
+    "isomorphic-dompurify": "^2.13.0",
     "svelte-flatpickr": "^3.3.4",
     "svelte-markdown": "^0.4.1",
     "tailwind-scrollbar": "^3.1.0"

@@ -1,5 +1,7 @@
 <script lang="ts">
 
+    import DOMPurify from "isomorphic-dompurify";
+    import { settings } from "../../lib/network/settings";
     import type { HyperLinkItem } from "../../lib/hyperlink/item";
     import { get_name_by_global_id } from "../../lib/game_data";
     import { fetch_item } from "./utils";
@@ -20,17 +22,28 @@
         fetch_item(fragment.id, (result) => {
 
             if (result.is_ok()) {
-                render_section!.innerHTML = result.unwrap();   
+                render_section!.innerHTML = DOMPurify.sanitize(result.unwrap());   
             }
 
         });
 
     }
 
+    function attempt_prefetch() {
+
+        if ($settings.chat_log.window.prefetch_hyperlinks) {
+            fetch_jediapedia_content();
+        }
+
+    }
+
     get_name_by_global_id(fragment.id).then((result) => {
 
         if (result.is_ok()) {
+
             name = result.unwrap();
+            attempt_prefetch();
+
         }
 
     });
