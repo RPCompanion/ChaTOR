@@ -1,9 +1,11 @@
 # SWTOR-Chat
 
-A third-party chat client for Star Wars: The Old Republic. 
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+
+A third-party chat client for Star Wars: The Old Republic. Designed and tested by the roleplay community.
 
 > [!WARNING]
-> This software is presently in alpha and is subject to change rapidly until stabilized.
+> This software is presently in alpha and is subject to change until stabilized.
 
 ## Current features
 
@@ -26,44 +28,31 @@ A third-party chat client for Star Wars: The Old Republic.
 - Character sheet integration
 - Dice Rolling
 
+## Building this software
+
+### Build Environment
+
+- [node.js](https://nodejs.org/en) v18.0+
+- [rust](https://www.rust-lang.org/) nightly compiler
+
+### Run steps
+
+
+1. Install local npm packages ```npm i```
+2. Use npm to start the app ```npm run tauri dev```
+
+### Build steps
+
+1. Install local npm packages if not already
+2. Run build command ```npm run tauri build```
+
+ChaTOR.exe will be located in ```src-tauri/target/release```
+
 ## Interested in the project?
 
 Consider joining our [discord](https://discord.gg/TwfBK94ree)
 
 ## Contributing
 
-Before you make a pull request, please consider opening an issue or discussion. We want to ensure that the change aligns with the project's direction, or that specific technical details are covered.
-All contributions are to be licensed under the AGPLv3
+Before you make a pull request, please open an issue or discussion. All contributions are to be licensed under the AGPLv3.
 
-## Building this software
-
-### Build Environment
-
-- [Node](https://nodejs.org/en) v18.0+
-- [rust](https://www.rust-lang.org/) nightly compiler
-
-### Run steps
-
-Assuming you've set up node.js and the rust nightly compiler, use the following steps to run the software
-
-Install local npm packages
-```sh
-npm i
-```
-
-Use npm to start the tauri app
-```sh
-npm run tauri dev
-```
-
-### Build steps
-
-Assuming you've installed the local npm packages (if not, see Run steps)
-
-```sh
-npm run tauri build
-```
-
-## Project License
-
-Licensed under the AGPLv3
