@@ -5,7 +5,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use sha2::{Sha256, Digest};
 
-use std::sync::{Arc, Mutex, OnceLock};
+use std::sync::{Mutex, OnceLock};
 use std::thread;
 use std::time::Duration;
 
@@ -24,14 +24,14 @@ use crate::dal::db::settings::get_settings;
 pub mod post;
 pub mod message_hash_container;
 
-lazy_static! {
-    static ref SWTOR_HWND: Arc<Mutex<Option<HWND>>> = Arc::new(Mutex::new(None));
-    static ref SWTOR_PID: Arc<Mutex<Option<u32>>> = Arc::new(Mutex::new(None));
-}
+static SWTOR_HWND: Mutex<Option<HWND>> = Mutex::new(None);
+static SWTOR_PID: Mutex<Option<u32>>   = Mutex::new(None);
 
 static PROCESS_CHECKSUM: OnceLock<Vec<u8>> = OnceLock::new();
 static PROCESS_IS_ACCESSIBLE: AtomicBool   = AtomicBool::new(true);
+
 const ACCESS_IS_DENIED: i32 = 0x80070005u32 as i32;
+const PROCESS_NAME: &str = "Star Wars™: The Old Republic™";
 
 fn should_attempt_to_get_checksum() -> bool {
 
@@ -57,7 +57,7 @@ unsafe fn set_process_checksum() {
         return;
     }
 
-    let pid = SWTOR_PID.lock().unwrap().clone().unwrap();
+    let pid = SWTOR_PID.lock().unwrap().unwrap();
 
     let handle = OpenProcess(PROCESS_QUERY_INFORMATION, false, pid);
     if handle.is_err() {
@@ -100,12 +100,11 @@ unsafe extern "system" fn enum_windows_existing_proc(hwnd: HWND, _param1: LPARAM
             window_text = text.replace("\0", "");
         },
         Err(_) => {
-
             return BOOL(1);
         }
     }
 
-    if window_text == "Star Wars™: The Old Republic™" {
+    if window_text == PROCESS_NAME {
 
         let mut process_id: u32 = 0;
         GetWindowThreadProcessId(hwnd, Some(&mut process_id as *mut u32));
@@ -126,13 +125,10 @@ pub fn hook_into_existing() {
 
     unsafe {
             
-        match EnumWindows(Some(enum_windows_existing_proc), LPARAM(0)) {
-            Ok(_) => {
-                //Enumerated every window and wasn't able to find SWTOR Window
-                SWTOR_HWND.lock().unwrap().take();
-                SWTOR_PID.lock().unwrap().take();
-            },
-            Err(_) => {}
+        //Enumerated every window and wasn't able to find SWTOR Window
+        if let Ok(_) = EnumWindows(Some(enum_windows_existing_proc), LPARAM(0)) {
+            SWTOR_HWND.lock().unwrap().take();
+            SWTOR_PID.lock().unwrap().take();
         }
         
     }
@@ -143,8 +139,7 @@ pub fn hook_into_existing() {
 
 pub fn window_in_focus() -> bool {
 
-    let t_hwnd = Arc::clone(&SWTOR_HWND);
-    if let Some(hwnd) = t_hwnd.lock().unwrap().as_ref() {
+    if let Some(hwnd) = SWTOR_HWND.lock().unwrap().as_ref() {
 
         unsafe {
             return GetForegroundWindow() == *hwnd;

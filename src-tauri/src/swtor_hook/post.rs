@@ -31,14 +31,12 @@ pub fn push_incoming_message_hash(channel: SwtorChannel, hash: u64) {
 
 fn post_message(msg_type: u32, wparam: usize, millis: u64) {
 
-    let wparam = WPARAM(wparam);
-
-    let hwnd = swtor_hook::get_hwnd();
-    if let Some(hwnd) = hwnd {
+    if let Some(hwnd) = swtor_hook::get_hwnd() {
 
         unsafe {
-            let _ = PostMessageW(hwnd, msg_type, wparam, LPARAM(0));
+            let _ = PostMessageW(hwnd, msg_type, WPARAM(wparam), LPARAM(0));
         }
+
         if millis > 0 {
             thread::sleep(Duration::from_millis(millis));
         }
@@ -49,14 +47,12 @@ fn post_message(msg_type: u32, wparam: usize, millis: u64) {
 
 fn send_message(msg_type: u32, wparam: usize, millis: u64) {
 
-    let wparam = WPARAM(wparam);
-
-    let hwnd = swtor_hook::get_hwnd();
-    if let Some(hwnd) = hwnd {
+    if let Some(hwnd) = swtor_hook::get_hwnd() {
 
         unsafe {
-            let _ = SendMessageW(hwnd, msg_type, wparam, LPARAM(0));
+            let _ = SendMessageW(hwnd, msg_type, WPARAM(wparam), LPARAM(0));
         }
+
         if millis > 0 {
             thread::sleep(Duration::from_millis(millis));
         }
@@ -84,9 +80,7 @@ fn attempt_post_submission(message: &str) {
     post_message(WM_KEYDOWN, ENTER_KEY, 250);
 
     for c in message.chars() {
-
         post_message(WM_CHAR, c as usize, 10);
-
     }
 
     post_message(WM_KEYDOWN, ENTER_KEY, 20);
@@ -99,11 +93,9 @@ fn attempt_post_submission_with_retry(command_message: &CommandMessage) -> Resul
     let c_message      = command_message.concat();
     let message_hash   = command_message.message.as_u64_hash();
 
-    let mut retries = 0;
-    while retries < 3 {
+    for _ in 0..3 {
 
         attempt_post_submission(&c_message);
-
         for _ in 0..4 {
 
             thread::sleep(Duration::from_millis(500));
@@ -114,8 +106,6 @@ fn attempt_post_submission_with_retry(command_message: &CommandMessage) -> Resul
             }
 
         }
-        
-        retries += 1;
 
     }
 
@@ -160,13 +150,9 @@ fn block_window_focus_thread(window: tauri::Window) {
         while WRITING.load(Ordering::Relaxed) {
 
             if swtor_hook::window_in_focus() {
-
-                match window.set_focus() {
-                    Ok(_) => {},
-                    Err(_) => {}
-                }
-
+                let _ = window.set_focus();
             }
+
             thread::sleep(Duration::from_millis(10));
 
         }
