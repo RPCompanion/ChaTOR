@@ -1,5 +1,5 @@
 
-use std::sync::{Arc, Mutex};
+use std::sync::Mutex;
 
 use crate::share::CaptureMessage;
 
@@ -7,7 +7,7 @@ pub mod chat_message;
 pub mod friends_list;
 
 lazy_static! {
-    static ref MESSAGES: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
+    static ref MESSAGES: Mutex<Vec<String>> = Mutex::new(Vec::new());
 }
 
 pub fn submit_message(capture_message: CaptureMessage) {

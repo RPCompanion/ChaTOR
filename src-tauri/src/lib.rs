@@ -10,7 +10,6 @@ use std::net::TcpListener;
 use std::net::TcpStream;
 use std::sync::atomic::AtomicBool;
 use std::sync::atomic::Ordering;
-use std::sync::Arc;
 
 use std::str;
 use std::thread;
@@ -28,10 +27,7 @@ use lib_only::{submit_message, drain_messages};
 #[macro_use]
 extern crate lazy_static;
 
-lazy_static! {
-    static ref QUIT: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
-}
-
+static QUIT: AtomicBool = AtomicBool::new(false);
 
 #[ctor::ctor]
 fn detour_init() {

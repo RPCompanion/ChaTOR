@@ -1,5 +1,5 @@
 
-use std::{io::{ErrorKind, Read, Write}, net::{TcpListener, TcpStream}, sync::{atomic::{AtomicBool, Ordering}, Arc, Mutex}, time::Duration};
+use std::{io::{ErrorKind, Read, Write}, net::{TcpListener, TcpStream}, sync::{atomic::{AtomicBool, Ordering}, Mutex}, time::Duration};
 use std::thread;
 
 use tracing::{error, info};
@@ -18,10 +18,11 @@ use self::message_container::SwtorMessageContainer;
 const SUPPORTED_SWTOR_CHECKSUM: [u8; 32] = sha256_to_array!("7F45BD615F00D7D184A1B364BEE330BDBA4B6DB0EBE0F3E48B83F4802FCBAA0E");
 
 lazy_static! {
-    static ref INJECTED: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
-    static ref CONTINUE_LOGGING: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
-    static ref MESSAGE_CONTAINER: Arc<Mutex<SwtorMessageContainer>> = Arc::new(Mutex::new(SwtorMessageContainer::new()));
+    static ref MESSAGE_CONTAINER: Mutex<SwtorMessageContainer> = Mutex::new(SwtorMessageContainer::new());
 }
+
+static INJECTED: AtomicBool = AtomicBool::new(false);
+static CONTINUE_LOGGING: AtomicBool = AtomicBool::new(false);
 
 #[derive(Deserialize, Serialize)]
 pub enum CaptureError {
@@ -172,12 +173,11 @@ fn handle_message(message: CaptureMessage) {
 
 fn start_logging_propagation(window: tauri::Window) {
 
-    let messages = Arc::clone(&MESSAGE_CONTAINER);
     thread::spawn(move || {
 
-        while CONTINUE_LOGGING.load(Ordering::Relaxed) || !messages.lock().unwrap().unstored_messages.is_empty() {
+        while CONTINUE_LOGGING.load(Ordering::Relaxed) || !MESSAGE_CONTAINER.lock().unwrap().unstored_messages.is_empty() {
 
-            let unstored_messages = messages
+            let unstored_messages = MESSAGE_CONTAINER
                 .lock()
                 .unwrap()
                 .drain_unstored();

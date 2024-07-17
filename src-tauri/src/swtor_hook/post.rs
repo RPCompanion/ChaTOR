@@ -5,7 +5,7 @@ use crate::utils::StringUtils;
 
 use crate::dal::db::user_character_messages::{CommandMessage, UserCharacterMessages};
 
-use std::sync::{Arc, Mutex};
+use std::sync::Mutex;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::time::Duration;
@@ -17,9 +17,10 @@ use windows::Win32::Foundation::{LPARAM, WPARAM};
 use windows::Win32::UI::WindowsAndMessaging::{PostMessageW, SendMessageW, WM_CHAR, WM_KEYDOWN, WM_KEYUP};
 
 lazy_static! {
-    static ref WRITING: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
-    static ref MESSAGE_HASH_CONTAINER: Arc<Mutex<MessageHashContainer>> = Arc::new(Mutex::new(MessageHashContainer::new()));
+    static ref MESSAGE_HASH_CONTAINER: Mutex<MessageHashContainer> = Mutex::new(MessageHashContainer::new());
 }
+
+static WRITING: AtomicBool = AtomicBool::new(false);
 
 const ENTER_KEY: usize     = 0x0D;
 const BACKSPACE_KEY: usize = 0x08;
@@ -89,22 +90,22 @@ fn attempt_post_submission(message: &str) {
 
 fn attempt_post_submission_with_retry(command_message: &CommandMessage) -> Result<(), &'static str> {
 
-    let message_hash_cont = Arc::clone(&MESSAGE_HASH_CONTAINER);
-    let c_message      = command_message.concat();
-    let message_hash   = command_message.message.as_u64_hash();
+    let c_message    = command_message.concat();
+    let message_hash = command_message.message.as_u64_hash();
 
     for _ in 0..3 {
 
         attempt_post_submission(&c_message);
         for _ in 0..4 {
 
-            thread::sleep(Duration::from_millis(500));
-            if message_hash_cont.lock().unwrap().message_hashes.contains(&message_hash) {
+            let lock = MESSAGE_HASH_CONTAINER.lock().unwrap();
+            if lock.message_hashes.contains(&message_hash) {
                 return Ok(());
-            } else if  message_hash_cont.lock().unwrap().channels.contains(&SwtorChannel::PlayerNotFound) {
+            } else if  lock.channels.contains(&SwtorChannel::PlayerNotFound) {
                 return Err("Player not found");
             }
 
+            thread::sleep(Duration::from_millis(500));
         }
 
     }
@@ -176,8 +177,7 @@ pub async fn submit_actual_post(window: tauri::Window, retry: bool, mut characte
         character_message.prepare_messages();
         character_message.store();
 
-        let message_hash_cont   = Arc::clone(&MESSAGE_HASH_CONTAINER);
-        message_hash_cont.lock().unwrap().clear();
+        MESSAGE_HASH_CONTAINER.lock().unwrap().clear();
 
         prep_game_for_input();
 
