@@ -9,9 +9,7 @@
     import { goto } from "@roxi/routify";
     import JSON5 from 'json5';
     
-
-    let template: ICharacterTemplate = JSON5.parse(standard);
-    let builder = new CharacterTemplate(template);
+    let template = new CharacterTemplate(JSON5.parse(standard));
 
     function on_back() {
         $goto("/character_sheets");
