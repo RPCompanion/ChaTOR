@@ -34,8 +34,8 @@
 
     function on_next() {
 
-        if (sheet.name.length == 0) {
-            toast_error("Please enter a character name.");
+        if (sheet.name.length <= 2) {
+            toast_error("Character name must be at least 3 characters long.");
             return;
         }
 

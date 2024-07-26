@@ -46,7 +46,7 @@ export function toast_error(message: string) {
 
     toast.push(message, {
         theme: {
-            "--toastBackground": "#ff0000",
+            "--toastBarBackground": "red",
             "--toastColor": "#ffffff"
         }
     });

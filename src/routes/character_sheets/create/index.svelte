@@ -102,9 +102,28 @@
 
     }
 
+    function get_page_title(l_sheet_comp: SheetComponents): string {
+            
+        switch (l_sheet_comp) {
+
+            case SheetComponents.Name:
+                return "Name and Description";
+            case SheetComponents.Perks:
+                return "Perks";
+            case SheetComponents.WeaponProficiencies:
+                return "Weapon Proficiencies";
+            case SheetComponents.Attributes:
+                return "Attributes";
+            case SheetComponents.Save:
+                return "Save";
+
+        }
+        
+    }
+
 </script>
 
-<PageFormatting title="Create Character Sheet">
+<PageFormatting title={get_page_title(sheet_component)}>
     <div class="h-6"></div>
     {#if sheet_component == SheetComponents.Name}
         <Name bind:sheet on:next={on_next}/>
