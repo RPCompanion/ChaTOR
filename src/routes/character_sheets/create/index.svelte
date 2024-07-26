@@ -11,6 +11,7 @@
     import Attributes from "./_Attributes.svelte";
     import Perks from "./_Perks.svelte";
     import WeaponProficiencies from "./_WeaponProficiencies.svelte";
+    import Save from "./_Save.svelte";
     
     enum SheetComponents {
         Name,
@@ -108,11 +109,12 @@
     {#if sheet_component == SheetComponents.Name}
         <Name bind:sheet on:next={on_next}/>
     {:else if sheet_component == SheetComponents.Perks}
-        <Perks/>
+        <Perks on:back={on_back} on:next={on_next}/>
     {:else if sheet_component == SheetComponents.WeaponProficiencies}
-        <WeaponProficiencies/>
+        <WeaponProficiencies on:back={on_back} on:next={on_next}/>
     {:else if sheet_component == SheetComponents.Attributes}
-        <Attributes/>
+        <Attributes on:back={on_back} on:next={on_next}/>
     {:else if sheet_component == SheetComponents.Save}
+        <Save on:back={on_back}/>
     {/if}
 </PageFormatting>
