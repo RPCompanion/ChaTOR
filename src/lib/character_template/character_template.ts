@@ -79,6 +79,7 @@ export class CharacterTemplate implements ICharacterTemplate {
             health: this.base_health,
             armor_class: this.base_armor_class,
             weapon_proficiencies: [],
+            perks: this.template.perks != undefined ? [] : undefined,
             attributes: attributes
         };
 

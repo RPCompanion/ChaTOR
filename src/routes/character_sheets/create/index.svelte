@@ -118,7 +118,7 @@
                 return "Save";
 
         }
-        
+
     }
 
 </script>
@@ -128,7 +128,7 @@
     {#if sheet_component == SheetComponents.Name}
         <Name bind:sheet on:next={on_next}/>
     {:else if sheet_component == SheetComponents.Perks}
-        <Perks on:back={on_back} on:next={on_next}/>
+        <Perks {template} bind:sheet on:back={on_back} on:next={on_next}/>
     {:else if sheet_component == SheetComponents.WeaponProficiencies}
         <WeaponProficiencies on:back={on_back} on:next={on_next}/>
     {:else if sheet_component == SheetComponents.Attributes}
