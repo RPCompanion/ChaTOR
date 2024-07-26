@@ -84,4 +84,12 @@ export class CharacterTemplate implements ICharacterTemplate {
 
     }
 
+    public has_perks(): boolean {
+        return this.perks !== undefined && this.perks.length > 0;
+    }
+
+    public has_weapon_proficiencies(): boolean {
+        return this.weapon_proficiencies !== undefined && this.weapon_proficiencies.categories.length > 0;
+    }
+
 }

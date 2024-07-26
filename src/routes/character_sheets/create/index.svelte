@@ -8,6 +8,9 @@
     import JSON5 from 'json5';
 
     import Name from "./_Name.svelte";
+    import Attributes from "./_Attributes.svelte";
+    import Perks from "./_Perks.svelte";
+    import WeaponProficiencies from "./_WeaponProficiencies.svelte";
     
     enum SheetComponents {
         Name,
@@ -19,15 +22,10 @@
     let sheet_component: SheetComponents = SheetComponents.Name;
 
     const template = new CharacterTemplate(JSON5.parse(standard));
+    const template_has_perks = template.has_perks();
+    const template_has_weapon_proficiencies = template.has_weapon_proficiencies();
+
     let sheet: ICharacterSheet = template.get_base_character_sheet();
-
-    function template_has_perks() {
-        return template.perks != undefined && template.perks.length > 0;
-    }
-
-    function template_has_weapon_proficiencies() {
-        return template.weapon_proficiencies != undefined && template.weapon_proficiencies.categories.length > 0;
-    }
 
     function on_next() {
 
@@ -35,9 +33,9 @@
 
             case SheetComponents.Name:
 
-                if (template_has_perks()) {
+                if (template_has_perks) {
                     sheet_component = SheetComponents.Perks;
-                } else if (template_has_weapon_proficiencies()) {
+                } else if (template_has_weapon_proficiencies) {
                     sheet_component = SheetComponents.WeaponProficiencies;
                 } else {
                     sheet_component = SheetComponents.Attributes;
@@ -46,7 +44,7 @@
 
             case SheetComponents.Perks:
 
-                if (template_has_weapon_proficiencies()) {
+                if (template_has_weapon_proficiencies) {
                     sheet_component = SheetComponents.WeaponProficiencies;
                 } else {
                     sheet_component = SheetComponents.Attributes;
@@ -78,7 +76,7 @@
 
             case SheetComponents.WeaponProficiencies:
 
-                if (template_has_perks()) {
+                if (template_has_perks) {
                     sheet_component = SheetComponents.Perks;
                 } else {
                     sheet_component = SheetComponents.Name;
@@ -87,7 +85,7 @@
 
             case SheetComponents.Attributes:
 
-                if (template_has_weapon_proficiencies()) {
+                if (template_has_weapon_proficiencies) {
                     sheet_component = SheetComponents.WeaponProficiencies;
                 } else {
                     sheet_component = SheetComponents.Name;
@@ -107,5 +105,14 @@
 
 <PageFormatting title="Create Character Sheet">
     <div class="h-6"></div>
-    <Name {sheet} on:next={on_next}/>
+    {#if sheet_component == SheetComponents.Name}
+        <Name bind:sheet on:next={on_next}/>
+    {:else if sheet_component == SheetComponents.Perks}
+        <Perks/>
+    {:else if sheet_component == SheetComponents.WeaponProficiencies}
+        <WeaponProficiencies/>
+    {:else if sheet_component == SheetComponents.Attributes}
+        <Attributes/>
+    {:else if sheet_component == SheetComponents.Save}
+    {/if}
 </PageFormatting>
