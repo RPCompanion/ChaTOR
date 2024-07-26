@@ -56,16 +56,18 @@ export class CharacterTemplate implements ICharacterTemplate {
     public get_base_character_sheet(): ICharacterSheet {
 
         let attributes: ISheetAttribute[] = this.attributes.map((attribute) => {
+
             return {
                 name: attribute.name,
                 value: 0,
-                skills: attribute.skills.map((skill) => {
+                skills: attribute.skills?.map((skill) => {
                     return {
                         name: skill.name,
                         value: 0
                     }  
                 })
             }
+
         });
 
         return {
