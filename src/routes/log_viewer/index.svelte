@@ -65,7 +65,7 @@
     async function init_date_tags() {
 
         let response = await get_all_date_tag_favourites();
-        if (response.is_error()) {
+        if (response.is_err()) {
             return;
         }
 

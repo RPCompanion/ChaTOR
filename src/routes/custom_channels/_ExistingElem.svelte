@@ -28,9 +28,9 @@
     async function on_delete() {
 
         let result = await custom_channel_delete(channel);
-        if (result.is_error()) {
+        if (result.is_err()) {
 
-            toast_error(result.unwrap_error());
+            toast_error(result.unwrap_err());
 
         }
 
@@ -39,18 +39,18 @@
     async function on_change() {
 
         let valid = channel_name_valid(channel.channel_name);
-        if (valid.is_error()) {
+        if (valid.is_err()) {
 
-            toast_error(valid.unwrap_error());
+            toast_error(valid.unwrap_err());
             channel.channel_name = channel_cache.channel_name;
             return;
 
         }
 
         let result = await custom_channel_save(channel);
-        if (result.is_error()) {
+        if (result.is_err()) {
 
-            toast_error(result.unwrap_error());
+            toast_error(result.unwrap_err());
             
         }
 

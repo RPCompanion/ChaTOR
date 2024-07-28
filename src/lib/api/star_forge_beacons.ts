@@ -23,8 +23,8 @@ export async function get_star_forge_beacons(): Promise<Result<IStarForgeBeacon[
         return Err("Failed to fetch data from the server.")
     }
 
-    if (response.is_error()) {
-        return Err(response.unwrap_error().message);
+    if (response.is_err()) {
+        return Err(response.unwrap_err().message);
     }
 
     return Ok(response.unwrap());

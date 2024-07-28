@@ -93,8 +93,8 @@ export class AutoMessageSplitter {
     private get_single_message_array(): Result<string[], string> {
 
         let prefix_result = this.prefix_message(this.message);
-        if (prefix_result.is_error()) {
-            return Err(prefix_result.unwrap_error());
+        if (prefix_result.is_err()) {
+            return Err(prefix_result.unwrap_err());
         }
         
         return Ok([prefix_result.unwrap()]);

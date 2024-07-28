@@ -52,8 +52,8 @@
 
         let validation = validate_emote();
 
-        if (validation.is_error()) {
-            toast.push(validation.unwrap_error());
+        if (validation.is_err()) {
+            toast.push(validation.unwrap_err());
             return;
         }
 

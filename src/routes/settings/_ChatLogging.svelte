@@ -32,7 +32,7 @@
             }
 
             $shown_characters_error = true;
-            toast_error(temp.unwrap_error());
+            toast_error(temp.unwrap_err());
 
         });
         

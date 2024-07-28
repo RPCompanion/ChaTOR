@@ -26,8 +26,8 @@
 
         let result = channel_name_valid(channel_name);
 
-        if (result.is_error()) {
-            toast_error(result.unwrap_error());
+        if (result.is_err()) {
+            toast_error(result.unwrap_err());
             return;
         }
 
@@ -36,8 +36,8 @@
             channel_number: channel_number
         });
 
-        if (response.is_error()) {
-            toast_error(response.unwrap_error());
+        if (response.is_err()) {
+            toast_error(response.unwrap_err());
             return;
         }
 

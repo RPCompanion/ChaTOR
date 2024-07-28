@@ -1,17 +1,25 @@
 
-export class Result<Ok, Error> {
+export class Result<Ok, Err> {
 
     private constructor(
         private readonly ok: Ok | null,
-        private readonly error: Error | null
+        private readonly err: Err | null
     ) {}
 
-    static ok<Ok, Error>(value: Ok): Result<Ok, Error> {
-        return new Result<Ok, Error>(value, null);
+    static ok<Ok, Err>(value: Ok): Result<Ok, Err> {
+        return new Result<Ok, Err>(value, null);
     }
 
-    static error<Ok, Error>(value: Error): Result<Ok, Error> {
-        return new Result<Ok, Error>(null, value);
+    static error<Ok, Err>(value: Err): Result<Ok, Err> {
+        return new Result<Ok, Err>(null, value);
+    }
+
+    static try<Ok>(callback: () => Ok): Result<Ok, Error> {
+        try {
+            return Result.ok(callback());
+        } catch (error) {
+            return Result.error(error instanceof Error ? error : new Error(String(error)));
+        }
     }
 
     is_ok(): boolean {
@@ -24,13 +32,13 @@ export class Result<Ok, Error> {
         }
     }
 
-    is_error(): boolean {
-        return this.error !== null;
+    is_err(): boolean {
+        return this.err !== null;
     }
 
-    is_error_cb(callback: (value: Error) => void) {
-        if (this.error !== null) {
-            callback(this.error);
+    is_err_cb(callback: (value: Err) => void) {
+        if (this.err !== null) {
+            callback(this.err);
         }
     }
 
@@ -48,11 +56,11 @@ export class Result<Ok, Error> {
         return this.ok;
     }
 
-    unwrap_error(): Error {
-        if (this.error === null) {
+    unwrap_err(): Err {
+        if (this.err === null) {
             throw new Error("Cannot unwrap ok result");
         }
-        return this.error;
+        return this.err;
     }
 
 }

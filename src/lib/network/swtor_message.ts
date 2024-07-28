@@ -74,7 +74,7 @@ export class SwtorMessage {
             }
 
             let result = parse_hyperlink(obj[0]);
-            if (result.is_error()) {
+            if (result.is_err()) {
                 fragments.push("<Unknown>");
             } else {
                 fragments.push(result.unwrap());

@@ -13,8 +13,8 @@
     async function get_beacons() {
 
         let response = await get_star_forge_beacons();
-        if (response.is_error()) {
-            toast.push(response.unwrap_error(), { theme: { "--toastBackground": "red" } });
+        if (response.is_err()) {
+            toast.push(response.unwrap_err(), { theme: { "--toastBackground": "red" } });
             return;
         }
 

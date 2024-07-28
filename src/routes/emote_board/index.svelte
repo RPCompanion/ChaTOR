@@ -10,8 +10,8 @@
     async function on_emote_click(emote: ICustomEmote) {
 
         let response = await submit_post("ButtonEmote", [emote.emote]);
-        if (response.is_error()) {
-            toast.push(response.unwrap_error(), { theme: { "--toastBackground": "red" } });
+        if (response.is_err()) {
+            toast.push(response.unwrap_err(), { theme: { "--toastBackground": "red" } });
         }
 
     }

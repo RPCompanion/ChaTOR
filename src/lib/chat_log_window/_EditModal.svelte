@@ -82,14 +82,14 @@
         chat_tab.name = chat_tab.name.trim();
 
         let name_result = validate_chat_tab_name();
-        if (name_result.is_error()) {
-            toast.push(name_result.unwrap_error(), { theme: { '--toastBarBackground': 'red' } });
+        if (name_result.is_err()) {
+            toast.push(name_result.unwrap_err(), { theme: { '--toastBarBackground': 'red' } });
             return;
         }
 
         let c_result = validate_channels();
-        if (c_result.is_error()) {
-            toast.push(c_result.unwrap_error(), { theme: { '--toastBarBackground': 'red' } });
+        if (c_result.is_err()) {
+            toast.push(c_result.unwrap_err(), { theme: { '--toastBarBackground': 'red' } });
             return;
         }
 

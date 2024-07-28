@@ -32,7 +32,7 @@
         show_modal = false;
         let resposne = await submit_post("ChatMessage", messages);
 
-        if (resposne.is_error()) {
+        if (resposne.is_err()) {
             return;
         }
 
@@ -79,8 +79,8 @@
         let custom_command = get_custom_command();
 
         let response = new AutoMessageSplitter(unicode_escape(message), undefined, custom_command).split();
-        if (response.is_error()) {
-            toast.push("Error: " + response.unwrap_error());
+        if (response.is_err()) {
+            toast.push("Error: " + response.unwrap_err());
             return;
         }
 

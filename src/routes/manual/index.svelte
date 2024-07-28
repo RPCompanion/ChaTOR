@@ -47,8 +47,8 @@
 
         messages = messages.map((message) => message.trim());
         let message_response = valid_messages(messages);
-        if (message_response.is_error()) {
-            toast.push(message_response.unwrap_error());
+        if (message_response.is_err()) {
+            toast.push(message_response.unwrap_err());
             return;
         }
 
@@ -65,8 +65,8 @@
         show_modal = false;
         let response = await submit_post("ChatMessage", messages.map((message) => unicode_escape(message)));
 
-        if (response.is_error()) {
-            toast.push(response.unwrap_error(), { theme: { "--toastBackground": "red" } });
+        if (response.is_err()) {
+            toast.push(response.unwrap_err(), { theme: { "--toastBackground": "red" } });
             return;
         }
 
@@ -83,8 +83,8 @@
     async function on_single_post(idx: number) {
 
         let response = await submit_post("ChatMessage", [messages[idx]]);
-        if (response.is_error()) {
-            toast.push(response.unwrap_error(), { theme: { "--toastBackground": "red" } });
+        if (response.is_err()) {
+            toast.push(response.unwrap_err(), { theme: { "--toastBackground": "red" } });
         }
 
     }

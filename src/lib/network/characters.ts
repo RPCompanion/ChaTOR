@@ -116,7 +116,7 @@ export function init_active_character() {
 
     get_all_characters((characters: Result<ICharacter[], string>) => {
 
-        if (characters.is_error()) {
+        if (characters.is_err()) {
             return;
         }
 
