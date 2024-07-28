@@ -22,6 +22,21 @@ export class Result<Ok, Err> {
         }
     }
 
+    static async async_try<Ok>(callback: () => Promise<Ok>): Promise<Result<Ok, Error>> {
+        try {
+            return Result.ok(await callback());
+        } catch (error) {
+            return Result.error(error instanceof Error ? error : new Error(String(error)));
+        }
+    }
+
+    map_err<Other>(conversion: (err: Err) => Other): Result<Ok, Other> {
+        if (this.ok !== null) {
+            return Result.ok(this.ok);
+        }
+        return Result.error(conversion(this.err!));
+    }
+
     is_ok(): boolean {
         return this.ok !== null;
     }
