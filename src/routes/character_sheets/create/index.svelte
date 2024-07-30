@@ -130,7 +130,7 @@
     {:else if sheet_component == SheetComponents.Perks}
         <Perks {template} bind:sheet on:back={on_back} on:next={on_next}/>
     {:else if sheet_component == SheetComponents.WeaponProficiencies}
-        <WeaponProficiencies on:back={on_back} on:next={on_next}/>
+        <WeaponProficiencies {template} bind:sheet on:back={on_back} on:next={on_next}/>
     {:else if sheet_component == SheetComponents.Attributes}
         <Attributes on:back={on_back} on:next={on_next}/>
     {:else if sheet_component == SheetComponents.Save}
