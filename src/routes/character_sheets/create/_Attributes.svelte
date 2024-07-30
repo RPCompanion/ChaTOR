@@ -6,14 +6,16 @@
     import type { ICharacterSheet } from "../../../lib/character_sheet/character_sheet";
     import { CharacterSheetUtils } from "../../../lib/character_sheet/character_sheet_utils";
     import type { IAttribute } from "../../../lib/character_template/attributes";
+    import PmButton from "./_PMButton.svelte";
     
     export let template: CharacterTemplate;
     export let sheet: ICharacterSheet;
 
     let attributes: IAttribute[] = template.attributes;
 
-    const GIVEN_ATTRIBUTE_POINTS: number         = template.allotments.attributes.given_points;
-    const GIVEN_SKILL_POINTS: number | undefined = template.allotments.skills?.given_points;
+    const GIVEN_ATTRIBUTE_POINTS: number          = template.allotments.attributes.given_points;
+    const MAX_ATTRIBUTE_VALUE: number | undefined = template.allotments.attributes.max_points_per_allotment;
+    const GIVEN_SKILL_POINTS: number | undefined  = template.allotments.skills?.given_points;
 
     let char_sheet_utils: CharacterSheetUtils = new CharacterSheetUtils(sheet, template);
     let l_attribute_points: number         = get_leftover_attribute_points(sheet);
@@ -58,6 +60,39 @@
         dispatch("back");
     }
 
+    function on_attr_change(attribute: string, value: number) {
+
+        let attr = sheet.attributes.find((a) => a.name === attribute);
+        if (attr == undefined) {
+            return;
+        }
+
+        let temp = attr.value + value;
+        if (temp < 0) {
+            return;
+        }
+
+        if (MAX_ATTRIBUTE_VALUE != undefined && temp > MAX_ATTRIBUTE_VALUE) {
+            return;
+        }
+
+        attr.value = temp;
+        sheet = sheet;
+
+    }
+
+    function get_attribute_value(t_sheet: ICharacterSheet, attribute: string): number {
+
+        let attr = t_sheet.attributes.find((a) => a.name === attribute);
+
+        if (attr == undefined) {
+            return 0;
+        }
+
+        return attr.value;
+
+    }
+
 </script>
 <div class="flex flex-col gap-1">
     <h2 class="text-white text-2xl">Attribute points left: {l_attribute_points}</h2>
@@ -65,9 +100,18 @@
         <h2 class="text-white text-2xl">Skill points left: {l_skill_points}</h2>
     {/if}
     {#each attributes as attribute}
-        <div class="flex flex-col gap-1 bg-slate-700 rounded-md p-1">
-            <h2 class="text-white text-2xl">{attribute.name}</h2>
-        </div>
+        {#if char_sheet_utils.can_use_attribute(attribute.name)}
+            <div class="flex flex-col gap-1">
+                <div class="bg-slate-700 rounded-md p-1 grid grid-cols-2">
+                    <h2 class="text-white text-2xl">{attribute.name}</h2>
+                    <div class="flex flex-row-reverse gap-1">
+                        <PmButton on:click={() => { on_attr_change(attribute.name, -1); }}>-</PmButton>
+                        <p class="bg-white rounded-md w-12 text-center text-xl">{get_attribute_value(sheet, attribute.name)}</p>
+                        <PmButton on:click={() => { on_attr_change(attribute.name, 1); } } >+</PmButton>
+                    </div>
+                </div>
+            </div>
+        {/if}
     {/each}
 </div>
 
