@@ -8,6 +8,6 @@ export interface ISkill {
 export interface IAttribute {
     name: string;
     description: string;
-    skills: ISkill[];
+    skills?: ISkill[];
     required?: IRequirements;
 }

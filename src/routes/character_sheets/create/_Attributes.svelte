@@ -7,6 +7,7 @@
     import { CharacterSheetUtils } from "../../../lib/character_sheet/character_sheet_utils";
     import type { IAttribute } from "../../../lib/character_template/attributes";
     import PmButton from "./_PMButton.svelte";
+    import Skills from "./_Skills.svelte";
     
     export let template: CharacterTemplate;
     export let sheet: ICharacterSheet;
@@ -115,6 +116,7 @@
                     </div>
                 </div>
             </div>
+            <Skills {attribute} bind:sheet />
         {/if}
     {/each}
 </div>
