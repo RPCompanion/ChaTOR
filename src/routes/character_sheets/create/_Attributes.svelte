@@ -62,6 +62,10 @@
 
     function on_attr_change(attribute: string, value: number) {
 
+        if (l_attribute_points == 0 && value > 0) {
+            return;
+        }
+
         let attr = sheet.attributes.find((a) => a.name === attribute);
         if (attr == undefined) {
             return;
