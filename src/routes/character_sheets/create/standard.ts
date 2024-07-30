@@ -108,7 +108,7 @@ export default `{
             pub perks: Option<Vec<String>>
         }
     */
-    weapon_proficiences: {
+    weapon_proficiencies: {
         categories: [
             {
                 category: "Ranged",
