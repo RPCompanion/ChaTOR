@@ -17,6 +17,7 @@
     const GIVEN_ATTRIBUTE_POINTS: number          = template.allotments.attributes.given_points;
     const MAX_ATTRIBUTE_VALUE: number | undefined = template.allotments.attributes.max_points_per_allotment;
     const GIVEN_SKILL_POINTS: number | undefined  = template.allotments.skills?.given_points;
+    const MAX_SKILL_VALUE: number | undefined     = template.allotments.skills?.max_points_per_allotment;
 
     let char_sheet_utils: CharacterSheetUtils = new CharacterSheetUtils(sheet, template);
     let l_attribute_points: number         = get_leftover_attribute_points(sheet);
@@ -116,7 +117,7 @@
                     </div>
                 </div>
             </div>
-            <Skills {attribute} bind:sheet />
+            <Skills {MAX_SKILL_VALUE} {l_skill_points} {attribute} bind:sheet />
         {/if}
     {/each}
 </div>
