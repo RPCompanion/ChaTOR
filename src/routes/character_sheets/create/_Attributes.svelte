@@ -29,6 +29,34 @@
 
     const dispatch = createEventDispatcher();
 
+    function clean_up_sheet() {
+
+        sheet.attributes.forEach((attr) => {
+
+            if (char_sheet_utils.can_use_attribute(attr.name)) {
+                return;
+            }
+
+            attr.value = 0;
+
+            if (attr.skills == undefined) {
+                return;
+            }
+
+            attr.skills.forEach((skill) => {
+
+                if (skill.value == 0) {
+                    return;
+                }
+
+                skill.value = 0;
+
+            });
+
+        });
+
+    }
+
     function get_leftover_attribute_points(t_sheet: ICharacterSheet): number {
 
         return GIVEN_ATTRIBUTE_POINTS - t_sheet.attributes.reduce((acc, attribute) => {
@@ -98,6 +126,8 @@
         return attr.value;
 
     }
+
+    clean_up_sheet();
 
 </script>
 <div class="flex flex-col gap-1">
