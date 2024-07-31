@@ -1,6 +1,7 @@
 
 import { type ICharacterSheet, type ISheetAttribute } from "../character_sheet/character_sheet";
 import { type IAttribute } from "./attributes";
+import type { IRequirements } from "./common";
 import { type IPerk } from "./perk";
 import { type IWeaponProficiency } from "./weapon_proficiency";
 
@@ -91,6 +92,20 @@ export class CharacterTemplate implements ICharacterTemplate {
 
     public has_weapon_proficiencies(): boolean {
         return this.weapon_proficiencies !== undefined && this.weapon_proficiencies.categories.length > 0;
+    }
+
+    public get_attribute_requirements(attribute_name: string): IRequirements | undefined {
+
+        let attribute = this.attributes.find((attribute) => {
+            return attribute.name === attribute_name;
+        });
+
+        if (attribute) {
+            return attribute.required;
+        }
+
+        return undefined;
+
     }
 
 }
