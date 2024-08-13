@@ -1,5 +1,5 @@
 
-use std::sync::{Arc, Mutex};
+use std::sync::Mutex;
 
 use rusqlite::params;
 use serde::{Deserialize, Serialize};

@@ -1,4 +1,5 @@
 
+use std::sync::LazyLock;
 use std::sync::Mutex;
 
 use crate::share::CaptureMessage;
@@ -6,9 +7,7 @@ use crate::share::CaptureMessage;
 pub mod chat_message;
 pub mod friends_list;
 
-lazy_static! {
-    static ref MESSAGES: Mutex<Vec<String>> = Mutex::new(Vec::new());
-}
+static MESSAGES: LazyLock<Mutex<Vec<String>>> = LazyLock::new(|| Mutex::new(Vec::new()));
 
 pub fn submit_message(capture_message: CaptureMessage) {
 

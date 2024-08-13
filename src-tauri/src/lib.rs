@@ -24,9 +24,6 @@ use windows::core::PCSTR;
 
 use lib_only::{submit_message, drain_messages};
 
-#[macro_use]
-extern crate lazy_static;
-
 static QUIT: AtomicBool = AtomicBool::new(false);
 
 #[ctor::ctor]
