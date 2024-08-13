@@ -83,7 +83,7 @@
     }
 
     function on_next() {
-
+        dispatch("next");
     }
 
     function on_back() {

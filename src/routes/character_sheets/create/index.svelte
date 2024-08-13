@@ -134,6 +134,6 @@
     {:else if sheet_component == SheetComponents.Attributes}
         <Attributes {template} bind:sheet on:back={on_back} on:next={on_next}/>
     {:else if sheet_component == SheetComponents.Save}
-        <Save on:back={on_back}/>
+        <Save bind:sheet on:back={on_back}/>
     {/if}
 </PageFormatting>
