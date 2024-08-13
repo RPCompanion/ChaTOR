@@ -42,7 +42,6 @@ base64 = "0.22"
 
 # Helpers
 int-enum = "1.1"
-lazy_static = "1.4.0"
 
 # Injection
 ctor = "0.2.8"

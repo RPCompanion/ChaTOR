@@ -1,4 +1,6 @@
 
+use std::sync::LazyLock;
+
 use serde::{Deserialize, Serialize};
 
 use crate::dal::db::settings::dimensions::WidthHeight;
@@ -24,7 +26,18 @@ pub struct AppSettings {
 
 }
 
-const TAURI_CONFIG_FILE: &str = include_str!("../../../../tauri.conf.json");
+pub const TAURI_CONFIG_FILE: &str = include_str!("../../../../tauri.conf.json");
+pub static TAURI_WINDOW_SETTINGS: LazyLock<WidthHeight> = LazyLock::new(|| {
+    
+    let conf: serde_json::Value = serde_json::from_str(TAURI_CONFIG_FILE).unwrap();
+    let windows = conf["tauri"]["windows"][0].clone();
+
+    WidthHeight {
+        width: windows["width"].as_i64().unwrap() as i32,
+        height: windows["height"].as_i64().unwrap() as i32
+    }
+
+});
 
 fn default_always_on_top() -> bool {
     false
@@ -50,15 +63,10 @@ impl Default for AppSettings {
 
     fn default() -> AppSettings {
 
-        let conf: serde_json::Value = serde_json::from_str(TAURI_CONFIG_FILE).unwrap();
-        let windows = conf["tauri"]["windows"][0].clone();
 
         AppSettings {
 
-            window: WidthHeight {
-                width: windows["width"].as_i64().unwrap() as i32,
-                height: windows["height"].as_i64().unwrap() as i32
-            },
+            window: *TAURI_WINDOW_SETTINGS,
             show_window_decorations: false,
             always_on_top: false,
             opacity: 100,

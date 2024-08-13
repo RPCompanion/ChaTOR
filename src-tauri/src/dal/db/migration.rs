@@ -1,5 +1,6 @@
 
 use std::io;
+use std::sync::LazyLock;
 use std::fs::{self, DirEntry};
 
 use tracing::error;
@@ -33,9 +34,7 @@ impl DatabaseVersion {
 
 }
 
-lazy_static! {
-	static ref VERSIONS: Vec<(DatabaseVersion, String)> = get_migration_scripts();
-}
+static VERSIONS: LazyLock<Vec<(DatabaseVersion, String)>> = LazyLock::new(|| get_migration_scripts());
 
 fn get_migration_script(path: DirEntry) -> (DatabaseVersion, String) {
 

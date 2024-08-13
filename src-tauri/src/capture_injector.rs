@@ -1,4 +1,5 @@
 
+use std::sync::LazyLock;
 use std::{io::{ErrorKind, Read, Write}, net::{TcpListener, TcpStream}, sync::{atomic::{AtomicBool, Ordering}, Mutex}, time::Duration};
 use std::thread;
 
@@ -17,9 +18,7 @@ use self::message_container::SwtorMessageContainer;
 
 const SUPPORTED_SWTOR_CHECKSUM: [u8; 32] = sha256_to_array!("7F45BD615F00D7D184A1B364BEE330BDBA4B6DB0EBE0F3E48B83F4802FCBAA0E");
 
-lazy_static! {
-    static ref MESSAGE_CONTAINER: Mutex<SwtorMessageContainer> = Mutex::new(SwtorMessageContainer::new());
-}
+static MESSAGE_CONTAINER: LazyLock<Mutex<SwtorMessageContainer>> = LazyLock::new(|| Mutex::new(SwtorMessageContainer::new()));
 
 static INJECTED: AtomicBool = AtomicBool::new(false);
 static CONTINUE_LOGGING: AtomicBool = AtomicBool::new(false);

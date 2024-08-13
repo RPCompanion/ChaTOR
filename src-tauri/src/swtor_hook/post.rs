@@ -6,6 +6,7 @@ use crate::utils::StringUtils;
 use crate::dal::db::user_character_messages::{CommandMessage, UserCharacterMessages};
 
 use std::sync::Mutex;
+use std::sync::LazyLock;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::time::Duration;
@@ -16,9 +17,7 @@ use crate::swtor_hook::message_hash_container::MessageHashContainer;
 use windows::Win32::Foundation::{LPARAM, WPARAM};
 use windows::Win32::UI::WindowsAndMessaging::{PostMessageW, SendMessageW, WM_CHAR, WM_KEYDOWN, WM_KEYUP};
 
-lazy_static! {
-    static ref MESSAGE_HASH_CONTAINER: Mutex<MessageHashContainer> = Mutex::new(MessageHashContainer::new());
-}
+static MESSAGE_HASH_CONTAINER: LazyLock<Mutex<MessageHashContainer>> = LazyLock::new(|| Mutex::new(MessageHashContainer::new()));
 
 static WRITING: AtomicBool = AtomicBool::new(false);
 

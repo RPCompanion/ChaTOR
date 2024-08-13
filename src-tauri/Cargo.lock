@@ -338,7 +338,6 @@ dependencies = [
  "em-libs",
  "futures",
  "int-enum",
- "lazy_static",
  "open",
  "regex",
  "reqwest",

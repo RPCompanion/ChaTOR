@@ -25,9 +25,7 @@ pub struct Settings {
     pub chat_log: ChatLogSettings
 }
 
-lazy_static! {
-    static ref SETTINGS: Arc<Mutex<Option<Settings>>> = Arc::new(Mutex::new(None));
-}
+static SETTINGS: Mutex<Option<Settings>> = Mutex::new(None);
 
 impl Settings {
 
