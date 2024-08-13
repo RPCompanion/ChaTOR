@@ -7,4 +7,6 @@ export interface IPerk {
   point_cost: number;
   attributes?: IAttributeModifier[];
   skills?: ISkillModifier[];
+  base_health_modifier?: number;
+  base_armor_class_modifier?: number;
 }

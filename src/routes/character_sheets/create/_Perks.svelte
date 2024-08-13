@@ -25,6 +25,11 @@
             return;
         }
 
+        let max_perks = template.allotments.perks!.max_perks;
+        if (max_perks != undefined && sheet.perks!.length >= max_perks) {
+            return;
+        }
+
         sheet.perks!.push(perk.name);
         sheet = sheet;
 

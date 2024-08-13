@@ -22,10 +22,15 @@ export interface IPoints {
     max_points_per_allotment?: number;
 }
 
+export interface IPerkPoints {
+    given_points: number;
+    max_perks?: number;
+}
+
 export interface IAllotment {
     attributes: IPoints;
     skills?: IPoints;
-    perks?: IPoints;
+    perks?: IPerkPoints;
 }
 
 export class CharacterTemplate implements ICharacterTemplate {

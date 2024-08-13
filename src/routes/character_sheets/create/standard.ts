@@ -32,7 +32,8 @@ export default `{
             max_points_per_allotment: 10
         },
         perks: {
-            given_points: 3
+            given_points: 3,
+            max_perks: 4
         }
     },
 
@@ -77,6 +78,23 @@ export default `{
             ]
         },
         {
+            name: "Charismatic",
+            description: "Your natural charm makes you more persuasive and likable, easily influencing others",
+            point_cost: 2,
+            attributes: [
+                {
+                    name: "Authority",
+                    modifier: 2
+                }
+            ],
+            skills: [
+                {
+                    name: "Persuasion",
+                    modifier: 3
+                }
+            ]
+        },
+        {
             name: "Honest Face",
             description: "You have a trustworthy face, giving you a penalty to Deception",
             point_cost: -1,
@@ -86,6 +104,18 @@ export default `{
                     modifier: -4
                 }
             ]
+        },
+        {
+            "name": "Toughness",
+            "description": "Increased resilience and durability, boosting your health",
+            "point_cost": 3,
+            "base_health_modifier": 5
+        },
+        {
+            "name": "Armored",
+            "description": "Proficiency with armor, increasing your armor class",
+            "point_cost": 2,
+            "base_armor_class_modifier": 2
         }
     ],
 
