@@ -1,14 +1,11 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use dal::db::settings::app_settings::TAURI_WINDOW_SETTINGS;
 use open;
 use tauri::{Manager, PhysicalSize, WindowEvent};
 use tauri::api::dialog::blocking::{ask, message};
 use tracing::{error, info};
-
-
-#[macro_use]
-extern crate lazy_static;
 
 mod swtor_hook;
 mod dal;
@@ -44,7 +41,14 @@ fn main() {
         .setup(|app| {
 
             let window = app.get_window("main").unwrap();
-            let settings = dal::db::settings::get_settings();
+            let mut settings = dal::db::settings::get_settings();
+
+            if TAURI_WINDOW_SETTINGS.width > settings.app.window.width || TAURI_WINDOW_SETTINGS.height > settings.app.window.height {
+
+                settings.app.window = *TAURI_WINDOW_SETTINGS;
+                dal::db::settings::update_settings(settings.clone());
+                
+            }
 
             window.set_size(PhysicalSize {
                 width: settings.app.window.width as f64,
