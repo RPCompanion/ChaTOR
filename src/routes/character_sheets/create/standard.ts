@@ -210,6 +210,24 @@ export default `{
             description: "Physical power and muscle mass"
         },
         {
+            name: "Prowess",
+            description: "Health and stamina",
+            skills: [
+                {
+                    name: "Endurance",
+                    description: "The ability to resist fatigue"
+                },
+                {
+                    name: "Resistance",
+                    description: "The ability to resist poisons and diseases"
+                },
+                {
+                    name: "Recovery",
+                    description: "The ability to heal quickly"
+                }
+            ]
+        },
+        {
             name: "Agility",
             description: "Dexterity and hand-eye coordination",
             skills: [
@@ -228,25 +246,7 @@ export default `{
             ]
         },
         {
-            name: "Vitality",
-            description: "Health and stamina",
-            skills: [
-                {
-                    name: "Endurance",
-                    description: "The ability to resist fatigue"
-                },
-                {
-                    name: "Resistance",
-                    description: "The ability to resist poisons and diseases"
-                },
-                {
-                    name: "Recovery",
-                    description: "The ability to heal quickly"
-                }
-            ]
-        },
-        {
-            name: "Authority",
+            name: "Charisma",
             description: "Leadership and presence",
             skills: [
                 {
@@ -260,7 +260,7 @@ export default `{
             ]
         },
         {
-            name: "Grit",
+            name: "Endurance",
             description: "Mental fortitude and willpower",
             skils: [
                 {
@@ -278,7 +278,7 @@ export default `{
             ]
         },
         {
-            name: "Expertise",
+            name: "Resourcefulness",
             description: "Knowledge and experience",
             skills: [
                 {
