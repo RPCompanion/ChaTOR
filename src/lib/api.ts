@@ -1,38 +1,39 @@
 
 import { Result, Ok, Err } from "./result";
 
-const WEBSITE_URL = "https://apiv2.rpcompanion.com"
+const API_URL = import.meta.env.PROD ? "https://apiv2.rpcompanion.com" : "http://localhost:6578";
+
 export const API_ENDPOINTS = {
 
     third_party: {
         discord_beacons: {
             star_forge:  {
-                url: `${WEBSITE_URL}/third_party/discord_beacons/star_forge`,
+                url: `${API_URL}/third_party/discord_beacons/star_forge`,
                 type: "GET"
             }
         }
     },
     account: {
         create: {
-            url: `${WEBSITE_URL}/account/create`,
+            url: `${API_URL}/account/create`,
             type: "POST"
         },
         login: {
-            url: `${WEBSITE_URL}/account/login`,
+            url: `${API_URL}/account/login`,
             type: "POST"
         },
     },
     character: {
         create: {
-            url: `${WEBSITE_URL}/character/create`,
+            url: `${API_URL}/character/create`,
             type: "POST"
         },
         delete: {
-            url: `${WEBSITE_URL}/character/delete`,
+            url: `${API_URL}/character/delete`,
             type: "DELETE"
         },
         templates: {
-            url: `${WEBSITE_URL}/character/templates`,
+            url: `${API_URL}/character/templates`,
             type: "GET"
         },
     }
