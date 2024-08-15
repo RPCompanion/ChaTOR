@@ -48,9 +48,9 @@ impl Account {
         const QUERY: &str =
         "
             INSERT INTO 
-                account (account_token)
+                account (account_id, account_token)
             VALUES
-                (?1);
+                (1, ?1);
         ";
 
         match conn.execute(QUERY, params![self.account_token]) {

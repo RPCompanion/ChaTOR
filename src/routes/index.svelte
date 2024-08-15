@@ -5,12 +5,12 @@
     import { init_network } from "../lib/network";
     import { goto } from "@roxi/routify";
     import { init_window_events } from "../lib/window";
-    import { init_account } from "../lib/api/account";
+    import { init_api } from "../lib/api";
 
     onMount(() => {
         init_network();
         init_window_events();
-        init_account();
+        init_api();
         $goto("/automatic");
     });
 
