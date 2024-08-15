@@ -11,8 +11,31 @@ export const API_ENDPOINTS = {
                 type: "GET"
             }
         }
+    },
+    account: {
+        create: {
+            url: `${WEBSITE_URL}/account/create`,
+            type: "POST"
+        },
+        login: {
+            url: `${WEBSITE_URL}/account/login`,
+            type: "POST"
+        },
+    },
+    character: {
+        create: {
+            url: `${WEBSITE_URL}/character/create`,
+            type: "POST"
+        },
+        delete: {
+            url: `${WEBSITE_URL}/character/delete`,
+            type: "DELETE"
+        },
+        templates: {
+            url: `${WEBSITE_URL}/character/templates`,
+            type: "GET"
+        },
     }
-
 };
 
 export interface IGenericAPIError {
