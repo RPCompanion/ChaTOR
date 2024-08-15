@@ -1,4 +1,5 @@
 
+import { init_account } from "./api/account";
 import { Result, Ok, Err } from "./result";
 
 const API_URL = import.meta.env.PROD ? "https://apiv2.rpcompanion.com" : "http://localhost:6578";
@@ -75,4 +76,8 @@ export async function http_get<T, E>(endpoint: string | Request): Promise<Result
 
     }
 
+}
+
+export function init_api() {
+    init_account();
 }
