@@ -7,6 +7,20 @@ CREATE TABLE IF NOT EXISTS Cache_Jediapedia
     html TEXT NOT NULL
 );
 
+
+CREATE TABLE IF NOT EXISTS Account
+(
+    account_id INTEGER UNIQUE,
+    account_token BLOB NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Account_Characters
+(
+    account_character_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    character_sheet TEXT NOT NULL,
+    public_token BLOB NOT NULL
+);
+
 /*
     CustomEmotes.order_index is used to keep track of the order of the emotes. Uniqueness is not enforced and
     favourites and non-favourites may share similar indices.
@@ -46,7 +60,7 @@ CREATE TABLE IF NOT EXISTS CustomEmoteCategory
 CREATE TABLE IF NOT EXISTS Settings
 (
     settings_id INTEGER UNIQUE,
-    settings TEXT VARCHAR NOT NULL
+    settings TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS Characters
