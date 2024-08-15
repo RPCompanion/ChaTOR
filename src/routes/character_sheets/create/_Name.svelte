@@ -5,11 +5,13 @@
     import VariableSizeButton from "../../../lib/buttons/VariableSizeButton.svelte";
     import type { ICharacterSheet } from "../../../lib/character_sheet/character_sheet";
     import { toast_error } from "../../../lib/utils";
+    import { get_sheet_config } from "@chator/character-sheet";
 
     export let sheet: ICharacterSheet;
 
-    const MAX_CHARACTER_NAME_LENGTH = 48;
-    const MAX_DESCRIPTION_LENGTH: number = 2048;
+    const SHEET_CONFIG = get_sheet_config();
+    const MAX_CHARACTER_NAME_LENGTH      = SHEET_CONFIG.name.max_length;
+    const MAX_DESCRIPTION_LENGTH: number = SHEET_CONFIG.description.max_length;
 
     const dispatch = createEventDispatcher();
     function on_name_input() {
