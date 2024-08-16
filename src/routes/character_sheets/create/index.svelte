@@ -26,6 +26,8 @@
     let template_has_weapon_proficiencies: boolean = false;
     let sheet: ICharacterSheet;
 
+    let server_id: number = 0;
+
     function on_selected_template(event: CustomEvent<CharacterTemplate>) {
 
         template = event.detail;
@@ -136,7 +138,7 @@
         <Template on:selected_template={on_selected_template}/>
     {:else}
         {#if sheet_component == SheetComponents.Name}
-            <Name bind:sheet on:next={on_next}/>
+            <Name bind:sheet bind:server_id on:next={on_next}/>
         {:else if sheet_component == SheetComponents.Perks}
             <Perks {template} bind:sheet on:back={on_back} on:next={on_next}/>
         {:else if sheet_component == SheetComponents.WeaponProficiencies}

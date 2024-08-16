@@ -6,8 +6,10 @@
     import type { ICharacterSheet } from "../../../lib/character_sheet/character_sheet";
     import { toast_error } from "../../../lib/utils";
     import { get_sheet_config } from "@chator/character-sheet";
+    import { servers } from "../../../lib/api/system";
 
     export let sheet: ICharacterSheet;
+    export let server_id: number;
 
     const SHEET_CONFIG = get_sheet_config();
     const MAX_CHARACTER_NAME_LENGTH      = SHEET_CONFIG.name.max_length;
@@ -41,6 +43,11 @@
             return;
         }
 
+        if (server_id == 0) {
+            toast_error("Please select a server.");
+            return;
+        }
+
         dispatch("next");
 
     }
@@ -48,13 +55,23 @@
 </script>
 
 <div class="flex flex-col gap-2">
-    <input 
-        type="text" 
-        placeholder="Character Name" 
-        class="rounded-md px-1 outline-slate-500 w-96 text-xl" 
-        bind:value={sheet.name} 
-        on:input={on_name_input}
-    />
+    <div class="flex flex-row gap-2">
+        <input 
+            type="text" 
+            placeholder="Character Name" 
+            class="rounded-md px-1 outline-slate-500 w-96 text-xl" 
+            bind:value={sheet.name} 
+            on:input={on_name_input}
+        />
+        {#if $servers.length != 0}
+            <select class="rounded-md px-1 outline-slate-500 text-xl" bind:value={server_id}>
+                <option value=0 disabled selected>Select a server</option>
+                {#each $servers as server}
+                    <option value={server.server_id}>{server.name}</option>
+                {/each}
+            </select>
+        {/if}
+    </div>
     <textarea 
         placeholder="Character Description" 
         class="min-h-96 rounded-md px-1 outline-slate-500 text-xl" 
