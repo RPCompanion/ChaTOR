@@ -17,7 +17,7 @@
             return;
         }
 
-        dispatch("selected_template", new CharacterTemplate(result.unwrap()));
+        dispatch("selected_template", {template_id: template_id, template: new CharacterTemplate(result.unwrap())});
 
     }
 

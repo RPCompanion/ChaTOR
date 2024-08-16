@@ -26,13 +26,22 @@
     let template_has_weapon_proficiencies: boolean = false;
     let sheet: ICharacterSheet;
 
-    let server_id: number = 0;
+    let server_id: number   = 0;
+    let template_id: number = 0;
 
-    function on_selected_template(event: CustomEvent<CharacterTemplate>) {
+    interface ISelectedTemplate {
+        template_id: number;
+        template: CharacterTemplate;
+    }
 
-        template = event.detail;
+    function on_selected_template(event: CustomEvent<ISelectedTemplate>) {
+
+        template_id = event.detail.template_id;
+        template = event.detail.template;
+
         template_has_perks = template.has_perks();
         template_has_weapon_proficiencies = template.has_weapon_proficiencies();
+        
         sheet = template.get_base_character_sheet();
 
     }
@@ -146,7 +155,7 @@
         {:else if sheet_component == SheetComponents.Attributes}
             <Attributes {template} bind:sheet on:back={on_back} on:next={on_next}/>
         {:else if sheet_component == SheetComponents.Save}
-            <Save bind:sheet on:back={on_back}/>
+            <Save bind:sheet bind:server_id bind:template_id on:back={on_back}/>
         {/if}
     {/if}
 </PageFormatting>

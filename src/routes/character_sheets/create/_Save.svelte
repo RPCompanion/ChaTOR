@@ -8,6 +8,8 @@
     import type { ICharacterSheet } from "../../../lib/character_sheet/character_sheet";
 
     export let sheet: ICharacterSheet;
+    export let server_id: number;
+    export let template_id: number;
     
     const dispatch = createEventDispatcher();
 
