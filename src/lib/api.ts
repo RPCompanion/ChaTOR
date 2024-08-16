@@ -1,5 +1,6 @@
 
 import { init_account } from "./api/account";
+import { init_servers } from "./api/system";
 import { Result, Ok, Err } from "./result";
 
 const API_URL = import.meta.env.PROD ? "https://apiv2.rpcompanion.com" : "http://localhost:6578";
@@ -41,6 +42,12 @@ export const API_ENDPOINTS = {
             url: `${API_URL}/character/templates`,
             type: "GET"
         },
+    },
+    system: {
+        servers: {
+            url: `${API_URL}/system/servers`,
+            type: "GET"
+        }
     }
     
 };
@@ -85,4 +92,5 @@ export async function http_get<T, E>(endpoint: string | Request): Promise<Result
 
 export function init_api() {
     init_account();
+    init_servers();
 }
