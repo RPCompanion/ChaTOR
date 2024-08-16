@@ -4,9 +4,8 @@
     import PageFormatting from "../../../components/_PageFormatting.svelte";
     import type { ICharacterSheet } from "../../../lib/character_sheet/character_sheet";
     import { CharacterTemplate } from "../../../lib/character_template/character_template";
-    import standard from './standard';
-    import JSON5 from 'json5';
 
+    import Template from "./_Template.svelte";
     import Name from "./_Name.svelte";
     import Attributes from "./_Attributes.svelte";
     import Perks from "./_Perks.svelte";
@@ -22,11 +21,19 @@
     }
     let sheet_component: SheetComponents = SheetComponents.Name;
 
-    const template = new CharacterTemplate(JSON5.parse(standard));
-    const template_has_perks = template.has_perks();
-    const template_has_weapon_proficiencies = template.has_weapon_proficiencies();
+    let template: CharacterTemplate | undefined = undefined;
+    let template_has_perks: boolean = false;
+    let template_has_weapon_proficiencies: boolean = false;
+    let sheet: ICharacterSheet;
 
-    let sheet: ICharacterSheet = template.get_base_character_sheet();
+    function on_selected_template(event: CustomEvent<CharacterTemplate>) {
+
+        template = event.detail;
+        template_has_perks = template.has_perks();
+        template_has_weapon_proficiencies = template.has_weapon_proficiencies();
+        sheet = template.get_base_character_sheet();
+
+    }
 
     function on_next() {
 
@@ -123,17 +130,21 @@
 
 </script>
 
-<PageFormatting title={get_page_title(sheet_component)}>
+<PageFormatting title={template == undefined ? 'Templates' : get_page_title(sheet_component)}>
     <div class="h-6"></div>
-    {#if sheet_component == SheetComponents.Name}
-        <Name bind:sheet on:next={on_next}/>
-    {:else if sheet_component == SheetComponents.Perks}
-        <Perks {template} bind:sheet on:back={on_back} on:next={on_next}/>
-    {:else if sheet_component == SheetComponents.WeaponProficiencies}
-        <WeaponProficiencies {template} bind:sheet on:back={on_back} on:next={on_next}/>
-    {:else if sheet_component == SheetComponents.Attributes}
-        <Attributes {template} bind:sheet on:back={on_back} on:next={on_next}/>
-    {:else if sheet_component == SheetComponents.Save}
-        <Save bind:sheet on:back={on_back}/>
+    {#if template == undefined}
+        <Template on:selected_template={on_selected_template}/>
+    {:else}
+        {#if sheet_component == SheetComponents.Name}
+            <Name bind:sheet on:next={on_next}/>
+        {:else if sheet_component == SheetComponents.Perks}
+            <Perks {template} bind:sheet on:back={on_back} on:next={on_next}/>
+        {:else if sheet_component == SheetComponents.WeaponProficiencies}
+            <WeaponProficiencies {template} bind:sheet on:back={on_back} on:next={on_next}/>
+        {:else if sheet_component == SheetComponents.Attributes}
+            <Attributes {template} bind:sheet on:back={on_back} on:next={on_next}/>
+        {:else if sheet_component == SheetComponents.Save}
+            <Save bind:sheet on:back={on_back}/>
+        {/if}
     {/if}
 </PageFormatting>

@@ -33,11 +33,16 @@ export const API_ENDPOINTS = {
             url: `${API_URL}/character/delete`,
             type: "DELETE"
         },
+        template: {
+            url: `${API_URL}/character/template/{template_id}`,
+            type: "GET"
+        },
         templates: {
             url: `${API_URL}/character/templates`,
             type: "GET"
         },
     }
+    
 };
 
 export interface IGenericAPIError {
