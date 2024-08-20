@@ -6,7 +6,7 @@ use crate::lib_only::submit_message;
 use crate::share::raw_swtor_message::RawSwtorMessage;
 use crate::share::CaptureMessage;
 
-const CHAT_RELATIVE_ADDRESS: isize = 0x03f3470;
+const CHAT_RELATIVE_ADDRESS: isize = 0x03f3460;
 
 static_detour! {
     static ChatHook: extern "C" fn(*mut u64, *const *const i8, *const *const i8, i32, *const *const i8) -> i64;
