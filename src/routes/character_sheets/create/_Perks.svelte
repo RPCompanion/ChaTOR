@@ -12,6 +12,8 @@
     const perks: IPerk[] = template.perks!;
     const dispatch = createEventDispatcher();
 
+    const MAX_PERKS: number | undefined = template.allotments.perks!.max_perks;
+
     let leftover_pointers: number = get_leftover_points(sheet.perks);
     $: leftover_pointers = get_leftover_points(sheet.perks);
 
@@ -25,8 +27,7 @@
             return;
         }
 
-        let max_perks = template.allotments.perks!.max_perks;
-        if (max_perks != undefined && sheet.perks!.length >= max_perks) {
+        if (MAX_PERKS != undefined && sheet.perks!.length >= MAX_PERKS) {
             return;
         }
 
@@ -73,7 +74,16 @@
 </script>
 
 <div class="flex flex-col gap-2">
-    <p class="text-xl text-white">Points: {leftover_pointers}</p>
+    <div class="text-xl text-white flex flex-row gap-1">
+        Perks points left: 
+        <p class="bg-slate-500 px-2 rounded-md shadow-md">{leftover_pointers}</p>
+    </div>
+    {#if MAX_PERKS != undefined && sheet.perks != undefined}
+        <div class="text-xl text-white flex flex-row gap-1 select-none">
+            Perks left to choose: 
+            <p class="bg-slate-500 px-2 rounded-md shadow-md select-none">{MAX_PERKS - sheet.perks.length}</p>
+        </div>
+    {/if}
     <div class="flex flex-col items-center gap-2">
         {#each perks as perk}
             <div 
