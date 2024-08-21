@@ -160,7 +160,7 @@
                     </div>
                     <div class="flex flex-row-reverse gap-1">
                         <PmButton on:click={() => { on_attr_change(attribute.name, -1); }}>-</PmButton>
-                        <p class="bg-white rounded-md w-12 text-center text-xl">{get_attribute_value(sheet, attribute.name)}</p>
+                        <p class="bg-white rounded-md w-12 text-center text-xl select-none">{get_attribute_value(sheet, attribute.name)}</p>
                         <PmButton on:click={() => { on_attr_change(attribute.name, 1); } } >+</PmButton>
                     </div>
                 </summary>
@@ -169,7 +169,7 @@
                     <div class="h-1"></div>
                     <Skills {MAX_SKILL_VALUE} {l_skill_points} {attribute} bind:sheet />
                 {/if}
-                
+
             </details> 
 
         {/if}

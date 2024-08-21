@@ -51,7 +51,7 @@
                 <div class="flex flex-col-reverse gap-1">
                     <div class="flex flex-row-reverse gap-1 pr-1">
                         <PmButton on:click={() => { on_skill_change(skill.name, -1); }}>-</PmButton>
-                        <p class="bg-white rounded-md w-12 text-center text-xl">{get_skill_value(sheet, skill.name)}</p>
+                        <p class="bg-white rounded-md w-12 text-center text-xl select-none">{get_skill_value(sheet, skill.name)}</p>
                         <PmButton on:click={() => { on_skill_change(skill.name, 1); } } >+</PmButton>
                     </div>
                 </div>
