@@ -8,6 +8,7 @@
     import type { IAttribute } from "../../../lib/character_template/attributes";
     import PmButton from "./_PMButton.svelte";
     import Skills from "./_Skills.svelte";
+    import { CaretDown } from "phosphor-svelte";
     
     export let template: CharacterTemplate;
     export let sheet: ICharacterSheet;
@@ -130,26 +131,50 @@
     clean_up_sheet();
 
 </script>
+
 <div class="flex flex-col gap-1">
-    <h2 class="text-white text-2xl">Attribute points left: {l_attribute_points}</h2>
+
+    <div class="text-white text-xl select-none flex flex-row gap-1">
+        <p>Attribute points left:</p>
+        <p class="bg-slate-500 rounded-md px-2">{l_attribute_points}</p>
+    </div>
+
     {#if l_skill_points != undefined}
-        <h2 class="text-white text-2xl">Skill points left: {l_skill_points}</h2>
+        <div class="text-white text-xl select-none flex flex-row gap-1">
+            <p>Skill points left:</p>
+            <p class="bg-slate-500 rounded-md px-2">{l_skill_points}</p>
+        </div>
     {/if}
+
     {#each attributes as attribute}
         {#if char_sheet_utils.can_use_attribute(attribute.name)}
-            <div class="flex flex-col gap-1">
-                <div class="bg-slate-700 rounded-md p-1 grid grid-cols-2">
-                    <h2 class="text-white text-2xl">{attribute.name}</h2>
+
+            <details class="cursor-pointer">
+
+                <summary class="bg-slate-700 rounded-md p-1 grid grid-cols-2">
+                    <div class="text-white select-none flex flex-row gap-1">
+                        <h2 class="text-2xl">{attribute.name}</h2>
+                        {#if attribute.skills != undefined}
+                            <CaretDown class="text-white" size=22 />
+                        {/if}
+                    </div>
                     <div class="flex flex-row-reverse gap-1">
                         <PmButton on:click={() => { on_attr_change(attribute.name, -1); }}>-</PmButton>
                         <p class="bg-white rounded-md w-12 text-center text-xl">{get_attribute_value(sheet, attribute.name)}</p>
                         <PmButton on:click={() => { on_attr_change(attribute.name, 1); } } >+</PmButton>
                     </div>
-                </div>
-            </div>
-            <Skills {MAX_SKILL_VALUE} {l_skill_points} {attribute} bind:sheet />
+                </summary>
+
+                {#if attribute.skills != undefined}
+                    <div class="h-1"></div>
+                    <Skills {MAX_SKILL_VALUE} {l_skill_points} {attribute} bind:sheet />
+                {/if}
+                
+            </details> 
+
         {/if}
     {/each}
+
 </div>
 
 <div class="h-6"></div>

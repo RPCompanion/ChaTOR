@@ -10,6 +10,6 @@
 
 </script>
 
-<button type="button" class="bg-slate-500 text-white text-xl px-2 rounded-md w-8 hover:text-gray-400" on:click={on_click}>
+<button type="button" class="bg-slate-500 text-white text-xl px-2 rounded-md w-8 hover:text-gray-400 select-none" on:click={on_click}>
     <slot></slot>
 </button>

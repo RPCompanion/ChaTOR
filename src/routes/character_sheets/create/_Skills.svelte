@@ -47,7 +47,7 @@
     <div class="flex flex-col gap-1 pl-4">
         {#each skills as skill}
             <div class="grid grid-cols-2 bg-slate-600 rounded-md pb-1">
-                <div class="text-2xl text-white pl-2">{skill.name}</div>
+                <div class="text-2xl text-white pl-2 select-none">{skill.name}</div>
                 <div class="flex flex-col-reverse gap-1">
                     <div class="flex flex-row-reverse gap-1 pr-1">
                         <PmButton on:click={() => { on_skill_change(skill.name, -1); }}>-</PmButton>
