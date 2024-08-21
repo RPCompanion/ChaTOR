@@ -6,6 +6,7 @@
     import type { CharacterTemplate } from "../../../lib/character_template/character_template";
     import type { IPerk } from "../../../lib/character_template/perk";
     import Perk from "./_Perk.svelte";
+    import PerkMeta from "./_PerkMeta.svelte";
 
     export let template: CharacterTemplate;
     export let sheet: ICharacterSheet;
@@ -14,6 +15,7 @@
     const dispatch = createEventDispatcher();
 
     const MAX_PERKS: number | undefined = template.allotments.perks!.max_perks;
+    let active_perk_meta: IPerk | undefined = undefined;
 
     let leftover_pointers: number = get_leftover_points(sheet.perks);
     $: leftover_pointers = get_leftover_points(sheet.perks);
@@ -52,16 +54,16 @@
 
     }
 
+    function show_perk_meta(t_perk: CustomEvent<IPerk>) {
+        active_perk_meta = t_perk.detail;
+    }
+
     function on_next() {
         dispatch("next");
     }
 
     function on_back() {
         dispatch("back");
-    }
-
-    function has_perk(perk: string, perks: string[] | undefined): boolean {
-        return perks!.includes(perk);
     }
 
     function get_leftover_points(perks: string[] | undefined): number {
@@ -89,10 +91,24 @@
             <p class="bg-slate-500 px-2 rounded-md shadow-md select-none">{MAX_PERKS - sheet.perks.length}</p>
         </div>
     {/if}
-    <div class="flex flex-col items-center gap-2">
-        {#each perks as perk}
-            <Perk {perk} bind:perks={sheet.perks} on:add_perk={add_perk} on:remove_perk={remove_perk}/>
-        {/each}
+    <div class="grid grid-cols-2 gap-2">
+        <div class="flex flex-col gap-2">
+            {#each perks as perk}
+                <Perk 
+                    {perk} 
+                    bind:perks={sheet.perks} 
+                    on:add_perk={add_perk} 
+                    on:remove_perk={remove_perk} 
+                    on:show_perk_meta={show_perk_meta}
+                    perk_meta_being_shown={active_perk_meta != undefined && active_perk_meta.name === perk.name}
+                />
+            {/each}
+        </div>
+        <div>
+            {#if active_perk_meta != undefined}
+                <PerkMeta perk={active_perk_meta} />
+            {/if}
+        </div>
     </div>
     <div class="flex flex-row gap-2 justify-center">
         <VariableSizeButton on:click={on_back}>Back</VariableSizeButton>
