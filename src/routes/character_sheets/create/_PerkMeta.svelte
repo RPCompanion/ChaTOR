@@ -5,8 +5,7 @@
     export let perk: IPerk;
 </script>
 
-<div class="bg-slate-600 rounded-md">
-    test
+<div class="px-2">
     {#if perk.base_health_modifier != undefined}
         <p>Health Modifier: {perk.base_health_modifier}</p>
     {/if}
