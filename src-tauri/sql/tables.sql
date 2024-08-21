@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS Account_Characters
 (
     account_character_id INTEGER PRIMARY KEY AUTOINCREMENT,
     character_sheet TEXT NOT NULL,
-    public_token BLOB NOT NULL
+    public_id BLOB UNIQUE NOT NULL
 );
 
 /*

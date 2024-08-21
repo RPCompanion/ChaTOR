@@ -1,11 +1,14 @@
 
 
 <script lang="ts">
+    
     import { save } from "@tauri-apps/api/dialog";
     import { writeTextFile } from "@tauri-apps/api/fs";
     import { createEventDispatcher } from "svelte";
     import VariableSizeButton from "../../../lib/buttons/VariableSizeButton.svelte";
     import type { ICharacterSheet } from "../../../lib/character_sheet/character_sheet";
+    import { create_character, save_character_locally, type ICreateCharacter, type ICharacter } from "../../../lib/api/character";
+    import { toast_error } from "../../../lib/utils";
 
     export let sheet: ICharacterSheet;
     export let server_id: number;
@@ -13,12 +16,33 @@
     
     const dispatch = createEventDispatcher();
 
-    function on_submit() {
+    async function on_submit() {
+
+        const c_char: ICreateCharacter = {
+            server_id: server_id,
+            template_id: template_id,
+            sheet: sheet
+        };
+
+        let response = await create_character(c_char);
+        if (response.is_err()) {
+            toast_error(response.unwrap_err());
+            return;
+        }
+
+        let character: ICharacter = {
+            public_id: response.unwrap().public_id,
+            character_sheet: sheet
+        }
+        
+        save_character_locally(character);
 
     }
 
     function on_back() {
+
         dispatch("back");
+
     }
 
     async function on_export() {

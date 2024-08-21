@@ -4,6 +4,8 @@ use serde::{Serialize, Deserialize};
 
 use rusqlite::params;
 
+pub mod character;
+
 use crate::dal::db;
 
 #[derive(Serialize, Deserialize)]

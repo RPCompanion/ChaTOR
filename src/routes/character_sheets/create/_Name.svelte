@@ -52,9 +52,18 @@
 
     }
 
+    function on_import() {
+
+        
+
+    }
+
 </script>
 
 <div class="flex flex-col gap-2">
+    <div class="flex flex-row-reverse">
+        <button type="button" class="text-white text-xl hover:text-gray-400" on:click={on_import}>Import</button>
+    </div>
     <div class="flex flex-row gap-2">
         <input 
             type="text" 
@@ -71,6 +80,7 @@
                 {/each}
             </select>
         {/if}
+        
     </div>
     <textarea 
         placeholder="Character Description" 
