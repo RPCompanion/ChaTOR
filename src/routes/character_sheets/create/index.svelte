@@ -147,7 +147,7 @@
         <Template on:selected_template={on_selected_template}/>
     {:else}
         {#if sheet_component == SheetComponents.Name}
-            <Name bind:sheet bind:server_id on:next={on_next}/>
+            <Name {template} bind:sheet bind:server_id on:next={on_next}/>
         {:else if sheet_component == SheetComponents.Perks}
             <Perks {template} bind:sheet on:back={on_back} on:next={on_next}/>
         {:else if sheet_component == SheetComponents.WeaponProficiencies}

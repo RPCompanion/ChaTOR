@@ -1,15 +1,19 @@
 
 <script lang="ts">
 
+    import { open } from "@tauri-apps/api/dialog";
+    import { readTextFile } from "@tauri-apps/api/fs";
     import { createEventDispatcher } from "svelte";
     import VariableSizeButton from "../../../lib/buttons/VariableSizeButton.svelte";
     import type { ICharacterSheet } from "../../../lib/character_sheet/character_sheet";
     import { toast_error } from "../../../lib/utils";
     import { get_sheet_config } from "@chator/character-sheet";
     import { servers } from "../../../lib/api/system";
+    import { CharacterTemplate, type ICharacterTemplate } from "../../../lib/character_template/character_template";
 
     export let sheet: ICharacterSheet;
     export let server_id: number;
+    export let template: CharacterTemplate;
 
     const SHEET_CONFIG = get_sheet_config();
     const MAX_CHARACTER_NAME_LENGTH      = SHEET_CONFIG.name.max_length;
@@ -52,9 +56,36 @@
 
     }
 
-    function on_import() {
+    async function on_import() {
 
-        
+        const path = await open({
+            multiple: false,
+            filters: [{ name: "Text Files", extensions: ["json"] }]
+        }) as string | undefined;
+
+        if (path == undefined) {
+            return;
+        }
+
+        let obj: any;
+        try {
+            obj = JSON.parse(await readTextFile(path));
+        } catch (e) {
+            toast_error("Invalid JSON file.");
+            return;
+        }
+
+        try {
+            
+            let temp: ICharacterTemplate = obj.template;
+            if (template.same_template(temp)) {
+                sheet = obj as ICharacterSheet;
+            }
+
+        } catch (e) {
+            toast_error("Invalid character sheet.");
+            return;
+        }
 
     }
 

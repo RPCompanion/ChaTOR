@@ -34,7 +34,7 @@ tokio = { version = "1", features = ["time", "macros"] }
 rusqlite = { version = "0.32", features = ["bundled", "uuid", "serde_json"] }
 
 # GUI
-tauri = { version = "1.6.2", features = ["fs-write-file", "window-all", "dialog-all", "devtools"] }
+tauri = { version = "1.6.2", features = [ "fs-read-file", "fs-write-file", "window-all", "dialog-all", "devtools"] }
 
 # Hashing
 sha2 = "0.10"

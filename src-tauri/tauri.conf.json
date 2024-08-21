@@ -27,7 +27,8 @@
                 "setAlwaysOnTop": true
             },
             "fs": {
-                "writeFile": true
+                "writeFile": true,
+                "readFile": true
             }
         },
         "bundle": {

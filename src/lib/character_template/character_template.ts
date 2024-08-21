@@ -59,6 +59,15 @@ export class CharacterTemplate implements ICharacterTemplate {
 
     }
 
+    public same_template(template: ICharacterTemplate): boolean {
+
+        return this.name === template.name &&
+               this.version[0] === template.version[0] &&
+               this.version[1] === template.version[1] &&
+               this.version[2] === template.version[2];
+
+    }
+
     public get_base_character_sheet(): ICharacterSheet {
 
         let attributes: ISheetAttribute[] = this.attributes.map((attribute) => {
