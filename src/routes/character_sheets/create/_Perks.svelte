@@ -5,6 +5,7 @@
     import type { ICharacterSheet } from "../../../lib/character_sheet/character_sheet";
     import type { CharacterTemplate } from "../../../lib/character_template/character_template";
     import type { IPerk } from "../../../lib/character_template/perk";
+    import Perk from "./_Perk.svelte";
 
     export let template: CharacterTemplate;
     export let sheet: ICharacterSheet;
@@ -17,7 +18,9 @@
     let leftover_pointers: number = get_leftover_points(sheet.perks);
     $: leftover_pointers = get_leftover_points(sheet.perks);
 
-    function add_perk(perk: IPerk) {
+    function add_perk(t_perk: CustomEvent<IPerk>) {
+
+        let perk = t_perk.detail;
 
         if (sheet.perks!.includes(perk.name)) {
             return;
@@ -36,7 +39,9 @@
 
     }
 
-    function remove_perk(perk: IPerk) {
+    function remove_perk(t_perk: CustomEvent<IPerk>) {
+
+        let perk = t_perk.detail;
 
         if (!sheet.perks!.includes(perk.name)) {
             return;
@@ -86,21 +91,7 @@
     {/if}
     <div class="flex flex-col items-center gap-2">
         {#each perks as perk}
-            <div 
-                class="w-96 min-h-32 px-2 rounded-md relative" 
-                class:bg-slate-600={!has_perk(perk.name, sheet.perks)} 
-                class:bg-slate-500={has_perk(perk.name, sheet.perks)}
-            >
-                <p class="text-xl text-white underline">{perk.name}</p>
-                <p class="text-white">{perk.description}</p>
-                <div class="absolute bottom-1">
-                    {#if has_perk(perk.name, sheet.perks)}
-                        <VariableSizeButton on:click={() => { remove_perk(perk); }}>Remove</VariableSizeButton>
-                    {:else}
-                        <VariableSizeButton on:click={() => { add_perk(perk); }}>Add</VariableSizeButton>
-                    {/if}
-                </div>
-            </div>
+            <Perk {perk} bind:perks={sheet.perks} on:add_perk={add_perk} on:remove_perk={remove_perk}/>
         {/each}
     </div>
     <div class="flex flex-row gap-2 justify-center">
