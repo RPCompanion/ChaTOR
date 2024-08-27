@@ -22,7 +22,7 @@ impl Character {
         const QUERY: &str =
         "
             INSERT INTO 
-                account_character (character_sheet, public_id)
+                Account_Characters (character_sheet, public_id)
             VALUES
                 (?1, ?2)
             ON CONFLICT(public_id) DO UPDATE SET
