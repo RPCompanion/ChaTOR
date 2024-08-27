@@ -6,6 +6,7 @@
 
 </script>
 
-<div>
-    
+<div class="flex flex-col items-center">
+    <p class="text-white text-2xl"><b>{sheet.name}</b></p>
+    <p class="text-white text-xl">{sheet.description}</p>
 </div>

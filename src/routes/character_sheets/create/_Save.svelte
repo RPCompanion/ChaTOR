@@ -34,7 +34,9 @@
 
         let character: ICharacter = {
             public_id: response.unwrap().public_id,
-            character_sheet: sheet
+            character_sheet: sheet,
+            server_id: server_id,
+            template_id: template_id
         }
         
         {
@@ -75,6 +77,7 @@
 </div>
 
 <CharacterSheetViewer {sheet}/>
+<div class="h-6"></div>
 
 <div class="flex flex-row justify-center gap-1">
     <VariableSizeButton on:click={on_back}>Back</VariableSizeButton>

@@ -10,6 +10,8 @@ import { toast_error } from "../utils";
 export interface ICharacter {
     character_sheet: ICharacterSheet;
     public_id: string;
+    template_id: number;
+    server_id: number;
 }
 
 export interface ICreateCharacterResponse {

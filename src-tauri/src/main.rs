@@ -70,6 +70,7 @@ fn main() {
             dal::db::account::get_account,
             dal::db::account::save_account,
             dal::db::account::character::save_character,
+            dal::db::account::character::fetch_all_characters,
             dal::db::custom_emote::get_all_custom_emotes,
             dal::db::custom_emote::create_custom_emote,
             dal::db::custom_emote::delete_custom_emote,

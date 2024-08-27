@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS Cache_Jediapedia
     html TEXT NOT NULL
 );
 
-
 CREATE TABLE IF NOT EXISTS Account
 (
     account_id INTEGER UNIQUE,
@@ -17,8 +16,10 @@ CREATE TABLE IF NOT EXISTS Account
 CREATE TABLE IF NOT EXISTS Account_Characters
 (
     account_character_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    character_sheet TEXT NOT NULL,
-    public_id BLOB UNIQUE NOT NULL
+    public_id BLOB UNIQUE NOT NULL,
+    template_id INTEGER NOT NULL,
+    server_id INTEGER NOT NULL,
+    character_sheet TEXT NOT NULL
 );
 
 /*
