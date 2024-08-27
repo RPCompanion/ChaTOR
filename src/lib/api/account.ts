@@ -3,6 +3,10 @@ import { invoke } from "@tauri-apps/api";
 import { writable, get } from "svelte/store";
 import { API_ENDPOINTS } from "../api";
 
+export interface ISession {
+    session_token: string;
+}
+
 export interface IAccount {
     account_token: string;
 }
@@ -36,6 +40,9 @@ async function login() {
         if (!response.ok) {
             return;
         }
+        
+        let new_session: ISession = await response.json();
+        session_token.set(new_session.session_token);
 
     } catch (e) {
         console.log(e);
