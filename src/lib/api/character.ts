@@ -5,6 +5,7 @@ import { get } from "svelte/store";
 import { API_ENDPOINTS } from "../api";
 
 import { invoke } from "@tauri-apps/api";
+import { toast_error } from "../utils";
 
 export interface ICharacter {
     character_sheet: ICharacterSheet;
@@ -67,6 +68,13 @@ export async function create_character(character: ICreateCharacter): Promise<Res
 /**
  * Saves a character to the local database.
 */
-export function save_character_locally(character: ICharacter) {
-    invoke("save_character", { character });
+export async function save_character_locally(character: ICharacter): Promise<Result<[], string>> {
+
+    try {
+        await invoke("save_character", { character });
+        return Ok([]);
+    } catch (e) {
+        return Err(e as string);
+    }
+
 }

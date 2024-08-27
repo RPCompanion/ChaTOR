@@ -2,6 +2,7 @@
 
 <script lang="ts">
     
+    import { goto } from "@roxi/routify";
     import { save } from "@tauri-apps/api/dialog";
     import { writeTextFile } from "@tauri-apps/api/fs";
     import { createEventDispatcher } from "svelte";
@@ -35,7 +36,14 @@
             character_sheet: sheet
         }
         
-        save_character_locally(character);
+        {
+            let response = await save_character_locally(character);
+            if (response.is_err()) {
+                toast_error(response.unwrap_err());
+                return;
+            }
+            $goto("/character_sheets");
+        }
 
     }
 
