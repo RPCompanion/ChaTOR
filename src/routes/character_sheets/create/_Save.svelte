@@ -76,7 +76,7 @@
     <button type="button" class="text-white text-xl hover:text-gray-400" on:click={on_export}>Export</button>
 </div>
 
-<CharacterSheetViewer {sheet}/>
+<CharacterSheetViewer {sheet} {server_id}/>
 <div class="h-6"></div>
 
 <div class="flex flex-row justify-center gap-1">
