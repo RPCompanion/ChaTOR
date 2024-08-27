@@ -10,6 +10,7 @@
     import type { ICharacterSheet } from "../../../lib/character_sheet/character_sheet";
     import { create_character, save_character_locally, type ICreateCharacter, type ICharacter } from "../../../lib/api/character";
     import { toast_error } from "../../../lib/utils";
+    import CharacterSheetViewer from "../../../components/_CharacterSheetViewer.svelte";
 
     export let sheet: ICharacterSheet;
     export let server_id: number;
@@ -72,6 +73,9 @@
 <div class="flex flex-row-reverse">
     <button type="button" class="text-white text-xl hover:text-gray-400" on:click={on_export}>Export</button>
 </div>
+
+<CharacterSheetViewer {sheet}/>
+
 <div class="flex flex-row justify-center gap-1">
     <VariableSizeButton on:click={on_back}>Back</VariableSizeButton>
     <VariableSizeButton on:click={on_submit}>Submit</VariableSizeButton>

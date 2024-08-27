@@ -13,6 +13,9 @@ export default defineConfig({
         }),
         routify(),
     ],
+    build: {
+        target: "esnext"
+    },
     test: {
         environment: "jsdom",
     },
