@@ -4,6 +4,7 @@ import { type IAttribute } from "./attributes";
 import type { IRequirements } from "./common";
 import { type IPerk } from "./perk";
 import { type IWeaponProficiency } from "./weapon_proficiency";
+import { CharacterTemplate as ChatorCharacterTemplate } from "@chator/character-sheet";
 
 export interface ICharacterTemplate {
     name: string;
@@ -70,33 +71,8 @@ export class CharacterTemplate implements ICharacterTemplate {
 
     public get_base_character_sheet(): ICharacterSheet {
 
-        let attributes: ISheetAttribute[] = this.attributes.map((attribute) => {
-
-            return {
-                name: attribute.name,
-                value: 0,
-                skills: attribute.skills?.map((skill) => {
-                    return {
-                        name: skill.name,
-                        value: 0
-                    }  
-                })
-            }
-
-        });
-
-        return {
-            name: "",
-            template: {
-                name: this.name,
-                version: this.version
-            },
-            health: this.base_health,
-            armor_class: this.base_armor_class,
-            weapon_proficiencies: [],
-            perks: this.template.perks != undefined ? [] : undefined,
-            attributes: attributes
-        };
+        let char_template = ChatorCharacterTemplate.from_str(JSON.stringify(this));
+        return JSON.parse(char_template.get_base_character_sheet().as_json_str())
 
     }
 

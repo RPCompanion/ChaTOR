@@ -15,7 +15,9 @@
 
     <p class="text-white text-2xl"><b>{sheet.name}</b></p>
     <p class="text-white text-xl underline">{server_name}</p>
-    <p class="text-white text-xl">{sheet.description}</p>
+    {#if sheet.description != null}
+        <p class="text-white text-xl">{sheet.description}</p>
+    {/if}
 
     {#if sheet.perks != undefined}
         <div class="h-6"></div>
