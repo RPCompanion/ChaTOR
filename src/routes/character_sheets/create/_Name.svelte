@@ -10,6 +10,7 @@
     import { get_sheet_config } from "@chator/character-sheet";
     import { servers } from "../../../lib/api/system";
     import { CharacterTemplate, type ICharacterTemplate } from "../../../lib/character_template/character_template";
+    import Tooltip from "../../../components/_Tooltip.svelte";
 
     export let sheet: ICharacterSheet;
     export let server_id: number;
@@ -93,7 +94,9 @@
 
 <div class="flex flex-col gap-2">
     <div class="flex flex-row-reverse">
-        <button type="button" class="text-white text-xl hover:text-gray-400" on:click={on_import}>Import</button>
+        <Tooltip placement="left" tooltip_text="Import a character file">
+            <button type="button" class="text-white text-xl hover:text-gray-400" on:click={on_import}>Import</button>
+        </Tooltip>
     </div>
     <div class="flex flex-row gap-2">
         <input 

@@ -11,6 +11,7 @@
     import { create_character, save_character_locally, type ICreateCharacter, type ICharacter } from "../../../lib/api/character";
     import { toast_error } from "../../../lib/utils";
     import CharacterSheetViewer from "../../../components/_CharacterSheetViewer.svelte";
+    import Tooltip from "../../../components/_Tooltip.svelte";
 
     export let sheet: ICharacterSheet;
     export let server_id: number;
@@ -73,7 +74,9 @@
 </script>
 
 <div class="flex flex-row-reverse">
-    <button type="button" class="text-white text-xl hover:text-gray-400" on:click={on_export}>Export</button>
+    <Tooltip tooltip_text="Export character to a file" placement="left">
+        <button type="button" class="text-white text-xl hover:text-gray-400" on:click={on_export}>Export</button>
+    </Tooltip>
 </div>
 
 <CharacterSheetViewer {sheet} {server_id}/>
