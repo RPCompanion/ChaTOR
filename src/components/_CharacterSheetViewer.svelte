@@ -3,6 +3,7 @@
 
     import type { ICharacterSheet } from "../lib/character_sheet/character_sheet";
     import { servers } from "../lib/api/system";
+    import { CaretDown } from "phosphor-svelte";
 
     export let sheet: ICharacterSheet;
     export let server_id: number;
@@ -44,5 +45,38 @@
             {/each}
         </div>
     {/if}
+
+    <div class="h-6"></div>
+    <div class="flex flex-col gap-1 select-none">
+        {#each sheet.attributes as attribute}
+            <details>
+
+                <summary class="grid grid-cols-2 text-white text-2xl bg-slate-700 rounded-md p-1" class:cursor-pointer={attribute.skills != undefined}>
+                    <p class="flex flex-row">
+                        {attribute.name}
+                        {#if attribute.skills != undefined}
+                            <CaretDown class="text-white" size=22 />
+                        {/if}
+                    </p>
+                    <div class="flex flex-row-reverse pr-2">
+                        <p>{attribute.value}</p>
+                    </div>
+                </summary>
+
+                {#if attribute.skills != undefined}
+                    <div class="pl-4 flex flex-col gap-1">
+                        <div></div>
+                        {#each attribute.skills as skill}
+                            <div class="grid grid-cols-2 text-white text-xl bg-slate-600 rounded-md pb-1">
+                                <p>{skill.name}:</p>
+                                <p class="flex flex-row-reverse pr-2">{skill.value}</p>
+                            </div>
+                        {/each}
+                    </div>
+                {/if}
+
+            </details>
+        {/each}
+    </div>
 
 </div>
