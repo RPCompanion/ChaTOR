@@ -149,9 +149,9 @@
     {#each attributes as attribute}
         {#if char_sheet_utils.can_use_attribute(attribute.name)}
 
-            <details class="cursor-pointer">
+            <details>
 
-                <summary class="bg-slate-700 rounded-md p-1 grid grid-cols-2">
+                <summary class="bg-slate-700 rounded-md p-1 grid grid-cols-2" class:cursor-pointer={attribute.skills}>
                     <div class="text-white select-none flex flex-row gap-1">
                         <h2 class="text-2xl">{attribute.name}</h2>
                         {#if attribute.skills != undefined}
