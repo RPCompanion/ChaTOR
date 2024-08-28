@@ -55,14 +55,14 @@ impl Character {
         const QUERY: &str =
         "
             INSERT INTO 
-                Account_Characters (character_sheet, public_id)
+                Account_Characters (character_sheet, public_id, template_id, server_id)
             VALUES
-                (?1, ?2)
+                (?1, ?2, ?3, ?4)
             ON CONFLICT(public_id) DO UPDATE SET
                 character_sheet = ?1;
         ";
 
-        if let Err(e) = conn.execute(QUERY, params![self.character_sheet, self.public_id]) {
+        if let Err(e) = conn.execute(QUERY, params![self.character_sheet, self.public_id, self.template_id, self.server_id]) {
             error!("Error saving character: {:?}", e);
             return Err("Error saving character");
         }

@@ -12,6 +12,7 @@
     import { toast_error } from "../../../lib/utils";
     import CharacterSheetViewer from "../../../components/_CharacterSheetViewer.svelte";
     import Tooltip from "../../../components/_Tooltip.svelte";
+    import { Err, Ok, type Result } from "../../../lib/result";
 
     export let sheet: ICharacterSheet;
     export let server_id: number;
@@ -19,7 +20,7 @@
     
     const dispatch = createEventDispatcher();
 
-    async function on_submit() {
+    async function submit_to_server(): Promise<Result<ICharacter, []>> {
 
         const c_char: ICreateCharacter = {
             server_id: server_id,
@@ -30,24 +31,38 @@
         let response = await create_character(c_char);
         if (response.is_err()) {
             toast_error(response.unwrap_err());
-            return;
+            return Err([]);
         }
 
-        let character: ICharacter = {
+        return Ok({
             public_id: response.unwrap().public_id,
             character_sheet: sheet,
             server_id: server_id,
             template_id: template_id
+        })
+
+    }
+
+    async function submit_to_local(character: ICharacter) {
+
+        let response = await save_character_locally(character);
+        if (response.is_err()) {
+            toast_error(response.unwrap_err());
+            return;
         }
-        
-        {
-            let response = await save_character_locally(character);
-            if (response.is_err()) {
-                toast_error(response.unwrap_err());
-                return;
-            }
-            $goto("/character_sheets");
+
+        $goto("/character_sheets");
+
+    }
+
+    async function on_submit() {
+
+        let response = await submit_to_server();
+        if (response.is_err()) {
+            return;
         }
+
+        await submit_to_local(response.unwrap());
 
     }
 
