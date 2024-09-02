@@ -21,6 +21,12 @@ interface UserCharacterMessages {
 
 export const hooked_in = writable<boolean>(false);
 
+type PostMessageResponse = 
+    | "Success"
+    | { Failed: string};
+
+var submit_post_callback: ((result: Result<[], string>) => void) | undefined = undefined;
+
 export function init_network() {
 
     init_settings(() => {
@@ -28,6 +34,7 @@ export function init_network() {
     });
 
     init_hook();
+    init_submit_post_listener();
     init_swtor_message_listener();
     init_custom_emotes();
     init_custom_channels();
@@ -43,7 +50,29 @@ function init_hook() {
 
 }
 
-export async function submit_post(message_type: MessageType, messages: string[]): Promise<Result<[], string>> {
+function init_submit_post_listener() {
+
+    listen("submit_post_response", (response) => {
+
+        let payload: PostMessageResponse = response.payload as PostMessageResponse;
+
+        if (submit_post_callback != undefined) {
+
+            if (payload == "Success") {
+                submit_post_callback(Ok([]));
+            } else {
+                submit_post_callback(Err((payload as { Failed: string }).Failed));
+            }
+
+            submit_post_callback = undefined;
+
+        }
+
+    });
+
+}
+
+export function submit_post(message_type: MessageType, messages: string[], callback: (result: Result<[], string>) => void): Result<[], string> {
 
     if (!get(hooked_in)) {
         return Err("SWTOR not hooked in. Have you launched the game?");
@@ -70,9 +99,11 @@ export async function submit_post(message_type: MessageType, messages: string[])
     let t_settings = get(settings);
     let retry: boolean = t_settings.chat_log.retry_message_submission && t_settings.chat_log.capture_chat_log && message_type != "ButtonEmote";
 
+    submit_post_callback = callback;
+
     try {
 
-        await invoke("submit_actual_post", {retry: retry, characterMessage: character_message});
+        invoke("submit_actual_post", {retry: retry, characterMessage: character_message});
         return Ok([]);
 
     } catch (error: any) {

@@ -1,5 +1,6 @@
 
-use tokio::task;
+
+
 use crate::swtor::SwtorChannel;
 use crate::utils::StringUtils;
 
@@ -10,6 +11,7 @@ use std::sync::LazyLock;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::time::Duration;
+use serde::Serialize;
 
 use crate::swtor_hook;
 use crate::swtor_hook::message_hash_container::MessageHashContainer;
@@ -24,6 +26,14 @@ static WRITING: AtomicBool = AtomicBool::new(false);
 const ENTER_KEY: usize     = 0x0D;
 const BACKSPACE_KEY: usize = 0x08;
 const SHIFT_KEY: usize     = 0x10;
+
+const RETRY_LOGIC_DELAY: u64 = 500;
+
+#[derive(Serialize, Clone)]
+pub enum PostMessageResponse {
+    Success,
+    Failed(&'static str)
+}
 
 pub fn push_incoming_message_hash(channel: SwtorChannel, hash: u64) {
     MESSAGE_HASH_CONTAINER.lock().unwrap().push(channel, hash);
@@ -104,7 +114,8 @@ fn attempt_post_submission_with_retry(command_message: &CommandMessage) -> Resul
                 return Err("Player not found");
             }
 
-            thread::sleep(Duration::from_millis(500));
+            thread::sleep(Duration::from_millis(RETRY_LOGIC_DELAY));
+
         }
 
     }
@@ -162,7 +173,7 @@ fn block_window_focus_thread(window: tauri::Window) {
 }
 
 #[tauri::command]
-pub async fn submit_actual_post(window: tauri::Window, retry: bool, mut character_message: UserCharacterMessages) -> Result<(), &'static str> {
+pub fn submit_actual_post(window: tauri::Window, retry: bool, mut character_message: UserCharacterMessages) -> Result<(), &'static str> {
 
     if WRITING.load(Ordering::Relaxed) {
         return Err("Already writing");
@@ -170,8 +181,8 @@ pub async fn submit_actual_post(window: tauri::Window, retry: bool, mut characte
 
     WRITING.store(true, Ordering::Relaxed);
 
-    block_window_focus_thread(window);
-    let result = task::spawn_blocking(move || {
+    block_window_focus_thread(window.clone());
+    thread::spawn(move || {
 
         character_message.prepare_messages();
         character_message.store();
@@ -181,16 +192,24 @@ pub async fn submit_actual_post(window: tauri::Window, retry: bool, mut characte
         prep_game_for_input();
 
         if retry {
-            retry_logic(character_message)?;
+
+            if let Err(e) = retry_logic(character_message) {
+                window.emit("submit_post_response", PostMessageResponse::Failed(e)).unwrap();
+            }
+
         } else {
-            non_retry_logic(character_message)?;
+
+            if let Err(e) = non_retry_logic(character_message) {
+                window.emit("submit_post_response", PostMessageResponse::Failed(e)).unwrap();
+            }
+
         }
 
-        Ok(())
+        window.emit("submit_post_response", PostMessageResponse::Success).unwrap();
+        WRITING.store(false, Ordering::Relaxed);
 
-    }).await.unwrap();
+    });
 
-    WRITING.store(false, Ordering::Relaxed);
-    result
+    Ok(())
 
 }

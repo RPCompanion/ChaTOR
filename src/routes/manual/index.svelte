@@ -13,6 +13,7 @@
     import CustomEmotesList from "../../components/emotes_list/_CustomEmotesList.svelte";
     import ChatLogWindow from "../../lib/_ChatLogWindow.svelte";
   import { unicode_escape } from "../../lib/utils";
+    import type { Result } from "../../lib/result";
 
     let messages: string[] = [""];
 
@@ -60,32 +61,39 @@
 
     }
 
-    async function submit_messages() {
+    function submit_messages() {
 
         show_modal = false;
-        let response = await submit_post("ChatMessage", messages.map((message) => unicode_escape(message)));
+        submit_post("ChatMessage", messages.map((message) => unicode_escape(message)), (result: Result<[], string>) => {
 
-        if (response.is_err()) {
-            toast.push(response.unwrap_err(), { theme: { "--toastBackground": "red" } });
-            return;
-        }
+            if (result.is_err()) {
+                toast.push(result.unwrap_err(), { theme: { "--toastBackground": "red" } });
+                return;
+            }
 
-        if ($settings.chat.clear_chat_after_posting) {
-            clear_chat();
-        }
+            if ($settings.chat.clear_chat_after_posting) {
+                clear_chat();
+            }
+
+        });
 
     }
 
     function on_no_confirmation() {
+
         show_modal = false;
+        
     }
 
-    async function on_single_post(idx: number) {
+    function on_single_post(idx: number) {
 
-        let response = await submit_post("ChatMessage", [messages[idx]]);
-        if (response.is_err()) {
-            toast.push(response.unwrap_err(), { theme: { "--toastBackground": "red" } });
-        }
+        submit_post("ChatMessage", [messages[idx]], (result: Result<[], string>) => {
+
+            if (result.is_err()) {
+                toast.push(result.unwrap_err(), { theme: { "--toastBackground": "red" } });
+            }
+
+        });
 
     }
 

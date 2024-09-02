@@ -69,11 +69,7 @@ fn start_tcp_messager() -> Result<(), &'static str> {
 
     thread::spawn(move || {
 
-        loop {
-
-            if should_quit() {
-                break;
-            }
+        while !should_quit() {
 
             for message in drain_messages() {
 

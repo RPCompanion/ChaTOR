@@ -6,13 +6,17 @@
     import VariableSizeButton from "../../lib/buttons/VariableSizeButton.svelte";
     import { submit_post } from "../../lib/network";
     import PageFormatting from "../../components/_PageFormatting.svelte";
+    import type { Result } from "../../lib/result";
 
-    async function on_emote_click(emote: ICustomEmote) {
+    function on_emote_click(emote: ICustomEmote) {
 
-        let response = await submit_post("ButtonEmote", [emote.emote]);
-        if (response.is_err()) {
-            toast.push(response.unwrap_err(), { theme: { "--toastBackground": "red" } });
-        }
+        submit_post("ButtonEmote", [emote.emote], (result: Result<[], string>) => {
+
+            if (result.is_err()) {
+                toast.push(result.unwrap_err(), { theme: { "--toastBackground": "red" } });
+            }
+
+        });
 
     }
 

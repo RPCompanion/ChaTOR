@@ -16,7 +16,8 @@
     import { SwtorChannel } from "../../lib/network/swtor_channel";
     import { unicode_escape } from "../../lib/utils";
     import { get_custom_channel_number } from "../../lib/network/custom_channels";
-  import Tooltip from "../../components/_Tooltip.svelte";
+    import Tooltip from "../../components/_Tooltip.svelte";
+    import type { Result } from "../../lib/result";
 
     let message: string     = "";
     let messages: string[]  = [];
@@ -27,18 +28,20 @@
         message = "";
     }
 
-    async function on_submitted() {
+    function on_submitted() {
 
         show_modal = false;
-        let resposne = await submit_post("ChatMessage", messages);
+        submit_post("ChatMessage", messages, (result: Result<[], string>) => {
 
-        if (resposne.is_err()) {
-            return;
-        }
+            if (result.is_err()) {
+                return;
+            }
 
-        if ($settings.chat.clear_chat_after_posting) {
-            message = "";
-        }
+            if ($settings.chat.clear_chat_after_posting) {
+                message = "";
+            }
+
+        });
 
     }
 
