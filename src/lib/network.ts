@@ -72,10 +72,13 @@ function init_submit_post_listener() {
 
 }
 
-export function submit_post(message_type: MessageType, messages: string[], callback: (result: Result<[], string>) => void): Result<[], string> {
+export function submit_post(message_type: MessageType, messages: string[], callback: (result: Result<[], string>) => void) {
 
     if (!get(hooked_in)) {
-        return Err("SWTOR not hooked in. Have you launched the game?");
+
+        callback(Err("SWTOR not hooked in. Have you launched the game?"));
+        return;
+
     }
 
     messages = messages.map((message) => message.trim());
@@ -83,9 +86,15 @@ export function submit_post(message_type: MessageType, messages: string[], callb
     for (let message of messages) { 
         
         if (message.length == 0) {
-            return Err("Empty message detected. Please remove it.");
+
+            callback(Err("Empty message detected. Please remove it."));
+            return;
+
         } else if (message.length > 255) {
-            return Err("Long message detected. Please shorten it.");
+
+            callback(Err("Long message detected. Please shorten it."));
+            return;
+
         }
 
     }
@@ -100,17 +109,7 @@ export function submit_post(message_type: MessageType, messages: string[], callb
     let retry: boolean = t_settings.chat_log.retry_message_submission && t_settings.chat_log.capture_chat_log && message_type != "ButtonEmote";
 
     submit_post_callback = callback;
-
-    try {
-
-        invoke("submit_actual_post", {retry: retry, characterMessage: character_message});
-        return Ok([]);
-
-    } catch (error: any) {
-
-        return Err(error);
-        
-    }
+    invoke("submit_post", {retry: retry, characterMessage: character_message});
 
 }
 

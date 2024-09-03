@@ -14,9 +14,8 @@
     import CustomCommand from "../../components/_CustomCommand.svelte";
     import { None, type Option, Some } from "../../lib/option";
     import { SwtorChannel } from "../../lib/network/swtor_channel";
-    import { unicode_escape } from "../../lib/utils";
+    import { toast_error, unicode_escape } from "../../lib/utils";
     import { get_custom_channel_number } from "../../lib/network/custom_channels";
-    import Tooltip from "../../components/_Tooltip.svelte";
     import type { Result } from "../../lib/result";
 
     let message: string     = "";
@@ -34,6 +33,7 @@
         submit_post("ChatMessage", messages, (result: Result<[], string>) => {
 
             if (result.is_err()) {
+                toast_error(result.unwrap_err());
                 return;
             }
 
@@ -83,7 +83,7 @@
 
         let response = new AutoMessageSplitter(unicode_escape(message), undefined, custom_command).split();
         if (response.is_err()) {
-            toast.push("Error: " + response.unwrap_err());
+            toast_error(response.unwrap_err());
             return;
         }
 

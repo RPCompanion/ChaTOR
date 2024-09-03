@@ -135,8 +135,9 @@ pub fn hook_into_existing() {
 
 }
 
-
-
+/**
+ * Returns true if the SWTOR window is in focus
+ */
 pub fn window_in_focus() -> bool {
 
     if let Some(hwnd) = SWTOR_HWND.lock().unwrap().as_ref() {
@@ -168,6 +169,7 @@ pub fn checksum_match(checksum: &[u8; 32]) -> Result<bool, &'static str> {
     if let Some(process_checksum) = PROCESS_CHECKSUM.get() {
         return Ok(checksum.iter().eq(process_checksum.iter()));
     }
+
     return Err("PROCESS_CHECKSUM not yet initialized");
 
 }

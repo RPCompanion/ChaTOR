@@ -110,7 +110,7 @@ fn attempt_post_submission_with_retry(command_message: &CommandMessage) -> Resul
             let lock = MESSAGE_HASH_CONTAINER.lock().unwrap();
             if lock.message_hashes.contains(&message_hash) {
                 return Ok(());
-            } else if  lock.channels.contains(&SwtorChannel::PlayerNotFound) {
+            } else if lock.channels.contains(&SwtorChannel::PlayerNotFound) {
                 return Err("Player not found");
             }
 
@@ -158,13 +158,15 @@ fn block_window_focus_thread(window: tauri::Window) {
 
     thread::spawn(move || {
 
+        let dur = Duration::from_millis(10);
+
         while WRITING.load(Ordering::Relaxed) {
 
             if swtor_hook::window_in_focus() {
                 let _ = window.set_focus();
             }
 
-            thread::sleep(Duration::from_millis(10));
+            thread::sleep(dur);
 
         }
 
@@ -173,10 +175,13 @@ fn block_window_focus_thread(window: tauri::Window) {
 }
 
 #[tauri::command]
-pub fn submit_actual_post(window: tauri::Window, retry: bool, mut character_message: UserCharacterMessages) -> Result<(), &'static str> {
+pub fn submit_post(window: tauri::Window, retry: bool, mut character_message: UserCharacterMessages) {
 
     if WRITING.load(Ordering::Relaxed) {
-        return Err("Already writing");
+
+        window.emit("submit_post_response", PostMessageResponse::Failed("ChaTOR is busy writing already")).unwrap();
+        return;
+
     }
 
     WRITING.store(true, Ordering::Relaxed);
@@ -209,7 +214,5 @@ pub fn submit_actual_post(window: tauri::Window, retry: bool, mut character_mess
         WRITING.store(false, Ordering::Relaxed);
 
     });
-
-    Ok(())
 
 }

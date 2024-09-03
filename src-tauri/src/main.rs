@@ -64,7 +64,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             swtor_hook::start_swtor_hook,
             swtor_hook::is_hooked_in,
-            swtor_hook::post::submit_actual_post,
+            swtor_hook::post::submit_post,
             open_link,
             dal::open_db_dir,
             dal::db::account::get_account,
