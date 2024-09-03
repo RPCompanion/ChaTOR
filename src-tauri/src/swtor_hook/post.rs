@@ -25,6 +25,8 @@ const ENTER_KEY: usize     = 0x0D;
 const BACKSPACE_KEY: usize = 0x08;
 const SHIFT_KEY: usize     = 0x10;
 
+const RETRY_DELAY: u64 = 500;
+
 pub fn push_incoming_message_hash(channel: SwtorChannel, hash: u64) {
     MESSAGE_HASH_CONTAINER.lock().unwrap().push(channel, hash);
 }
@@ -92,19 +94,26 @@ fn attempt_post_submission_with_retry(command_message: &CommandMessage) -> Resul
     let c_message    = command_message.concat();
     let message_hash = command_message.message.as_u64_hash();
 
+    let delay = Duration::from_millis(RETRY_DELAY);
     for _ in 0..3 {
 
         attempt_post_submission(&c_message);
         for _ in 0..4 {
 
-            let lock = MESSAGE_HASH_CONTAINER.lock().unwrap();
-            if lock.message_hashes.contains(&message_hash) {
-                return Ok(());
-            } else if  lock.channels.contains(&SwtorChannel::PlayerNotFound) {
-                return Err("Player not found");
+            // Drop lock before sleeping to prevent deadlocks.
+            {
+
+                let lock = MESSAGE_HASH_CONTAINER.lock().unwrap();
+                if lock.message_hashes.contains(&message_hash) {
+                    return Ok(());
+                } else if  lock.channels.contains(&SwtorChannel::PlayerNotFound) {
+                    return Err("Player not found");
+                }
+
             }
 
-            thread::sleep(Duration::from_millis(500));
+            thread::sleep(delay);
+
         }
 
     }
@@ -162,7 +171,7 @@ fn block_window_focus_thread(window: tauri::Window) {
 }
 
 #[tauri::command]
-pub async fn submit_actual_post(window: tauri::Window, retry: bool, mut character_message: UserCharacterMessages) -> Result<(), &'static str> {
+pub async fn submit_post(window: tauri::Window, retry: bool, mut character_message: UserCharacterMessages) -> Result<(), &'static str> {
 
     if WRITING.load(Ordering::Relaxed) {
         return Err("Already writing");

@@ -72,7 +72,7 @@ export async function submit_post(message_type: MessageType, messages: string[])
 
     try {
 
-        await invoke("submit_actual_post", {retry: retry, characterMessage: character_message});
+        await invoke("submit_post", {retry: retry, characterMessage: character_message});
         return Ok([]);
 
     } catch (error: any) {

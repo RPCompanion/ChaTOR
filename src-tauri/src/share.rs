@@ -12,9 +12,11 @@ pub enum CaptureMessage {
     Chat(RawSwtorMessage)
 }
 
-impl CaptureMessage {
+impl AsJson for CaptureMessage {}
 
-    pub fn as_json_str(&self) -> String {
+pub trait AsJson {
+
+    fn as_json(&self) -> String where Self: serde::ser::Serialize {
         serde_json::to_string(self).unwrap()
     }
 
