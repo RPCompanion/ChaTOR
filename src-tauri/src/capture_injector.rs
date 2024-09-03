@@ -142,6 +142,7 @@ fn start_tcp_listener_loop() {
 
         });
         buffer = [0; 2048];
+
     }
     info!("Stopped listening for messages");
 
@@ -160,16 +161,21 @@ fn handle_message(message: CaptureMessage) {
             panic!("{}", panic_message);
         },
         _ => {
+
             MESSAGE_CONTAINER
                 .lock()
                 .unwrap()
                 .push(message);
+            
         }
 
     }
 
 }
 
+/**
+ * This function is responsible for propagating messages from the message container to the window and database.
+ */
 fn start_logging_propagation(window: tauri::Window) {
 
     thread::spawn(move || {
@@ -182,8 +188,10 @@ fn start_logging_propagation(window: tauri::Window) {
                 .drain_unstored();
 
             if !unstored_messages.is_empty() {
+
                 SwtorMessage::save_messages_to_db(unstored_messages.clone());
                 window.emit("swtor_messages", unstored_messages).unwrap();
+
             }
 
             thread::sleep(Duration::from_secs(1));

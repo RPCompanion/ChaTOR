@@ -107,11 +107,16 @@ fn attempt_post_submission_with_retry(command_message: &CommandMessage) -> Resul
         attempt_post_submission(&c_message);
         for _ in 0..4 {
 
-            let lock = MESSAGE_HASH_CONTAINER.lock().unwrap();
-            if lock.message_hashes.contains(&message_hash) {
-                return Ok(());
-            } else if lock.channels.contains(&SwtorChannel::PlayerNotFound) {
-                return Err("Player not found");
+            // Place lock in it's own scope to prevent deadlock. The delay following the lock, prevented other threads from acquiring the lock.
+            {
+
+                let lock = MESSAGE_HASH_CONTAINER.lock().unwrap();
+                if lock.message_hashes.contains(&message_hash) {
+                    return Ok(());
+                } else if lock.channels.contains(&SwtorChannel::PlayerNotFound) {
+                    return Err("Player not found");
+                }
+
             }
 
             thread::sleep(Duration::from_millis(RETRY_LOGIC_DELAY));
