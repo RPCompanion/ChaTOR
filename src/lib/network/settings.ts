@@ -5,10 +5,22 @@ import { toast } from "@zerodevx/svelte-toast";
 import { hooked_in } from "../network";
 import { ESwtorChannel } from "./swtor_channel";
 import { set_initial_swtor_channels } from "./swtor_message/swtor_chat_tab_messages";
+import { Color, type IColor } from "./character_colors";
 
 export type ChannelDispatcher =
     | { RegularDispatch: number }
     | { CustomDispatch: string };
+
+export interface IChannelColors {
+    say: IColor,
+    yell: IColor,
+    emote: IColor,
+    whisper: IColor,
+    group: IColor,
+    guild: IColor,
+    ops: IColor,
+    ops_leader: IColor
+}
 
 export interface IChatTab {
     name: string;
@@ -31,6 +43,8 @@ export interface IChatLogWindow {
     show_chat_log_window: boolean;
     chat_tabs: IChatTab[];
     window: IWidthHeight;
+    override_channel_colors: boolean;
+    channel_colors: IChannelColors;
 }
 
 export interface IChatLogSettings {
@@ -99,7 +113,7 @@ export function default_settings(): ISettings {
                     {
                         name: "Global",
                         channels: [
-                            { RegularDispatch: ESwtorChannel.GLOBAL},
+                            { RegularDispatch: ESwtorChannel.GLOBAL },
                             { RegularDispatch: ESwtorChannel.PVP },
                             { RegularDispatch: ESwtorChannel.TRADE }
                         ],
@@ -108,10 +122,10 @@ export function default_settings(): ISettings {
                     {
                         name: "Local",
                         channels: [
-                            { RegularDispatch: ESwtorChannel.EMOTE},
-                            { RegularDispatch: ESwtorChannel.SAY},
-                            { RegularDispatch: ESwtorChannel.YELL},
-                            { RegularDispatch: ESwtorChannel.WHISPER}
+                            { RegularDispatch: ESwtorChannel.EMOTE },
+                            { RegularDispatch: ESwtorChannel.SAY },
+                            { RegularDispatch: ESwtorChannel.YELL },
+                            { RegularDispatch: ESwtorChannel.WHISPER }
                         ],
                         default_channel: undefined
                     }
@@ -119,8 +133,21 @@ export function default_settings(): ISettings {
                 window: {
                     width: 0,
                     height: 176
+                },
+                override_channel_colors: false,
+                channel_colors: {
+                    say: { r: 179, g: 236, b: 254 },
+                    yell: { r: 255, g: 115, b: 255 },
+                    emote: { r: 255, g: 128, b: 34 },
+                    whisper: { r: 165, g: 159, b: 244 },
+                    group: { r: 29, g: 140, b: 254 },
+                    guild: { r: 130, g: 236, b: 137 },
+                    ops: { r: 239, g: 188, b: 85 },
+                    ops_leader: { r: 255, g: 84, b: 0 }
                 }
+
             }
+
         }
 
     }

@@ -2,6 +2,7 @@
 use em_libs::dal::em_dirs::EmDirs;
 
 pub mod db;
+pub mod colors;
 pub mod character_colors;
 pub mod game_data;
 

@@ -5,7 +5,13 @@ import { settings } from "./settings";
 import { ESwtorChannel } from "./swtor_channel";
 import { Result, Ok, Err } from "../result";
 
-export class Color {
+export interface IColor {
+    r: number;
+    g: number;
+    b: number;
+}
+
+export class Color implements IColor {
 
     public r: number;
     public g: number;
