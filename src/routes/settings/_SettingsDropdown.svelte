@@ -1,7 +1,7 @@
 
 <script lang="ts">
     export let options: string[];
-    export let choosen_option: string | undefined = undefined
+    export let choosen_option: string | null = null
 </script>
 
 <select name="characters" class="w-1/2" bind:value={choosen_option}>

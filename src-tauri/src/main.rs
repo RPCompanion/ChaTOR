@@ -1,8 +1,14 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use std::fs;
+
+use clap::Parser;
+
 use dal::db::settings::app_settings::TAURI_WINDOW_SETTINGS;
+use dal::db::settings::Settings;
 use open;
+use share::AsJson;
 use tauri::{Manager, PhysicalSize, WindowEvent};
 use tauri::api::dialog::blocking::{ask, message};
 use tracing::{error, info};
@@ -20,7 +26,29 @@ mod network;
 
 use crash_reporter::CrashReporter;
 
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+struct Args {
+    #[clap(short, long)]
+    generate_default_settings: bool
+}
+
+fn parse_args() {
+
+    let args = Args::parse();
+
+    if args.generate_default_settings {
+
+        fs::write("./default_settings.json", Settings::default().as_json()).unwrap(); 
+        std::process::exit(0);
+
+    }
+
+}
+
 fn main() {
+
+    parse_args();
 
     let _guard = logging::init();
     init_system();

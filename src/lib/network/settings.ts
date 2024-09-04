@@ -3,9 +3,9 @@ import { writable, get } from "svelte/store";
 import { invoke } from "@tauri-apps/api";
 import { toast } from "@zerodevx/svelte-toast";
 import { hooked_in } from "../network";
-import { ESwtorChannel } from "./swtor_channel";
 import { set_initial_swtor_channels } from "./swtor_message/swtor_chat_tab_messages";
-import { Color, type IColor } from "./character_colors";
+import { type IColor } from "./character_colors";
+import default_settings_obj from "./default_settings.json";
 
 export type ChannelDispatcher =
     | { RegularDispatch: number }
@@ -25,7 +25,7 @@ export interface IChannelColors {
 export interface IChatTab {
     name: string;
     channels: ChannelDispatcher[];
-    default_channel?: ChannelDispatcher;
+    default_channel: ChannelDispatcher | null;
 }
 
 export interface IChatSettings {
@@ -51,7 +51,7 @@ export interface IChatLogSettings {
     capture_chat_log: boolean;
     log_global_chat: boolean;
     retry_message_submission: boolean;
-    character_ini_to_pull_from?: string;
+    character_ini_to_pull_from: string | null;
     window: IChatLogWindow;
 }
 
@@ -77,85 +77,12 @@ export interface ISettings {
 
 type CaptureError = "AlreadyInjected" | "SwtorNotRunning" | "WrongGuiSettings" | "UnsupportedVersion" | "NotYetFullyReady";
 
-export function default_settings(): ISettings {
-
-    return {
-
-        app: {
-            window: {
-                width: 800,
-                height: 600
-            },
-            show_window_decorations: false,
-            opacity: 100,
-            always_on_top: false,
-            show_background_image: false,
-            show_page_header: true
-        },
-        chat: {
-            confirmation_before_posting: true,
-            enter_to_post: false,
-            enter_to_confirm: false,
-            clear_chat_after_posting: false,
-            remove_starting_pronouns: false,
-            starting_characters_are_lowercase: true,
-            show_favourite_emotes: true
-        },
-        chat_log: {
-            capture_chat_log: false,
-            log_global_chat: false,
-            retry_message_submission: false,
-            character_ini_to_pull_from: undefined,
-            window: {
-                prefetch_hyperlinks: true,
-                show_chat_log_window: false,
-                chat_tabs: [
-                    {
-                        name: "Global",
-                        channels: [
-                            { RegularDispatch: ESwtorChannel.GLOBAL },
-                            { RegularDispatch: ESwtorChannel.PVP },
-                            { RegularDispatch: ESwtorChannel.TRADE }
-                        ],
-                        default_channel: { RegularDispatch: ESwtorChannel.GLOBAL } 
-                    },
-                    {
-                        name: "Local",
-                        channels: [
-                            { RegularDispatch: ESwtorChannel.EMOTE },
-                            { RegularDispatch: ESwtorChannel.SAY },
-                            { RegularDispatch: ESwtorChannel.YELL },
-                            { RegularDispatch: ESwtorChannel.WHISPER }
-                        ],
-                        default_channel: undefined
-                    }
-                ],
-                window: {
-                    width: 0,
-                    height: 176
-                },
-                override_channel_colors: false,
-                channel_colors: {
-                    say: { r: 179, g: 236, b: 254 },
-                    yell: { r: 255, g: 115, b: 255 },
-                    emote: { r: 255, g: 128, b: 34 },
-                    whisper: { r: 165, g: 159, b: 244 },
-                    group: { r: 29, g: 140, b: 254 },
-                    guild: { r: 130, g: 236, b: 137 },
-                    ops: { r: 239, g: 188, b: 85 },
-                    ops_leader: { r: 255, g: 84, b: 0 }
-                }
-
-            }
-
-        }
-
-    }
-
-}
-
 export const settings = writable<ISettings>(default_settings());
 export const chat_log_active = writable<boolean>(false);
+
+export function default_settings(): ISettings {
+    return default_settings_obj as ISettings;
+}
 
 export function init_settings(dependent_callback: () => void) {
 

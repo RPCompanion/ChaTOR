@@ -16,7 +16,7 @@ impl OldChatTab {
 
     pub fn migrate() -> Result<(), &'static str> {
 
-        let settings = Settings::get_json()?;
+        let settings = Settings::get_from_db()?;
         let chat_tabs: &Vec<serde_json::Value> = settings["chat_log"]
             .as_object().unwrap()["window"]
             .as_object().unwrap()["chat_tabs"]

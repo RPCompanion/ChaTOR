@@ -62,6 +62,7 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 chrono = { version = "0.4", features = ["serde"] }
 ctrlc = "3.4.4"
 regex = "1.10"
+clap = { version = "4.5.17", features = ["derive"] }
 
 # Project Specific
 chator-macros = { git = "https://github.com/RPCompanion/chator-macros" }
@@ -80,7 +81,6 @@ scraper = "0.19"
 # Windows
 clipboard-win = "5.0.0"
 windows = { version = "0.52", features = ["Data_Xml_Dom", "Win32_Foundation", "Win32_Security", "Win32_System_Threading", "Win32_System_LibraryLoader", "Win32_UI_WindowsAndMessaging", "Win32_UI_Input_KeyboardAndMouse", "Win32_System_ProcessStatus", "Win32_UI_WindowsAndMessaging"] }
-
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.

@@ -4,6 +4,8 @@ use std::sync::Mutex;
 use rusqlite::params;
 use serde::{Deserialize, Serialize};
 
+use crate::share::AsJson;
+
 use super::get_connection;
 
 pub mod chat_settings;
@@ -31,14 +33,14 @@ impl Settings {
 
     pub fn get() -> Settings {
 
-        match Settings::get_json() {
+        match Settings::get_from_db() {
             Ok(settings) => serde_json::from_value(settings).unwrap(),
             Err(_) => Settings::default()
         }
 
     }
 
-    pub fn get_json() -> Result<serde_json::Value, &'static str> {
+    pub fn get_from_db() -> Result<serde_json::Value, &'static str> {
 
         let conn = get_connection();
         let response = conn.query_row("SELECT settings FROM Settings LIMIT 1", params![], |row| {
@@ -88,6 +90,8 @@ impl Default for Settings {
 
     }
 }
+
+impl AsJson for Settings {}
 
 #[tauri::command]
 pub fn get_settings() -> Settings {
