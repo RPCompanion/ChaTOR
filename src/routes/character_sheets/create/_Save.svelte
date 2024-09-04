@@ -8,7 +8,8 @@
     import { createEventDispatcher } from "svelte";
     import VariableSizeButton from "../../../lib/buttons/VariableSizeButton.svelte";
     import type { ICharacterSheet } from "../../../lib/character_sheet/character_sheet";
-    import { create_character, save_character_locally, type ICreateCharacter, type ICharacter } from "../../../lib/api/character";
+    import { create_character, type ICreateCharacter} from "../../../lib/api/character";
+    import { type ICharacter, save_character } from "../../../lib/network/characters";
     import { toast_error } from "../../../lib/utils";
     import CharacterSheetViewer from "../../../components/_CharacterSheetViewer.svelte";
     import Tooltip from "../../../components/_Tooltip.svelte";
@@ -45,7 +46,7 @@
 
     async function submit_to_local(character: ICharacter) {
 
-        let response = await save_character_locally(character);
+        let response = await save_character(character);
         if (response.is_err()) {
             toast_error(response.unwrap_err());
             return;

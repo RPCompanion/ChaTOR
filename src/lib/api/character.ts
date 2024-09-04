@@ -4,16 +4,6 @@ import { session_token } from "./account";
 import { get } from "svelte/store";
 import { API_ENDPOINTS } from "../api";
 
-import { invoke } from "@tauri-apps/api";
-import { toast_error } from "../utils";
-
-export interface ICharacter {
-    character_sheet: ICharacterSheet;
-    public_id: string;
-    template_id: number;
-    server_id: number;
-}
-
 export interface ICreateCharacterResponse {
     public_id: string;
 }
@@ -63,20 +53,6 @@ export async function create_character(character: ICreateCharacter): Promise<Res
 
     } catch (e) {
         return Err("Failed to create character.");
-    }
-
-}
-
-/**
- * Saves a character to the local database.
-*/
-export async function save_character_locally(character: ICharacter): Promise<Result<[], string>> {
-
-    try {
-        await invoke("save_character", { character });
-        return Ok([]);
-    } catch (e) {
-        return Err(e as string);
     }
 
 }

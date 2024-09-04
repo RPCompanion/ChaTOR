@@ -79,6 +79,6 @@ pub fn save_character(character: Character) -> Result<(), &'static str> {
 }
 
 #[tauri::command]
-pub fn fetch_all_characters() -> Result<Vec<Character>, &'static str> {
+pub fn get_all_characters() -> Result<Vec<Character>, &'static str> {
     Character::fetch_all()
 }
