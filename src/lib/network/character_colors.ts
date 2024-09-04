@@ -27,12 +27,12 @@ export class Color {
 
 }
 
-export class CharacterColorInfo {
+export class CharacterColorInfo implements ICharacterColorInfo {
     
     public character_name: string;
     public channel_colors: Color[];
 
-    constructor(character: ICharacter) {
+    constructor(character: ICharacterColorInfo) {
         this.character_name = character.character_name;
         this.channel_colors = character.channel_colors;
     }
@@ -77,7 +77,7 @@ export interface IColor {
     b: number;
 }
 
-export interface ICharacter {
+export interface ICharacterColorInfo {
     character_name: string;
     channel_colors: Color[];
 }
@@ -93,11 +93,11 @@ export const SAY_COLOR_INDEX: number     = 0;
 
 export const active_character = writable<CharacterColorInfo | undefined>(undefined);
 
-export function get_all_character_colors(callback: (characters: Result<ICharacter[], string>) => void) {
+export function get_all_character_colors(callback: (characters: Result<ICharacterColorInfo[], string>) => void) {
 
     invoke("get_all_character_colors").then((response: any) => {
 
-        let temp: ICharacter[] = response.map((c: any) => {
+        let temp: ICharacterColorInfo[] = response.map((c: any) => {
             return {
                 character_name: c.character_name,
                 channel_colors: c.channel_colors.map((cc: IColor) => new Color(cc.r, cc.g, cc.b))
@@ -114,7 +114,7 @@ export function get_all_character_colors(callback: (characters: Result<ICharacte
 
 export function init_active_character_color() {
 
-    get_all_character_colors((characters: Result<ICharacter[], string>) => {
+    get_all_character_colors((characters: Result<ICharacterColorInfo[], string>) => {
 
         if (characters.is_err()) {
             return;
@@ -128,7 +128,7 @@ export function init_active_character_color() {
 
         let character = characters
             .unwrap()
-            .find((c: ICharacter) => c.character_name === character_name);
+            .find((c: ICharacterColorInfo) => c.character_name === character_name);
 
         if (character == undefined) {
             return;
