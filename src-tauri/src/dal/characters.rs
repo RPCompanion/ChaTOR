@@ -5,6 +5,8 @@ use std::fs::DirEntry;
 use serde::{Serialize, Deserialize};
 use directories::ProjectDirs;
 
+use tracing::error;
+
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Color {
@@ -15,13 +17,64 @@ pub struct Color {
 
 impl Color {
 
-    pub fn from_hex(hex: &str) -> Color {
+    pub fn from_hex(hex: &str) -> Result<Color, &'static str> {
 
         let hex = hex.trim_start_matches("#");
-        let r = u8::from_str_radix(&hex[0..2], 16).unwrap();
-        let g = u8::from_str_radix(&hex[2..4], 16).unwrap();
-        let b = u8::from_str_radix(&hex[4..6], 16).unwrap();
-        Color { r, g, b }
+
+        if hex.len() != 6 {
+            return Err("Invalid hex color");
+        }
+
+        let r = u8::from_str_radix(&hex[0..2], 16).map_err(|_| "Invalid r hex color")?;
+        let g = u8::from_str_radix(&hex[2..4], 16).map_err(|_| "Invalid g hex color")?;
+        let b = u8::from_str_radix(&hex[4..6], 16).map_err(|_| "Invalid b hex color")?;
+
+        Ok(Color { r, g, b })
+
+    }
+
+    pub fn get_default_colors() -> Vec<Color> {
+
+        vec![
+            Color::from_hex("b3ecfe").unwrap(),
+            Color::from_hex("ff73ff").unwrap(),
+            Color::from_hex("ff8022").unwrap(),
+            Color::from_hex("a59ff4").unwrap(),
+            Color::from_hex("eeee00").unwrap(),
+            Color::from_hex("eeee00").unwrap(),
+            Color::from_hex("B3ECFF").unwrap(),
+            Color::from_hex("B3ECFF").unwrap(),
+            Color::from_hex("B3ECFF").unwrap(),
+            Color::from_hex("1d8cfe").unwrap(),
+            Color::from_hex("82ec89").unwrap(),
+            Color::from_hex("FF00FF").unwrap(),
+            Color::from_hex("efbc55").unwrap(),
+            Color::from_hex("317A3C").unwrap(),
+            Color::from_hex("eeee00").unwrap(),
+            Color::from_hex("FF0000").unwrap(),
+            Color::from_hex("eeee00").unwrap(),
+            Color::from_hex("ff7f7f").unwrap(),
+            Color::from_hex("EEEE00").unwrap(),
+            Color::from_hex("EEEE00").unwrap(),
+            Color::from_hex("EEEE00").unwrap(),
+            Color::from_hex("eeee00").unwrap(),
+            Color::from_hex("eeee00").unwrap(),
+            Color::from_hex("eeee00").unwrap(),
+            Color::from_hex("eeee00").unwrap(),
+            Color::from_hex("eeee00").unwrap(),
+            Color::from_hex("eeee00").unwrap(),
+            Color::from_hex("eeee00").unwrap(),
+            Color::from_hex("eeee00").unwrap(),
+            Color::from_hex("ff5400").unwrap(),
+            Color::from_hex("eeee00").unwrap(),
+            Color::from_hex("eeee00").unwrap(),
+            Color::from_hex("eeee00").unwrap(),
+            Color::from_hex("A00000").unwrap(),
+            Color::from_hex("C92E56").unwrap(),
+            Color::from_hex("BB4FD2").unwrap(),
+            Color::from_hex("1FAB29").unwrap(),
+            Color::from_hex("FF6600").unwrap(),
+        ]
 
     }
 
@@ -95,14 +148,23 @@ impl Character {
 
         if let Some(line) = lines.into_iter().find(|line| line.contains("ChatColors")) {
 
-            return Ok(line.split("=")
+            let color_results = line.split("=")
                 .collect::<Vec<&str>>()[1]
                 .trim()
                 .split(";")
                 .into_iter()
                 .filter(|color| !color.is_empty())
                 .map(|color| Color::from_hex(color))
-                .collect::<Vec<Color>>());
+                .collect::<Result<Vec<Color>, &'static str>>();
+
+            if color_results.is_err() {
+
+                error!("Could not parse ChatColors: {:?}", color_results.err().unwrap());
+                return Ok(Color::get_default_colors());
+
+            }
+
+            return Ok(color_results.unwrap());
 
         }
 

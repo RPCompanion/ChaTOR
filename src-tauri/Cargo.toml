@@ -1,6 +1,6 @@
 [package]
 name = "chator"
-version = "0.1.18"
+version = "0.1.19"
 description = "A Chat system for Star Wars: The Old Republic."
 authors = ["Emma Davenport"]
 license = ""
@@ -57,7 +57,7 @@ sysinfo = "0.30"
 # Logging
 tracing = "0.1"
 tracing-appender = "0.2"
-tracing-subscriber = "0.3"
+tracing-subscriber = {version = "0.3", features = ["env-filter"] }
 
 # Misc
 chrono = { version = "0.4", features = ["serde"] }
