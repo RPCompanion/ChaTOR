@@ -27,7 +27,7 @@ export class Color {
 
 }
 
-export class Character {
+export class CharacterColorInfo {
     
     public character_name: string;
     public channel_colors: Color[];
@@ -91,11 +91,11 @@ export const EMOTE_COLOR_INDEX: number   = 2;
 export const YELL_COLOR_INDEX: number    = 1;
 export const SAY_COLOR_INDEX: number     = 0;
 
-export const active_character = writable<Character | undefined>(undefined);
+export const active_character = writable<CharacterColorInfo | undefined>(undefined);
 
-export function get_all_characters(callback: (characters: Result<ICharacter[], string>) => void) {
+export function get_all_character_colors(callback: (characters: Result<ICharacter[], string>) => void) {
 
-    invoke("get_all_characters").then((response: any) => {
+    invoke("get_all_character_colors").then((response: any) => {
 
         let temp: ICharacter[] = response.map((c: any) => {
             return {
@@ -112,9 +112,9 @@ export function get_all_characters(callback: (characters: Result<ICharacter[], s
 
 }
 
-export function init_active_character() {
+export function init_active_character_color() {
 
-    get_all_characters((characters: Result<ICharacter[], string>) => {
+    get_all_character_colors((characters: Result<ICharacter[], string>) => {
 
         if (characters.is_err()) {
             return;
@@ -134,7 +134,7 @@ export function init_active_character() {
             return;
         }
 
-        active_character.set(new Character(character));
+        active_character.set(new CharacterColorInfo(character));
 
     });
 

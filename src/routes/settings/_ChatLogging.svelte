@@ -10,17 +10,16 @@
     import { toast_error } from "../../lib/utils";
 
     import { 
-        get_all_characters, 
+        get_all_character_colors, 
         type ICharacter
-    } from "../../lib/network/characters";
-    import { toast } from "@zerodevx/svelte-toast";
+    } from "../../lib/network/character_colors";
 
     const SECTION_SUB_TEXT: string = "Chat logging uses DLL injection, which is against the TOS of SWTOR and may result in a ban. Use at your own risk.";
 
     let characters: ICharacter[] = [];
     function init_all_characters() {
 
-        get_all_characters((temp: Result<ICharacter[], string>) => {
+        get_all_character_colors((temp: Result<ICharacter[], string>) => {
 
             if (temp.is_ok()) {
                 characters = temp.unwrap();

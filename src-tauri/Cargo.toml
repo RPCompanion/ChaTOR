@@ -3,11 +3,10 @@ name = "chator"
 version = "0.1.18"
 description = "A Chat system for Star Wars: The Old Republic."
 authors = ["Emma Davenport"]
-license = ""
+license = "AGPL-3.0"
 repository = ""
 default-run = "chator"
 edition = "2021"
-rust-version = "1.60"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

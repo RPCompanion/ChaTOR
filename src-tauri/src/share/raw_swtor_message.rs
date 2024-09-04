@@ -4,6 +4,8 @@ use std::ffi::CStr;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
+use super::AsJson;
+
 #[derive(Deserialize, Serialize)]
 pub struct RawSwtorMessage {
     pub channel: i32,
@@ -48,10 +50,6 @@ impl RawSwtorMessage {
 
     }
 
-    pub fn as_json_str(&self) -> String {    
-
-        serde_json::to_string(self).unwrap()
-
-    }
-
 }
+
+impl AsJson for RawSwtorMessage {}

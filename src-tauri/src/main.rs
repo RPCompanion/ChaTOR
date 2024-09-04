@@ -81,7 +81,7 @@ fn main() {
             dal::db::custom_channel::delete_custom_channel,
             dal::db::settings::get_settings,
             dal::db::settings::update_settings,
-            dal::characters::get_all_characters,
+            dal::character_colors::get_all_character_colors,
             dal::db::chat_log::get_chat_log_from_date,
             dal::db::chat_log::get_distinct_dates,
             dal::db::chat_log::get_todays_chat_log,

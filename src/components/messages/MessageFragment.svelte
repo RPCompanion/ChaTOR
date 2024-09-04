@@ -1,7 +1,7 @@
 
 <script lang="ts">
 
-    import { active_character } from "../../lib/network/characters";
+    import { active_character } from "../../lib/network/character_colors";
     import type { Hyperlink } from "../../lib/hyperlink_parser";
     import { unicode_unescape } from "../../lib/utils";
     import type { ESwtorChannel } from "../../lib/network/swtor_channel";

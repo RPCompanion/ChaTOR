@@ -28,19 +28,19 @@ impl Color {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct Character {
+pub struct CharacterColorInfo {
     pub character_name: String,
     pub channel_colors: Vec<Color>
 }
 
-impl Character {
+impl CharacterColorInfo {
 
-    pub fn get_all_characters() -> Result<Vec<Character>, &'static str> {
+    pub fn get_all_characters() -> Result<Vec<CharacterColorInfo>, &'static str> {
 
         if let Some(project) = ProjectDirs::from("com", "SWTOR", "swtor") {
 
             let path = project.config_local_dir().parent().unwrap().join("settings");
-            let mut characters: Vec<Character> = Vec::new();
+            let mut characters: Vec<CharacterColorInfo> = Vec::new();
 
             let entries = path.read_dir();
 
@@ -52,7 +52,7 @@ impl Character {
 
                 match entry {
                     Ok(entry) => {
-                        let character = Character::get_character(entry);
+                        let character = CharacterColorInfo::get_character(entry);
                         if character.is_some() {
                             characters.push(character.unwrap());
                         }
@@ -69,7 +69,7 @@ impl Character {
 
     }
 
-    fn get_character(entry: DirEntry) -> Option<Character> {
+    fn get_character(entry: DirEntry) -> Option<CharacterColorInfo> {
 
         let e_path = entry.path();
         if !e_path.is_file() {
@@ -82,8 +82,8 @@ impl Character {
         }
 
         let character_name = file_name.split("_").nth(1).unwrap();
-        let channel_colors = Character::get_gui_colors(e_path.to_str().unwrap()).unwrap();
-        return Some(Character { character_name: character_name.to_string(), channel_colors });
+        let channel_colors = CharacterColorInfo::get_gui_colors(e_path.to_str().unwrap()).unwrap();
+        return Some(CharacterColorInfo { character_name: character_name.to_string(), channel_colors });
 
     }
 
@@ -113,6 +113,6 @@ impl Character {
 }
 
 #[tauri::command]
-pub fn get_all_characters() -> Result<Vec<Character>, &'static str> {
-    Character::get_all_characters()
+pub fn get_all_character_colors() -> Result<Vec<CharacterColorInfo>, &'static str> {
+    CharacterColorInfo::get_all_characters()
 }

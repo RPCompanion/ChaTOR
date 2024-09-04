@@ -1,10 +1,9 @@
 
 import { get } from "svelte/store";
-import { settings } from "./settings";
 import { listen } from "@tauri-apps/api/event";
 import { SwtorChannel, ESwtorChannel } from "./swtor_channel";
 import { add_swtor_channel_message } from "./swtor_message/swtor_chat_tab_messages";
-import { active_character } from "./characters";
+import { active_character } from "./character_colors";
 import { add_player } from "./players";
 import { 
     get_hyperlink_regex,
