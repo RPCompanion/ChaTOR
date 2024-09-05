@@ -54,6 +54,9 @@ impl Default for ChatLogWindow {
 #[derive(Deserialize, Serialize, Clone)]
 pub struct ChannelColors {
     say: Color,
+    global: Color,
+    pvp: Color,
+    trade: Color,
     yell: Color,
     emote: Color,
     whisper: Color,
@@ -69,6 +72,9 @@ impl Default for ChannelColors {
         
         ChannelColors {
             say: Color::new(179, 236, 254),
+            global: Color::new(179, 236, 254),
+            pvp: Color::new(179, 236, 254),
+            trade: Color::new(179, 236, 254),
             yell: Color::new(255, 115, 255),
             emote: Color::new(255, 128, 34),
             whisper: Color::new(165, 159, 244),

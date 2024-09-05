@@ -13,6 +13,9 @@ export type ChannelDispatcher =
 
 export interface IChannelColors {
     say: IColor,
+    global: IColor,
+    pvp: IColor,
+    trade: IColor,
     yell: IColor,
     emote: IColor,
     whisper: IColor,
@@ -79,6 +82,7 @@ type CaptureError = "AlreadyInjected" | "SwtorNotRunning" | "WrongGuiSettings" |
 export const settings = writable<ISettings>(default_settings());
 export const chat_log_active = writable<boolean>(false);
 
+// Run .\ChaTOR.exe -g to generate blob file and then replace existing "default_settings.json" with the new one
 export function default_settings(): ISettings {
     return default_settings_obj as ISettings;
 }
