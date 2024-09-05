@@ -25,6 +25,9 @@
         let channel_colors = settings.chat_log.window.channel_colors;
         switch (channel_type) {
 
+            case ESwtorChannel.GLOBAL:      return Color.get_hex(channel_colors.global);
+            case ESwtorChannel.PVP:         return Color.get_hex(channel_colors.pvp);
+            case ESwtorChannel.TRADE:       return Color.get_hex(channel_colors.trade);
             case ESwtorChannel.SAY:         return Color.get_hex(channel_colors.say);
             case ESwtorChannel.YELL:        return Color.get_hex(channel_colors.yell);
             case ESwtorChannel.EMOTE:       return Color.get_hex(channel_colors.emote);

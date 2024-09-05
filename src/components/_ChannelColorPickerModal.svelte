@@ -15,13 +15,19 @@
 </script>
 
 {#if show}
-    <div transition:fly|local={{ duration: 500, y: -500 }} class="fixed p-1 center w-52 bg-slate-500 rounded-md border border-slate-700 z-10">
+    <div 
+        transition:fly|local={{ duration: 500, y: -500 }} 
+        class="fixed p-1 center w-52 bg-slate-500 rounded-md border border-black z-10 shadow-md">
         <div class="flex flex-row gap-1">
             <h1 class="text-white text-xl">Channel Colors</h1>
             <div class="relative left-8">
                 <XButton on:click={close}></XButton>
             </div>
         </div>
+        <Color text="Global" bind:color={$settings.chat_log.window.channel_colors.global}/>
+        <Color text="PVP" bind:color={$settings.chat_log.window.channel_colors.pvp}/>
+        <Color text="Trade" bind:color={$settings.chat_log.window.channel_colors.trade}/>
+        <div class="h-1 bg-slate-300"></div>
         <Color text="Say" bind:color={$settings.chat_log.window.channel_colors.say}/>
         <Color text="Yell" bind:color={$settings.chat_log.window.channel_colors.yell}/>
         <Color text="Emote" bind:color={$settings.chat_log.window.channel_colors.emote}/>
