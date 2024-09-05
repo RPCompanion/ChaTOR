@@ -18,6 +18,7 @@
     export let channel_type: ESwtorChannel;
 
     let color_hex: string = get_channel_color(channel_type);
+    $: color_hex = get_channel_color(channel_type);
 
     function get_channel_color(channel_type: ESwtorChannel): string {
 
