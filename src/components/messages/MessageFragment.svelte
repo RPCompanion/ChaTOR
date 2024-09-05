@@ -1,10 +1,11 @@
 
 <script lang="ts">
 
-    import { active_character } from "../../lib/network/character_colors";
+    import { Color } from "../../lib/network/local_characters";
+    import { settings } from "../../lib/network/settings";
     import type { Hyperlink } from "../../lib/hyperlink_parser";
     import { unicode_unescape } from "../../lib/utils";
-    import type { ESwtorChannel } from "../../lib/network/swtor_channel";
+    import { ESwtorChannel } from "../../lib/network/swtor_channel";
     import { HyperLinkGuild } from "../../lib/hyperlink/guild";
     import { HyperLinkItem } from "../../lib/hyperlink/item";
     import { HyperLinkQuest } from "../../lib/hyperlink/quest";
@@ -16,8 +17,26 @@
     export let fragment: string | Hyperlink
     export let channel_type: ESwtorChannel;
 
-    let color_hex: string = "#000000";
-    $: color_hex = $active_character?.get_channel_color(channel_type).to_hex() ?? "#000000";
+    let color_hex: string = get_channel_color(channel_type);
+
+    function get_channel_color(channel_type: ESwtorChannel): string {
+
+        let channel_colors = $settings.chat_log.window.channel_colors;
+        switch (channel_type) {
+
+            case ESwtorChannel.SAY:         return Color.get_hex(channel_colors.say);
+            case ESwtorChannel.YELL:        return Color.get_hex(channel_colors.yell);
+            case ESwtorChannel.EMOTE:       return Color.get_hex(channel_colors.emote);
+            case ESwtorChannel.WHISPER:     return Color.get_hex(channel_colors.whisper);
+            case ESwtorChannel.GROUP:       return Color.get_hex(channel_colors.group);
+            case ESwtorChannel.GUILD:       return Color.get_hex(channel_colors.guild);
+            case ESwtorChannel.OP:          return Color.get_hex(channel_colors.ops);
+            case ESwtorChannel.OPS_OFFICER: return Color.get_hex(channel_colors.ops_leader);
+            default: return new Color(channel_colors.say).to_hex();
+
+        }
+
+    }
 
 </script>
 

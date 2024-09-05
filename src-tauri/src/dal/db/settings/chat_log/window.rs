@@ -22,9 +22,6 @@ pub struct ChatLogWindow {
     #[serde(default = "WidthHeight::default")]
     window: WidthHeight,
 
-    #[serde(default = "default_override_channel_colors")]
-    override_channel_colors: bool,
-
     #[serde(default = "ChannelColors::default")]
     channel_colors: ChannelColors
 
@@ -38,10 +35,6 @@ const fn default_show_chat_log_window() -> bool {
     false
 }
 
-const fn default_override_channel_colors() -> bool {
-    false
-}
-
 impl Default for ChatLogWindow {
 
     fn default() -> ChatLogWindow {
@@ -51,7 +44,6 @@ impl Default for ChatLogWindow {
             show_chat_log_window: default_show_chat_log_window(),
             chat_tabs: ChatTab::default_tabs(),
             window: WidthHeight::default(),
-            override_channel_colors: default_override_channel_colors(),
             channel_colors: ChannelColors::default()
         }
 

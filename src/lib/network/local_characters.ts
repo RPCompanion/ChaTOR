@@ -17,10 +17,10 @@ export class Color implements IColor {
     public g: number;
     public b: number;
 
-    constructor(r: number, g: number, b: number) {
-        this.r = r;
-        this.g = g;
-        this.b = b;
+    constructor(color: IColor) {
+        this.r = color.r;
+        this.g = color.g;
+        this.b = color.b;
     }
 
     public equals(other: Color): boolean {
@@ -28,36 +28,34 @@ export class Color implements IColor {
     }
 
     public to_hex(): string {
-        return "#" + this.r.toString(16) + this.g.toString(16) + this.b.toString(16);
+        return Color.get_hex(this);
+    }
+
+    public static get_hex(color: IColor): string {
+        return "#" + color.r.toString(16) + color.g.toString(16) + color.b.toString(16);
     }
 
 }
 
-export class CharacterColorInfo implements ICharacterColorInfo {
+export class LocalCharacterInfo implements ICharacterColorInfo {
     
     public character_name: string;
-    public channel_colors: Color[];
+    public channel_colors?: Color[];
 
     constructor(character: ICharacterColorInfo) {
         this.character_name = character.character_name;
         this.channel_colors = character.channel_colors;
     }
 
-    public relevant_channel_color(color: Color): boolean {
+    /**
+     * 
+     * Get the color for a specific channel. This functionality has been replaced by user defined channel colors. Consider depcrecated.
+     * */ 
+    public get_channel_color(channel: ESwtorChannel): Color | undefined {
 
-        for (let i = 0; i < 4; i++) {
-
-            if (this.channel_colors[i].equals(color)) {
-                return true;
-            }
-
+        if (this.channel_colors == undefined) {
+            return undefined;
         }
-
-        return false;
-
-    }
-
-    public get_channel_color(channel: ESwtorChannel): Color {
 
         switch (channel) {
             case ESwtorChannel.SAY: return this.channel_colors[SAY_COLOR_INDEX];
@@ -73,19 +71,12 @@ export class CharacterColorInfo implements ICharacterColorInfo {
         }
 
     }
-
     
-}
-
-export interface IColor {
-    r: number;
-    g: number;
-    b: number;
 }
 
 export interface ICharacterColorInfo {
     character_name: string;
-    channel_colors: Color[];
+    channel_colors?: Color[];
 }
 
 export const OPS_LEADER_COLOR_INDEX: number = 29;
@@ -97,16 +88,16 @@ export const EMOTE_COLOR_INDEX: number   = 2;
 export const YELL_COLOR_INDEX: number    = 1;
 export const SAY_COLOR_INDEX: number     = 0;
 
-export const active_character = writable<CharacterColorInfo | undefined>(undefined);
+export const active_character = writable<LocalCharacterInfo | undefined>(undefined);
 
-export function get_all_character_colors(callback: (characters: Result<ICharacterColorInfo[], string>) => void) {
+export function get_all_local_characters(callback: (characters: Result<ICharacterColorInfo[], string>) => void) {
 
-    invoke("get_all_character_colors").then((response: any) => {
+    invoke("get_all_local_characters").then((response: any) => {
 
         let temp: ICharacterColorInfo[] = response.map((c: any) => {
             return {
                 character_name: c.character_name,
-                channel_colors: c.channel_colors.map((cc: IColor) => new Color(cc.r, cc.g, cc.b))
+                channel_colors: c.channel_colors.map((cc: IColor) => new Color(cc))
             }
         });
         callback(Ok(temp));
@@ -118,9 +109,9 @@ export function get_all_character_colors(callback: (characters: Result<ICharacte
 
 }
 
-export function init_active_character_color() {
+export function init_active_local_character() {
 
-    get_all_character_colors((characters: Result<ICharacterColorInfo[], string>) => {
+    get_all_local_characters((characters: Result<ICharacterColorInfo[], string>) => {
 
         if (characters.is_err()) {
             return;
@@ -140,7 +131,7 @@ export function init_active_character_color() {
             return;
         }
 
-        active_character.set(new CharacterColorInfo(character));
+        active_character.set(new LocalCharacterInfo(character));
 
     });
 

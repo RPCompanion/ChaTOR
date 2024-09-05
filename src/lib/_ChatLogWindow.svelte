@@ -1,6 +1,6 @@
 
 <script lang="ts">
-    import { active_character } from "./network/character_colors";
+    import { active_character } from "./network/local_characters";
     import { createEventDispatcher } from "svelte";
     import { SwtorMessage } from "./network/swtor_message";
 

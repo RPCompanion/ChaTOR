@@ -21,8 +21,11 @@ export enum ESwtorChannel {
 export class SwtorChannel {
 
     public readonly type: ESwtorChannel;
+
     constructor(channel: ESwtorChannel) {
+
         this.type = channel;
+        
     }
 
     public get_name(): Option<string> {

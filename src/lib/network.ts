@@ -7,7 +7,7 @@ import { Result, Ok, Err } from "./result";
 import { init_custom_emotes } from "./network/custom_emote";
 import { init_settings } from "./network/settings";
 import { init_swtor_message_listener } from "./network/swtor_message";
-import { init_active_character_color } from "./network/character_colors";
+import { init_active_local_character } from "./network/local_characters";
 import { settings } from "./network/settings";
 import { init_custom_channels } from "./network/custom_channels";
 
@@ -24,7 +24,7 @@ export const hooked_in = writable<boolean>(false);
 export function init_network() {
 
     init_settings(() => {
-        init_active_character_color();
+        init_active_local_character();
     });
 
     init_hook();

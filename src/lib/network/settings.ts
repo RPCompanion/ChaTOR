@@ -4,7 +4,7 @@ import { invoke } from "@tauri-apps/api";
 import { toast } from "@zerodevx/svelte-toast";
 import { hooked_in } from "../network";
 import { set_initial_swtor_channels } from "./swtor_message/swtor_chat_tab_messages";
-import { type IColor } from "./character_colors";
+import { type IColor } from "./local_characters";
 import default_settings_obj from "./default_settings.json";
 
 export type ChannelDispatcher =
@@ -43,7 +43,6 @@ export interface IChatLogWindow {
     show_chat_log_window: boolean;
     chat_tabs: IChatTab[];
     window: IWidthHeight;
-    override_channel_colors: boolean;
     channel_colors: IChannelColors;
 }
 

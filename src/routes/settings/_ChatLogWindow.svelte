@@ -26,14 +26,9 @@
                 <SettingsToggle bind:checked={$settings.chat_log.window.prefetch_hyperlinks}></SettingsToggle>
             </Setting>
         {/if}
-        <Setting setting="Override Channel Colors" sub_text="By default, ChaTOR will attempt to fetch channel colors from the game itself.">
-            <SettingsToggle bind:checked={$settings.chat_log.window.override_channel_colors}></SettingsToggle>
+        <Setting setting="Set Channel Colors">
+            <VariableSizeButton on:click={on_channel_colors_change}>Change</VariableSizeButton>
         </Setting>
-        {#if $settings.chat_log.window.override_channel_colors}
-            <Setting setting="Set Channel Colors">
-                <VariableSizeButton on:click={on_channel_colors_change}>Change</VariableSizeButton>
-            </Setting>
-        {/if}
     </SettingSection>
     <ChannelColorPickerModal bind:show={show_channel_color_picker}></ChannelColorPickerModal>
 {/if}

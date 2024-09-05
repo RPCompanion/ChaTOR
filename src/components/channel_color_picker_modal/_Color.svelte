@@ -1,7 +1,7 @@
 
 <script lang="ts">
 
-    import type { IColor } from "../../lib/network/character_colors";
+    import type { IColor } from "../../lib/network/local_characters";
     import ColorPicker from 'svelte-awesome-color-picker';
 
     export let text: string;

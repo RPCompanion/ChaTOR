@@ -9,20 +9,24 @@ use tracing::error;
 
 use super::colors::Color;
 
+
+/**
+ * Parsed from .ini files found in C:\Users\USERACCOUNT\AppData\Local\SWTOR\swtor\settings
+ */
 #[derive(Serialize, Deserialize)]
-pub struct CharacterColorInfo {
+pub struct LocalCharacterInfo {
     pub character_name: String,
-    pub channel_colors: Vec<Color>
+    pub channel_colors: Option<Vec<Color>>
 }
 
-impl CharacterColorInfo {
+impl LocalCharacterInfo {
 
-    pub fn get_all_characters() -> Result<Vec<CharacterColorInfo>, &'static str> {
+    pub fn get_all_characters() -> Result<Vec<LocalCharacterInfo>, &'static str> {
 
         if let Some(project) = ProjectDirs::from("com", "SWTOR", "swtor") {
 
             let path = project.config_local_dir().parent().unwrap().join("settings");
-            let mut characters: Vec<CharacterColorInfo> = Vec::new();
+            let mut characters: Vec<LocalCharacterInfo> = Vec::new();
 
             let entries = path.read_dir();
 
@@ -34,7 +38,7 @@ impl CharacterColorInfo {
 
                 match entry {
                     Ok(entry) => {
-                        let character = CharacterColorInfo::get_character(entry);
+                        let character = LocalCharacterInfo::get_character(entry);
                         if character.is_some() {
                             characters.push(character.unwrap());
                         }
@@ -51,7 +55,7 @@ impl CharacterColorInfo {
 
     }
 
-    fn get_character(entry: DirEntry) -> Option<CharacterColorInfo> {
+    fn get_character(entry: DirEntry) -> Option<LocalCharacterInfo> {
 
         let e_path = entry.path();
         if !e_path.is_file() {
@@ -64,12 +68,13 @@ impl CharacterColorInfo {
         }
 
         let character_name = file_name.split("_").nth(1).unwrap();
-        let channel_colors = CharacterColorInfo::get_gui_colors(e_path.to_str().unwrap()).unwrap();
-        return Some(CharacterColorInfo { character_name: character_name.to_string(), channel_colors });
+        let channel_colors = LocalCharacterInfo::get_gui_colors(e_path.to_str().unwrap());
+
+        return Some(LocalCharacterInfo { character_name: character_name.to_string(), channel_colors });
 
     }
 
-    fn get_gui_colors(path: &str) -> Result<Vec<Color>, &'static str> {
+    fn get_gui_colors(path: &str) -> Option<Vec<Color>> {
 
         let temp    = fs::read(path).unwrap();
         let content = String::from_utf8_lossy(&temp);
@@ -89,21 +94,23 @@ impl CharacterColorInfo {
             if color_results.is_err() {
 
                 error!("Could not parse ChatColors: {:?}", color_results.err().unwrap());
-                return Ok(Color::get_default_colors());
+                return None
 
             }
 
-            return Ok(color_results.unwrap());
+            return Some(color_results.unwrap());
 
         }
 
-        Err("Could not find ChatColors in file")
+        None
 
     }
 
 }
 
 #[tauri::command]
-pub fn get_all_character_colors() -> Result<Vec<CharacterColorInfo>, &'static str> {
-    CharacterColorInfo::get_all_characters()
+pub fn get_all_local_characters() -> Result<Vec<LocalCharacterInfo>, &'static str> {
+
+    LocalCharacterInfo::get_all_characters()
+    
 }
