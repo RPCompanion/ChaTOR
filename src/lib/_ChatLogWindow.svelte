@@ -20,7 +20,10 @@
     import PlayerFilter from "../components/_PlayerFilter.svelte";
     import RestorePosts from "./chat_log_window/_RestorePosts.svelte";
     import Messages from "../components/_Messages.svelte";
+    import { Gear } from "phosphor-svelte";
+    import ChannelColorPickerModal from "../components/_ChannelColorPickerModal.svelte";
 
+    let show_channel_color_picker: boolean = false;
     let auto_scroll: boolean = true;
     let container: HTMLElement | undefined = undefined;
     let last_message: HTMLElement | undefined = undefined;
@@ -82,6 +85,10 @@
 
     }
 
+    function show_channel_color_picker_modal() {
+        show_channel_color_picker = true;
+    }    
+
     afterUpdate(() => {
 
         if (!update_scheduled) {
@@ -133,8 +140,18 @@
         <PlayerFilter bind:elems={$players_filter}/>
     </div>
 </div>
+
+<ChannelColorPickerModal bind:show={show_channel_color_picker}/>
+
 <div>
-    <ChatTabs/>
+    <div class="grid grid-cols-[1fr,auto]">
+        <ChatTabs/>
+        <div class="flex justify-end items-center">
+            <button class="text-white hover:text-gray-400" on:click={show_channel_color_picker_modal}>
+                <Gear size="26"/>
+            </button>
+        </div>
+    </div>
     <div 
         bind:this={container} class="flex flex-col h-44 max-h-96 resize-y rounded-tr-md border-2 border-slate-700 overflow-y-auto scrollbar scrollbar-thumb-sky-800 scrollbar-track-slate-100 chat-container-background">
         {#each swtor_messages as message}

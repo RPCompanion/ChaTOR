@@ -15,7 +15,7 @@
 </script>
 
 {#if show}
-    <div transition:fly|local={{ duration: 500, y: -500 }} class="fixed p-1 center w-52 bg-slate-500 rounded-md border border-slate-700">
+    <div transition:fly|local={{ duration: 500, y: -500 }} class="fixed p-1 center w-52 bg-slate-500 rounded-md border border-slate-700 z-10">
         <div class="flex flex-row gap-1">
             <h1 class="text-white text-xl">Channel Colors</h1>
             <div class="relative left-8">

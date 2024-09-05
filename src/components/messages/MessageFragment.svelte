@@ -2,7 +2,7 @@
 <script lang="ts">
 
     import { Color } from "../../lib/network/local_characters";
-    import { settings } from "../../lib/network/settings";
+    import { settings, type ISettings } from "../../lib/network/settings";
     import type { Hyperlink } from "../../lib/hyperlink_parser";
     import { unicode_unescape } from "../../lib/utils";
     import { ESwtorChannel } from "../../lib/network/swtor_channel";
@@ -17,12 +17,12 @@
     export let fragment: string | Hyperlink
     export let channel_type: ESwtorChannel;
 
-    let color_hex: string = get_channel_color(channel_type);
-    $: color_hex = get_channel_color(channel_type);
+    let color_hex: string = get_channel_color($settings, channel_type);
+    $: color_hex = get_channel_color($settings, channel_type);
 
-    function get_channel_color(channel_type: ESwtorChannel): string {
+    function get_channel_color(settings: ISettings, channel_type: ESwtorChannel): string {
 
-        let channel_colors = $settings.chat_log.window.channel_colors;
+        let channel_colors = settings.chat_log.window.channel_colors;
         switch (channel_type) {
 
             case ESwtorChannel.SAY:         return Color.get_hex(channel_colors.say);
