@@ -15,7 +15,7 @@ use crate::dal::db::swtor_message::SwtorMessage;
 pub mod message_container;
 use self::message_container::SwtorMessageContainer;
 
-const SUPPORTED_SWTOR_CHECKSUM: [u8; 32] = sha256_to_array!("9E7E3787199D1361E350F813570B08A7F2559EC37048E1CB71A1FC5DF2509595");
+const SUPPORTED_SWTOR_CHECKSUM: [u8; 32] = sha256_to_array!("9BC86D590E845D8DD785425475BE0E32AA3BF806BC36D375A100ED6C01C311F2");
 
 lazy_static! {
     static ref INJECTED: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
