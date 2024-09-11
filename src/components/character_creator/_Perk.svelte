@@ -2,8 +2,8 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
     import { createEventDispatcher } from "svelte";
-    import type { IPerk } from "../../../lib/character_template/perk";
-    import VariableSizeButton from "../../../lib/buttons/VariableSizeButton.svelte";
+    import type { IPerk } from "../../lib/character_template/perk";
+    import VariableSizeButton from "../../lib/buttons/VariableSizeButton.svelte";
     import PerkMeta from "./_PerkMeta.svelte";
 
     export let perk: IPerk;

@@ -1,11 +1,11 @@
 
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
-    import VariableSizeButton from "../../../lib/buttons/VariableSizeButton.svelte";
-    import type { CharacterTemplate } from "../../../lib/character_template/character_template";
-    import type { ICharacterSheet } from "../../../lib/character_sheet/character_sheet";
-    import { CharacterSheetUtils } from "../../../lib/character_sheet/character_sheet_utils";
-    import type { IAttribute } from "../../../lib/character_template/attributes";
+    import VariableSizeButton from "../../lib/buttons/VariableSizeButton.svelte";
+    import type { CharacterTemplate } from "../../lib/character_template/character_template";
+    import type { ICharacterSheet } from "../../lib/character_sheet/character_sheet";
+    import { CharacterSheetUtils } from "../../lib/character_sheet/character_sheet_utils";
+    import type { IAttribute } from "../../lib/character_template/attributes";
     import PmButton from "./_PMButton.svelte";
     import Skills from "./_Skills.svelte";
     import { CaretDown } from "phosphor-svelte";

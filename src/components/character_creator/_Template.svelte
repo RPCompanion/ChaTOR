@@ -2,9 +2,9 @@
 <script lang="ts">
 
     import { createEventDispatcher, onMount } from "svelte";
-    import { type IMinifiedCharacterTemplate, fetch_templates, fetch_template } from "../../../lib/api/template";
-    import { toast_error } from "../../../lib/utils";
-    import { CharacterTemplate } from "../../../lib/character_template/character_template";
+    import { type IMinifiedCharacterTemplate, fetch_templates, fetch_template } from "../../lib/api/template";
+    import { toast_error } from "../../lib/utils";
+    import { CharacterTemplate } from "../../lib/character_template/character_template";
 
     const dispatch = createEventDispatcher();
 

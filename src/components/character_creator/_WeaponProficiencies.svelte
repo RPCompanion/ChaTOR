@@ -1,11 +1,11 @@
 
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
-    import VariableSizeButton from "../../../lib/buttons/VariableSizeButton.svelte";
-    import type { IWeaponProficiency } from "../../../lib/character_template/weapon_proficiency";
-    import type { ICharacterSheet } from "../../../lib/character_sheet/character_sheet";
-    import type { CharacterTemplate } from "../../../lib/character_template/character_template";
-    import Checkbox from "../../../lib/Checkbox.svelte";
+    import VariableSizeButton from "../../lib/buttons/VariableSizeButton.svelte";
+    import type { IWeaponProficiency } from "../../lib/character_template/weapon_proficiency";
+    import type { ICharacterSheet } from "../../lib/character_sheet/character_sheet";
+    import type { CharacterTemplate } from "../../lib/character_template/character_template";
+    import Checkbox from "../../lib/Checkbox.svelte";
     
     export let template: CharacterTemplate;
     export let sheet: ICharacterSheet;

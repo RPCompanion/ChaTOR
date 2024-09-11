@@ -1,7 +1,7 @@
 
 <script lang="ts">
 
-    import type { IPerk } from "../../../lib/character_template/perk";
+    import type { IPerk } from "../../lib/character_template/perk";
 
     export let perk: IPerk;
     const HAS_PERK_META = 

@@ -1,7 +1,7 @@
 
 <script lang="ts">
-    import type { ICharacterSheet } from "../../../lib/character_sheet/character_sheet";
-    import type { IAttribute, ISkill } from "../../../lib/character_template/attributes";
+    import type { ICharacterSheet } from "../../lib/character_sheet/character_sheet";
+    import type { IAttribute, ISkill } from "../../lib/character_template/attributes";
     import PmButton from "./_PMButton.svelte";
 
     export let attribute: IAttribute;

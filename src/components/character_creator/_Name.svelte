@@ -4,13 +4,13 @@
     import { open } from "@tauri-apps/api/dialog";
     import { readTextFile } from "@tauri-apps/api/fs";
     import { createEventDispatcher } from "svelte";
-    import VariableSizeButton from "../../../lib/buttons/VariableSizeButton.svelte";
-    import type { ICharacterSheet } from "../../../lib/character_sheet/character_sheet";
-    import { toast_error } from "../../../lib/utils";
+    import VariableSizeButton from "../../lib/buttons/VariableSizeButton.svelte";
+    import type { ICharacterSheet } from "../../lib/character_sheet/character_sheet";
+    import { toast_error } from "../../lib/utils";
     import { get_sheet_config } from "@chator/character-sheet";
-    import { servers } from "../../../lib/api/system";
-    import { CharacterTemplate, type ICharacterTemplate } from "../../../lib/character_template/character_template";
-    import Tooltip from "../../../components/_Tooltip.svelte";
+    import { servers } from "../../lib/api/system";
+    import { CharacterTemplate, type ICharacterTemplate } from "../../lib/character_template/character_template";
+    import Tooltip from "../_Tooltip.svelte";
 
     export let sheet: ICharacterSheet;
     export let server_id: number;
