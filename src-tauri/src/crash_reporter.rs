@@ -3,7 +3,7 @@ use tracing::error;
 use serde::{Deserialize, Serialize};
 use reqwest::blocking::Client;
 
-mod sys_info;
+pub mod sys_info;
 
 use sys_info::SysInfo;
 use crate::config::config;
