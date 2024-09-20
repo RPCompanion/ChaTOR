@@ -31,10 +31,10 @@
     const ROLEPLAY_SECTION: INavbarSection = {
         name: "Roleplay",
         elements: [
-           /* {
+           {
                 name: "Character Sheets",
                 link: "/character_sheets"
-            },*/
+            },
             {
                 name: "Star Forge Beacons",
                 link: "/star_forge_beacons"
