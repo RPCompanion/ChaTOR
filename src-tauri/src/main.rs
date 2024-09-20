@@ -25,6 +25,7 @@ mod logging;
 mod network;
 
 use crash_reporter::CrashReporter;
+use crash_reporter::sys_info::SysInfo;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -53,6 +54,8 @@ fn main() {
     let _guard = logging::init();
     init_system();
     info!("Starting ChaTOR");
+    info!("System Information {}", SysInfo::default().as_json());
+    info!("Client Settings {}", dal::db::settings::get_settings().as_json());
 
     let tauri_response = 
         tauri::Builder::default()
@@ -139,6 +142,8 @@ fn main() {
 
 }
 
+/// Initializes the system.
+/// Sets up panic hook, sigterm handler, config and data access layer
 fn init_system() {
 
     setup_panic_hook();
