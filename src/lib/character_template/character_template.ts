@@ -1,5 +1,5 @@
 
-import { type ICharacterSheet, type ISheetAttribute } from "../character_sheet/character_sheet";
+import { type ICharacterSheet, type ISheetAttribute, type ITemplate } from "../character_sheet/character_sheet";
 import { type IAttribute } from "./attributes";
 import type { IRequirements } from "./common";
 import { type IPerk } from "./perk";
@@ -60,7 +60,7 @@ export class CharacterTemplate implements ICharacterTemplate {
 
     }
 
-    public same_template(template: ICharacterTemplate): boolean {
+    public same_template(template: ITemplate): boolean {
 
         return this.name === template.name &&
                this.version[0] === template.version[0] &&

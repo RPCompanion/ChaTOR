@@ -12,7 +12,7 @@
     import { deep_copy } from "../utils";
 
     export let index: number | undefined = undefined;
-    export let chat_tab: IChatTab = { name: "", channels: [] }
+    export let chat_tab: IChatTab = { name: "", channels: [], default_channel: null }
 
     let show_edit_modal: boolean = false;
     let chat_tab_cached = deep_copy(chat_tab);

@@ -29,8 +29,8 @@
     export let template: CharacterTemplate | undefined = undefined;
     export let sheet: ICharacterSheet | undefined = undefined;
 
-    let template_has_perks: boolean = false;
-    let template_has_weapon_proficiencies: boolean = false;
+    export let template_has_perks: boolean = false;
+    export let template_has_weapon_proficiencies: boolean = false;
 
     export let server_id: number   = 0;
     export let template_id: number = 0;
