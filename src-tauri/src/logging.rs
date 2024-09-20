@@ -30,13 +30,14 @@ pub fn init() -> WorkerGuard {
 
     let env_filter = if cfg!(debug_assertions) {
 
-        EnvFilter::builder()
-            .with_default_directive(LevelFilter::TRACE.into())
-            .from_env_lossy()
+        EnvFilter::from("trace")
+            .add_directive("selectors::matching=off".parse().unwrap())
 
     } else {
 
         EnvFilter::from("error")
+            .add_directive(LevelFilter::INFO.into())
+            .add_directive("selectors::matching=off".parse().unwrap())
         
     };
 
