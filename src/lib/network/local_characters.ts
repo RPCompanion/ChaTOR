@@ -92,12 +92,17 @@ export const active_character = writable<LocalCharacterInfo | undefined>(undefin
 
 export function get_all_local_characters(callback: (characters: Result<ICharacterColorInfo[], string>) => void) {
 
+    type LocalCharacterResponseElem = {
+        character_name: string,
+        channel_colors?: IColor[]
+    }
+
     invoke("get_all_local_characters").then((response: any) => {
 
-        let temp: ICharacterColorInfo[] = response.map((c: any) => {
+        let temp: ICharacterColorInfo[] = response.map((c: LocalCharacterResponseElem) => {
             return {
                 character_name: c.character_name,
-                channel_colors: c.channel_colors.map((cc: IColor) => new Color(cc))
+                channel_colors: c.channel_colors?.map((cc: IColor) => new Color(cc))
             }
         });
         callback(Ok(temp));
