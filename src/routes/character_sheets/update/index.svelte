@@ -46,7 +46,7 @@
         template = response.unwrap();
         if (!template!.same_template($character!.character_sheet.template)) {
 
-            toast.push("The template for this character has been updated. Reseting character sheet");
+            toast.push("The template for this character has been updated. Resetting character sheet");
             reset_character_sheet();
 
         }
