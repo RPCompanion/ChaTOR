@@ -16,7 +16,7 @@ use crate::dal::db::swtor_message::SwtorMessage;
 pub mod message_container;
 use self::message_container::SwtorMessageContainer;
 
-const SUPPORTED_SWTOR_CHECKSUM: [u8; 32] = sha256_to_array!("9BC86D590E845D8DD785425475BE0E32AA3BF806BC36D375A100ED6C01C311F2");
+const SUPPORTED_SWTOR_CHECKSUM: [u8; 32] = sha256_to_array!("B1630AD7CFB367E0813CC8C976DCEED4E091525BBCF4AD82E564C9437B732DA3");
 
 static MESSAGE_CONTAINER: LazyLock<Mutex<SwtorMessageContainer>> = LazyLock::new(|| Mutex::new(SwtorMessageContainer::new()));
 
