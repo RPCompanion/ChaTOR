@@ -34,6 +34,10 @@ export const API_ENDPOINTS = {
             url: `${API_URL}/character/delete`,
             type: "DELETE"
         },
+        update: {
+            url: `${API_URL}/character/update`,
+            type: "PUT"
+        },
         template: {
             url: `${API_URL}/character/template/{template_id}`,
             type: "GET"

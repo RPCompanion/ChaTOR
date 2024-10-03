@@ -9,6 +9,8 @@
     import { CharacterTemplate } from "../../../lib/character_template/character_template";
     import { fetch_template } from "../../../lib/api/template";
     import { toast } from "@zerodevx/svelte-toast";
+    import { update_character } from "../../../lib/api/character";
+    import { save_character } from "../../../lib/network/characters";
 
     if ($character == undefined) {
 
@@ -55,9 +57,17 @@
 
     }
 
-    function on_submit(event: CustomEvent<ICharacterSubmission>) {
+    async function on_submit(event: CustomEvent<ICharacterSubmission>) {
 
-        console.log("STUB: Character update submission");
+        let response = await update_character($character!);
+        if (response.is_err()) {
+            toast_error(response.unwrap_err());
+            return;
+        }
+
+        await save_character($character!);
+        toast.push("Character updated successfully");
+        $goto("/character_sheets");
 
     }
 

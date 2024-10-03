@@ -30,6 +30,19 @@ export class Result<Ok, Err> {
         }
     }
 
+    /**
+     * Transforms a Result<Ok, Err> to a Result<T, Err> only if the result is Err.
+     */
+    transform_ok<T>(): Result<T, Err> {
+
+        if (this.err === null) {
+            throw new Error("Cannot transform Result<Ok, Err> to Result<T, Err> if the result is Ok");
+        }
+
+        return Result.error(this.err!);
+
+    }
+
     map_err<Other>(conversion: (err: Err) => Other): Result<Ok, Other> {
         if (this.ok !== null) {
             return Result.ok(this.ok);

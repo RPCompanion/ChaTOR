@@ -2,6 +2,7 @@
 import { invoke } from "@tauri-apps/api";
 import { writable, get } from "svelte/store";
 import { API_ENDPOINTS } from "../api";
+import { Result, Ok, Err } from "../result";
 
 export interface ISession {
     session_token: string;
@@ -18,6 +19,17 @@ export interface INewAccount {
 
 export const account_token = writable<string | null>(null);
 export const session_token = writable<string | null>(null);
+
+export function get_session_token(): Result<string, string> {
+
+    let val = get(session_token);
+    if (val === null) {
+        return Err("You are not logged in. Consider restarting the application.");
+    }
+
+    return Ok(val);
+
+}
 
 async function login() {
 
