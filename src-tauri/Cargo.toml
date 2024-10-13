@@ -51,7 +51,7 @@ retour = { version = "0.3", features = ["static-detour"] }
 # Local System
 directories = "5.0.1"
 open = "5.1"
-sysinfo = "0.30"
+sysinfo = "0.32"
 
 # Logging
 tracing = "0.1"

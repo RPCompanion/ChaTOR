@@ -12,6 +12,7 @@ use share::AsJson;
 use tauri::{Manager, PhysicalSize, WindowEvent};
 use tauri::api::dialog::blocking::{ask, message};
 use tracing::{error, info};
+use sysinfo::{ProcessesToUpdate, System};
 
 mod swtor_hook;
 mod dal;
@@ -47,9 +48,28 @@ fn parse_args() {
 
 }
 
+/// Checks if there are multiple instances of ChaTOR running.
+fn check_multiple_instances() {
+
+    let mut sys = System::new_all();
+    sys.refresh_processes(ProcessesToUpdate::All, true);
+
+    let multi_instance = 
+        sys.processes().iter()
+            .filter(|(_, process)| process.name().to_str().unwrap().contains("ChaTOR"))
+            .count() > 1;
+
+    if multi_instance {
+        message(None::<&tauri::Window>, "ChaTOR Error", "Unable to run multiple instances of ChaTOR.");
+        std::process::exit(1);
+    }
+
+}
+
 fn main() {
 
     parse_args();
+    check_multiple_instances();
 
     let _guard = logging::init();
     init_system();
