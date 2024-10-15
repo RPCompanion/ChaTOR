@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::fs;
+use std::process;
 
 use clap::Parser;
 
@@ -54,14 +55,31 @@ fn check_multiple_instances() {
     let mut sys = System::new_all();
     sys.refresh_processes(ProcessesToUpdate::All, true);
 
-    let multi_instance = 
+    let processes = 
         sys.processes().iter()
             .filter(|(_, process)| process.name().to_str().unwrap().contains("ChaTOR"))
-            .count() > 1;
+            .collect::<Vec<_>>();
 
-    if multi_instance {
-        message(None::<&tauri::Window>, "ChaTOR Error", "Unable to run multiple instances of ChaTOR.");
+    if processes.len() == 1 {
+        return;
+    }
+
+    info!("Multiple instances of ChaTOR running -> {}", processes.len());
+
+    let response = ask(None::<&tauri::Window>, "ChaTOR Crash", "Unable to run multiple instances of ChaTOR. Close other instances?");
+    if !response {
         std::process::exit(1);
+    }
+
+    let local_pid = process::id();
+    for (pid, proc) in processes {
+
+        if local_pid == pid.as_u32() {
+            continue;
+        }
+
+        proc.kill();
+
     }
 
 }
@@ -69,10 +87,12 @@ fn check_multiple_instances() {
 fn main() {
 
     parse_args();
-    check_multiple_instances();
 
     let _guard = logging::init();
+
+    check_multiple_instances();
     init_system();
+
     info!("Starting ChaTOR");
     info!("System Information {}", SysInfo::default().as_json());
     info!("Client Settings {}", dal::db::settings::get_settings().as_json());
