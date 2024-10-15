@@ -45,7 +45,7 @@ int-enum = "1.1"
 
 # Injection
 ctor = "0.2.8"
-dll-syringe = "0.15.2"
+dll-syringe = { version = "0.15.2", features = ["payload-utils"] }
 retour = { version = "0.3", features = ["static-detour"] }
 
 # Local System
