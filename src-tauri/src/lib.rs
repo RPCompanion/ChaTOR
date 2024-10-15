@@ -8,8 +8,7 @@ mod lib_only;
 use std::io::prelude::*;
 use std::net::TcpListener;
 use std::net::TcpStream;
-use std::sync::atomic::AtomicBool;
-use std::sync::atomic::Ordering;
+use std::sync::atomic::{AtomicBool, AtomicU16, Ordering};
 
 use std::str;
 use std::thread;
@@ -26,18 +25,62 @@ use lib_only::{submit_message, drain_messages};
 
 static QUIT: AtomicBool = AtomicBool::new(false);
 
-#[ctor::ctor]
-fn detour_init() {
+// TcpListener port for the chator client
+static CHATOR_PORT: AtomicU16 = AtomicU16::new(0);
+// TcpListener port for this injected module
+static LOCAL_PORT: AtomicU16  = AtomicU16::new(0);
 
-    if let Err(_) = start_tcp_messager() {
-        return;
+dll_syringe::payload_procedure!{
+
+    fn capture_module_initalized() -> bool {
+        CHATOR_PORT.load(Ordering::Relaxed) != 0
     }
 
-    set_panic_hook();
-    start_quit_listener();
+}
 
-    unsafe {
-        begin_hook();
+dll_syringe::payload_procedure! {
+
+    fn get_module_ports() -> (u16, u16) {
+        (CHATOR_PORT.load(Ordering::Relaxed), LOCAL_PORT.load(Ordering::Relaxed))
+    }
+
+}
+
+dll_syringe::payload_procedure! {
+
+    fn set_chator_port(port: u16) {
+        CHATOR_PORT.store(port, Ordering::Relaxed);
+    }
+
+}
+
+dll_syringe::payload_procedure! {
+
+    /* 
+        This function is called by the chator client to initialize the module.
+        Returns the port that the module is listening on.
+    */
+    fn init_capture_module(chator_port: u16) -> u16 {
+
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let port     = listener.local_addr().unwrap().port();
+
+        CHATOR_PORT.store(chator_port, Ordering::Relaxed);
+        LOCAL_PORT.store(port, Ordering::Relaxed);
+
+        set_panic_hook();
+        start_quit_listener(listener);
+
+        if let Err(_) = start_tcp_messenger() {
+            return 0
+        }
+
+        unsafe {
+            begin_hook();
+        }
+
+        port
+
     }
 
 }
@@ -46,9 +89,9 @@ fn should_quit() -> bool {
     QUIT.load(Ordering::Relaxed)
 }
 
-fn start_tcp_messager() -> Result<(), &'static str> {
+fn start_tcp_messenger() -> Result<(), &'static str> {
 
-    let stream_connector = || -> Result<TcpStream, &'static str> {
+    let stream_connector = move || -> Result<TcpStream, &'static str> {
 
         loop {
 
@@ -56,7 +99,13 @@ fn start_tcp_messager() -> Result<(), &'static str> {
                 return Err("Quitting");
             }
 
-            match TcpStream::connect("127.0.0.1:4592") {
+            /* 
+                I'm making the assumption that the chator client might change the port later on (definitely possible in dev environments).
+                This is a simple way to handle that.
+            */
+            let ip_addr_str = format!("127.0.0.1:{}", CHATOR_PORT.load(Ordering::Relaxed));
+
+            match TcpStream::connect(&ip_addr_str) {
                 Ok(stream) => { return Ok(stream); },
                 Err(_) => { thread::sleep(Duration::from_millis(1000)); }
             }
@@ -111,15 +160,12 @@ fn set_panic_hook() {
 
 }
 
-fn start_quit_listener() {
+fn start_quit_listener(listener: TcpListener) {
 
-    thread::spawn(|| {
+    thread::spawn(move || {
 
-        let listener = TcpListener::bind("127.0.0.1:4593").unwrap();
         listener.accept().unwrap();
-
         end_detours();
-
         QUIT.store(true, Ordering::Relaxed);
 
     });

@@ -3,6 +3,7 @@ use std::sync::LazyLock;
 use std::{io::{ErrorKind, Read, Write}, net::{TcpListener, TcpStream}, sync::{atomic::{AtomicBool, Ordering}, Mutex}, time::Duration};
 use std::thread;
 
+use syringe_container::SyringeContainer;
 use tracing::{error, info};
 
 use serde::{Deserialize, Serialize};
@@ -14,6 +15,8 @@ use crate::{share::CaptureMessage, swtor_hook};
 use crate::dal::db::swtor_message::SwtorMessage;
 
 pub mod message_container;
+mod syringe_container;
+
 use self::message_container::SwtorMessageContainer;
 
 const SUPPORTED_SWTOR_CHECKSUM: [u8; 32] = sha256_to_array!("B1630AD7CFB367E0813CC8C976DCEED4E091525BBCF4AD82E564C9437B732DA3");
@@ -62,43 +65,54 @@ fn start_injecting_thread(swtor_pid: u32, window: tauri::Window) {
 
         INJECTED.store(true, Ordering::Relaxed);
         CONTINUE_LOGGING.store(true, Ordering::Relaxed);
-        
+
         let target_process = OwnedProcess::from_pid(swtor_pid).unwrap();
         let syringe = Syringe::for_process(target_process);
 
-        let tcp_thread = thread::spawn(|| {
-            start_tcp_listener_loop();
-        });
-        thread::sleep(Duration::from_secs(1));
-        start_logging_propagation(window);
+        let syringe_container = SyringeContainer::inject(&syringe);
 
-        let injected_payload = if cfg!(debug_assertions) {
-            syringe.find_or_inject("./target/debug/swtor_chat_capture.dll")
-        } else {
-            syringe.find_or_inject("./swtor_chat_capture.dll")
-        };
-
-        match injected_payload {
-            Ok(_) => {    
-                info!("Payload injected");
-            },
-            Err(err) => {
-                error!("Error injecting payload: {:?}", err);
-                INJECTED.store(false, Ordering::Relaxed);
-                CONTINUE_LOGGING.store(false, Ordering::Relaxed);
-                return;
-            }
+        if syringe_container.is_err() {
+            INJECTED.store(false, Ordering::Relaxed);
+            CONTINUE_LOGGING.store(false, Ordering::Relaxed);
+            return;
         }
 
-        let injected_payload = injected_payload.unwrap();
+        let syringe_container = syringe_container.unwrap();
 
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let chator_port = listener.local_addr().unwrap().port();
+
+        info!("ChaTOR listening on port {}", chator_port);
+
+        // ChaTOR must have restarted for this to be the case.
+        let module_port: u16 = if syringe_container.capture_module_initalized() {
+
+            info!("Capture module already initialized");
+            syringe_container.set_chator_port(chator_port);
+            syringe_container.get_module_ports().1
+
+        } else {
+
+            info!("Initializing capture module");
+            syringe_container.init_capture_module(chator_port)
+
+        };
+
+        info!("Module listening on {}", module_port);
+
+        let tcp_thread = thread::spawn(move || {
+            start_tcp_listener_loop(listener, module_port);
+        });
+
+        start_logging_propagation(window);
         tcp_thread.join().unwrap();
 
-        if let Err(err) = syringe.eject(injected_payload) {
+        if let Err(err) = syringe_container.eject() {
             error!("Error ejecting payload: {:?}", err);
         } else {
             info!("Payload ejected");
         }
+
         CONTINUE_LOGGING.store(false, Ordering::Relaxed);
         INJECTED.store(false, Ordering::Relaxed);
 
@@ -106,9 +120,8 @@ fn start_injecting_thread(swtor_pid: u32, window: tauri::Window) {
 
 }
 
-fn start_tcp_listener_loop() {
+fn start_tcp_listener_loop(listener: TcpListener, module_port: u16) {
 
-    let listener = TcpListener::bind("127.0.0.1:4592").unwrap();
     let mut stream = listener.accept().unwrap().0;
 
     stream.set_read_timeout(Some(Duration::from_millis(1000))).unwrap();
@@ -145,9 +158,10 @@ fn start_tcp_listener_loop() {
     }
     info!("Stopped listening for messages");
 
-    if let Ok(mut stream) = TcpStream::connect("127.0.0.1:4593") {
+    if let Ok(mut stream) = TcpStream::connect(&format!("127.0.0.1:{}", module_port)) {
         stream.write(b"stop").unwrap();
     }
+
     thread::sleep(Duration::from_secs(1));
 
 }

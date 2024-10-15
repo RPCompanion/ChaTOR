@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::fs;
+use std::process;
 
 use clap::Parser;
 
@@ -12,6 +13,7 @@ use share::AsJson;
 use tauri::{Manager, PhysicalSize, WindowEvent};
 use tauri::api::dialog::blocking::{ask, message};
 use tracing::{error, info};
+use sysinfo::{ProcessesToUpdate, System};
 
 mod swtor_hook;
 mod dal;
@@ -47,12 +49,50 @@ fn parse_args() {
 
 }
 
+/// Checks if there are multiple instances of ChaTOR running.
+fn check_multiple_instances() {
+
+    let mut sys = System::new_all();
+    sys.refresh_processes(ProcessesToUpdate::All, true);
+
+    let processes = 
+        sys.processes().iter()
+            .filter(|(_, process)| process.name().to_str().unwrap().contains("ChaTOR"))
+            .collect::<Vec<_>>();
+
+    if processes.len() == 1 {
+        return;
+    }
+
+    info!("Multiple instances of ChaTOR running -> {}", processes.len());
+
+    let response = ask(None::<&tauri::Window>, "ChaTOR Crash", "Unable to run multiple instances of ChaTOR. Close other instances?");
+    if !response {
+        std::process::exit(1);
+    }
+
+    let local_pid = process::id();
+    for (pid, proc) in processes {
+
+        if local_pid == pid.as_u32() {
+            continue;
+        }
+
+        proc.kill();
+
+    }
+
+}
+
 fn main() {
 
     parse_args();
 
     let _guard = logging::init();
+
+    check_multiple_instances();
     init_system();
+
     info!("Starting ChaTOR");
     info!("System Information {}", SysInfo::default().as_json());
     info!("Client Settings {}", dal::db::settings::get_settings().as_json());
