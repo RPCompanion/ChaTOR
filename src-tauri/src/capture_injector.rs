@@ -4,7 +4,7 @@ use std::{io::{ErrorKind, Read, Write}, net::{TcpListener, TcpStream}, sync::{at
 use std::thread;
 
 use syringe_container::SyringeContainer;
-use tracing::{error, info};
+use tracing::{debug, error, info};
 
 use serde::{Deserialize, Serialize};
 use serde_json::{Deserializer, Value};
@@ -82,23 +82,9 @@ fn start_injecting_thread(swtor_pid: u32, window: tauri::Window) {
         let listener = TcpListener::bind("127.0.0.1:0").unwrap();
         let chator_port = listener.local_addr().unwrap().port();
 
-        info!("ChaTOR listening on port {}", chator_port);
-
-        // ChaTOR must have restarted for this to be the case.
-        let module_port: u16 = if syringe_container.capture_module_initalized() {
-
-            info!("Capture module already initialized");
-            syringe_container.set_chator_port(chator_port);
-            syringe_container.get_module_ports().1
-
-        } else {
-
-            info!("Initializing capture module");
-            syringe_container.init_capture_module(chator_port)
-
-        };
-
-        info!("Module listening on {}", module_port);
+        debug!("ChaTOR listening on port {}", chator_port);
+        let module_port: u16 = syringe_container.init_capture_module(chator_port);
+        debug!("Module listening on {}", module_port);
 
         let tcp_thread = thread::spawn(move || {
             start_tcp_listener_loop(listener, module_port);
