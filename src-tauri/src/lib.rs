@@ -16,6 +16,7 @@ use std::time::Duration;
 
 use lib_only::chat_message;
 
+use share::bind_tcp_listener;
 use share::CaptureMessage;
 
 use windows::Win32::System::LibraryLoader::GetModuleHandleA;
@@ -45,8 +46,7 @@ dll_syringe::payload_procedure! {
 
         }
 
-        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
-        let port     = listener.local_addr().unwrap().port();
+        let (listener, port) = bind_tcp_listener();
 
         CHATOR_PORT.store(chator_port, Ordering::Relaxed);
         MODULE_PORT.store(port, Ordering::Relaxed);

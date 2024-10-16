@@ -1,6 +1,9 @@
 
 use std::sync::LazyLock;
-use std::{io::{ErrorKind, Read, Write}, net::{TcpListener, TcpStream}, sync::{atomic::{AtomicBool, Ordering}, Mutex}, time::Duration};
+use std::io::{ErrorKind, Read, Write};
+use std::net::{TcpListener, TcpStream};
+use std::sync::{atomic::{AtomicBool, Ordering}, Mutex};
+use std::time::Duration;
 use std::thread;
 
 use syringe_container::SyringeContainer;
@@ -11,6 +14,7 @@ use serde_json::{Deserializer, Value};
 use dll_syringe::{process::OwnedProcess, Syringe};
 use chator_macros::sha256_to_array;
 
+use crate::share::bind_tcp_listener;
 use crate::{share::CaptureMessage, swtor_hook};
 use crate::dal::db::swtor_message::SwtorMessage;
 
@@ -77,10 +81,8 @@ fn start_injecting_thread(swtor_pid: u32, window: tauri::Window) {
             return;
         }
 
-        let syringe_container = syringe_container.unwrap();
-
-        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
-        let chator_port = listener.local_addr().unwrap().port();
+        let syringe_container       = syringe_container.unwrap();
+        let (listener, chator_port) = bind_tcp_listener();
 
         debug!("ChaTOR listening on port {}", chator_port);
         let module_port: u16 = syringe_container.init_capture_module(chator_port);
