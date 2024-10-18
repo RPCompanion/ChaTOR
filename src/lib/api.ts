@@ -52,6 +52,12 @@ export const API_ENDPOINTS = {
             url: `${API_URL}/system/servers`,
             type: "GET"
         }
+    },
+    chator: {
+        latest_version: {
+            url: `${API_URL}/chator/latest_version`,
+            type: "GET"
+        }
     }
     
 };
