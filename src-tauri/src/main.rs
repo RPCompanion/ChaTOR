@@ -28,6 +28,7 @@ mod network;
 
 use crash_reporter::CrashReporter;
 use crash_reporter::sys_info::SysInfo;
+use utils::open_log_dir;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -223,23 +224,20 @@ fn setup_panic_hook() {
 
     std::panic::set_hook(Box::new(|panic_info| {
 
-        let open_log_dir = || {
-
-            match std::env::current_dir() {
-                Ok(dir) => {
-                    let _ = open::that(format!("{}/{}", dir.to_str().unwrap(), "logs"));
-                },
-                Err(_) => {}
-            }
-
+        let payload: Option<String> = if let Some(payload) = panic_info.payload().downcast_ref::<&str>() {
+            Some(payload.to_string())
+        } else if let Some(payload) = panic_info.payload().downcast_ref::<String>() {
+            Some(payload.clone())
+        } else {
+            None
         };
 
-        error!("Panic: {:?}", panic_info);
+        error!("Panic: Payload -> {:?} {:?}", payload, panic_info);
         capture_injector::stop_injecting_capture();
-        let response = ask(None::<&tauri::Window>, "ChaTOR Crash", "ChaTOR has crashed. Send a crash report?");
 
+        let response = ask(None::<&tauri::Window>, "ChaTOR Crash", "ChaTOR has crashed. Send a crash report?");
         if response {
-            CrashReporter::new(format!("{:?}", panic_info)).submit()
+            CrashReporter::new(format!("Payload:{:?}\n\nPanic info:{:?}", payload, panic_info)).submit()
         } else {
             open_log_dir();
         }        

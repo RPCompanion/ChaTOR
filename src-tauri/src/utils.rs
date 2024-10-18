@@ -63,3 +63,14 @@ pub fn get_file(path: &str) -> String {
 	contents
 
 }
+
+pub fn open_log_dir() {
+
+	match std::env::current_dir() {
+		Ok(dir) => {
+			let _ = open::that(format!("{}/{}", dir.to_str().unwrap(), "logs"));
+		},
+		Err(_) => {}
+	}
+
+}

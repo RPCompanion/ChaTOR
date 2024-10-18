@@ -1,9 +1,11 @@
 
+use crash_report_response::ChatorCrashReportResponse;
 use tracing::error;
 use serde::{Deserialize, Serialize};
 use reqwest::blocking::Client;
 
 pub mod sys_info;
+pub mod crash_report_response;
 
 use sys_info::SysInfo;
 use crate::config::config;
@@ -35,6 +37,17 @@ impl CrashReporter {
 
         if let Err(e) = response {
             error!("Error submitting crash report: {:?}", e);
+            return;
+        }
+
+        let response = response.unwrap();
+        match response.json::<ChatorCrashReportResponse>() {
+            Ok(crash_report_response) => {
+                crash_report_response.save(self.as_json());
+            },
+            Err(e) => {
+                error!("Error parsing crash report response: {:?}", e);
+            }
         }
 
     }

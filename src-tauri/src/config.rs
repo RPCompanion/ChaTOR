@@ -16,7 +16,12 @@ impl Config {
 
     pub fn new() -> Result<Self, String> {
 
-        const PATH: &str = "config.toml";
+        const PATH: &str = if cfg!(debug_assertions) {
+            "dev-config.toml"
+        } else {
+            "config.toml"
+        };
+
         match std::fs::read_to_string(PATH) {
 
             Ok(contents) => {

@@ -22,6 +22,21 @@ CREATE TABLE IF NOT EXISTS Account_Characters
     character_sheet TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS CrashReports
+(
+    crash_report_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    crash_uuid BLOB UNIQUE NOT NULL,
+    report TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS CrashReport_Responses
+(
+    crash_report_response_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    crash_report_id INTEGER NOT NULL REFERENCES CrashReports(crash_report_id),
+    response TEXT NOT NULL,
+    response_read BOOLEAN NOT NULL DEFAULT(FALSE)
+);
+
 /*
     CustomEmotes.order_index is used to keep track of the order of the emotes. Uniqueness is not enforced and
     favourites and non-favourites may share similar indices.
