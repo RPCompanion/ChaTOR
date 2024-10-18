@@ -43,7 +43,7 @@ export async function chator_check_latest_version() {
         .map((v) => parseInt(v));
 
     if (version[0] != data.major || version[1] != data.minor || version[2] != data.patch) {
-        toast.push(`A new version of Chator v${data.major}.${data.minor}.${data.patch} is available! Download at Itch.io or Discord`);
+        toast.push(`ChaTOR v${data.major}.${data.minor}.${data.patch} is available! Download at Itch.io or Discord.`);
     }
 
 }
