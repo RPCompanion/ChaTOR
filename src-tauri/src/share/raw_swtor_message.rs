@@ -29,12 +29,12 @@ impl RawSwtorMessage {
 
     }
 
-    pub fn from_raw_ptrs(channel_id: i32, from: *const *const i8, to: *const *const i8, chat_message: *const *const i8) -> Result<RawSwtorMessage, &'static str> {
+    pub fn from_raw_ptrs(channel_id: i32, from: *const i8, to: *const i8, chat_message: *const i8) -> Result<RawSwtorMessage, &'static str> {
 
-        let converter = |ptr: *const *const i8| -> Result<String, &'static str> {
+        let converter = |ptr: *const i8| -> Result<String, &'static str> {
 
             unsafe {
-                Ok(CStr::from_ptr(*ptr)
+                Ok(CStr::from_ptr(ptr)
                     .to_str()
                     .map_err(|_| "Failed to convert")?
                     .to_string())

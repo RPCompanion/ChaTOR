@@ -19,7 +19,7 @@ mod syringe_container;
 
 use self::message_container::SwtorMessageContainer;
 
-const SUPPORTED_SWTOR_CHECKSUM: [u8; 32] = sha256_to_array!("B1630AD7CFB367E0813CC8C976DCEED4E091525BBCF4AD82E564C9437B732DA3");
+const SUPPORTED_SWTOR_CHECKSUM: [u8; 32] = sha256_to_array!("8E786B388F52146BDB6E503D1125F33F7F0AA3B8C8BB7CAAB800EEE0C3357A76");
 
 static MESSAGE_CONTAINER: LazyLock<Mutex<SwtorMessageContainer>> = LazyLock::new(|| Mutex::new(SwtorMessageContainer::new()));
 

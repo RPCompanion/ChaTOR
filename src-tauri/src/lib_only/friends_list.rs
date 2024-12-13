@@ -12,7 +12,7 @@ static_detour! {
     static UpdateFriendsListHook: extern "C" fn(*const u64, *const i8, i8, *const u64) -> i64;
 }
 
-const UPDATE_FRIENDS_LIST_ADDRESS: isize = 0x03f38a0;
+const UPDATE_FRIENDS_LIST_ADDRESS: isize = 0x05230c0;
 
 pub unsafe fn begin_detour(base_address: isize) {
 
