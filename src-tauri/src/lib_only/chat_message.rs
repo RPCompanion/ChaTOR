@@ -43,10 +43,14 @@ pub fn begin_detour(base_address: isize) {
 pub fn receive_chat_message_detour(param_1: *mut u64, from: *const i8, to: *const i8, channel_id: i32, chat_message: *const i8) -> i64 {
 
     match RawSwtorMessage::from_raw_ptrs(channel_id, from, to, chat_message) {
+
         Ok(message) => {
             submit_message(CaptureMessage::Chat(message));
         },
-        Err(_) => {}
+        Err(e) => {
+            submit_message(CaptureMessage::Error(e.to_string()));
+        }
+        
     }
 
     return ChatHook.call(param_1, from, to, channel_id, chat_message);

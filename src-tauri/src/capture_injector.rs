@@ -4,7 +4,7 @@ use std::{io::{ErrorKind, Read, Write}, net::{TcpListener, TcpStream}, sync::{at
 use std::thread;
 
 use syringe_container::SyringeContainer;
-use tracing::{error, info};
+use tracing::{error, info, debug};
 
 use serde::{Deserialize, Serialize};
 use serde_json::{Deserializer, Value};
@@ -147,6 +147,7 @@ fn start_tcp_listener_loop(listener: TcpListener, module_port: u16) {
 
                 if let Ok(message) = serde_json::from_value(value) {
 
+                    debug!("Received message: {:?}", message);
                     handle_message(message);
 
                 }

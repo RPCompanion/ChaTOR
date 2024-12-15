@@ -4,12 +4,13 @@ use serde::{Deserialize, Serialize};
 
 pub mod raw_swtor_message;
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub enum CaptureMessage {
     Info(String),
     CaptureError(String),
     Panic(String),
-    Chat(RawSwtorMessage)
+    Chat(RawSwtorMessage),
+    Error(String)
 }
 
 impl AsJson for CaptureMessage {}
