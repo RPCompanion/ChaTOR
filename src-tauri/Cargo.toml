@@ -1,6 +1,6 @@
 [package]
 name = "chator"
-version = "0.1.24"
+version = "0.1.25"
 description = "A Chat system for Star Wars: The Old Republic."
 authors = ["Emma Davenport"]
 license = "AGPL-3.0"
@@ -64,6 +64,7 @@ ctrlc = "3.4.4"
 regex = "1.10"
 clap = { version = "4.5.17", features = ["derive"] }
 thiserror = "2.0"
+microseh = "1.1"
 
 # Project Specific
 chator-macros = { git = "https://github.com/RPCompanion/chator-macros" }

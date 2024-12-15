@@ -377,7 +377,7 @@ checksum = "613afe47fcd5fac7ccf1db93babcb082c5994d996f20b8b159f2ad1658eb5724"
 
 [[package]]
 name = "chator"
-version = "0.1.24"
+version = "0.1.25"
 dependencies = [
  "base64 0.22.1",
  "chator-macros",
@@ -391,6 +391,7 @@ dependencies = [
  "em-libs",
  "futures",
  "int-enum",
+ "microseh",
  "open",
  "regex",
  "reqwest",
@@ -2355,6 +2356,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "488016bfae457b036d996092f6cb448677611ce4449e970ceaf42695203f218a"
 dependencies = [
  "autocfg",
+]
+
+[[package]]
+name = "microseh"
+version = "1.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "434c4ca971bcd27ed5c8bf9a2e24aa9fcb9affc2e67696b44a80b98f3b46a015"
+dependencies = [
+ "cc",
 ]
 
 [[package]]
