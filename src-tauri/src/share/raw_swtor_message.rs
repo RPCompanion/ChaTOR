@@ -1,12 +1,10 @@
 
-use std::mem;
-use std::ffi::CStr;
-
+use std::{ffi::CStr, str::Utf8Error};
+use encoding_rs::WINDOWS_1252;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use thiserror::Error;
-
 use super::AsJson;
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -72,43 +70,25 @@ impl RawSwtorMessage {
 
             unsafe {
 
-                /* 
-                    I originally attempted to derive a CStr from the *const i8, however, I discovered that the pointer can also be a pointer to a string (*const *const i8).
-                    Sometimes, the *const i8 would result in a valid UTF-8 string, even when it was actually a *const *const i8. (Great. Difficult to detect.)
-                    The user then would receive garbled text, because CStr::from_ptr().to_str() didn't fail. 
+                match CStr::from_ptr(ptr).to_str() {
+                    Ok(s) => {
 
-                    So, we go back to treating the pointer as *const *const i8 first, and then we try to convert it to a CStr. However, if it's actually a *const i8, then
-                    this will result in a seg fault. Hence the need for SEH.
+                        if s.len() == 0 {
 
-                    Structured Exception Handling.
+                            return Ok(CStr::from_ptr(*(ptr as *const *const i8))
+                                .to_str()
+                                .unwrap()
+                                .to_string());
 
-                    Weird ISSUE!!
-                */
-                let d_result = microseh::try_seh(|| {
+                        }
 
-                    /* 
-                        WTF, sometimes the pointer is a pointer to a string and sometimes it's just a string.
-                        Issue appeared in update 7.6x (12/10/2024)
-                    */
-                    CStr::from_ptr(*(ptr as *const *const i8))
+                        return Ok(s.to_string());
+
+                    },
+                    Err(_) => Ok(CStr::from_ptr(*(ptr as *const *const i8))
                         .to_str()
                         .unwrap()
-                        .to_string()
-
-                });
-
-                if let Ok(d_result) = d_result {
-                    return Ok(d_result)
-                }
-
-
-                match CStr::from_ptr(ptr).to_str() {
-                    Ok(s) => { 
-                        return Ok(s.to_string()) 
-                    },
-                    Err(e) => { 
-                        return Err(RawStrConversionError::new(conv, e.to_string()))
-                     }
+                        .to_string())
                 }
 
             }

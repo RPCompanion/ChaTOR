@@ -2,6 +2,7 @@
 mod share;
 mod swtor;
 mod utils;
+mod logging;
 
 mod lib_only;
 
@@ -22,6 +23,8 @@ use windows::Win32::System::LibraryLoader::GetModuleHandleA;
 use windows::core::PCSTR;
 
 use lib_only::{submit_message, drain_messages};
+
+use crate::logging::init;
 
 static QUIT: AtomicBool = AtomicBool::new(false);
 

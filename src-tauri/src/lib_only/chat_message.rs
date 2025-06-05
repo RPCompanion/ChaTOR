@@ -6,7 +6,7 @@ use crate::lib_only::submit_message;
 use crate::share::raw_swtor_message::RawSwtorMessage;
 use crate::share::CaptureMessage;
 
-const CHAT_RELATIVE_ADDRESS: isize = 0x0522940;
+const CHAT_RELATIVE_ADDRESS: isize = 0x0522bc0;
 
 static_detour! {
     static ChatHook: extern "C" fn(*mut u64, *const i8, *const i8, i32, *const i8) -> i64;
@@ -41,6 +41,15 @@ pub fn begin_detour(base_address: isize) {
 
 */
 pub fn receive_chat_message_detour(param_1: *mut u64, from: *const i8, to: *const i8, channel_id: i32, chat_message: *const i8) -> i64 {
+
+
+    if cfg!(debug_assertions) {
+
+        submit_message(CaptureMessage::Info(
+            format!("RawSwtorMessage::from_raw_ptrs - param_1: {:?}, channel_id: {}, from: {:?}, to: {:?}, chat_message: {:?}", param_1, channel_id, from, to, chat_message)
+        ));
+
+    }
 
     match RawSwtorMessage::from_raw_ptrs(channel_id, from, to, chat_message) {
 
