@@ -73,7 +73,11 @@ impl RawSwtorMessage {
                 match CStr::from_ptr(ptr).to_str() {
                     Ok(s) => {
 
-                        if s.chars().any(|c| (c as u32) > 255) || s.len() == 0 {
+                        let probably_double_ptr = 
+                            s.chars().any(|c| (c as u32) > 255 || (c as u32) < 32) || 
+                            s.len() == 0;
+
+                        if probably_double_ptr {
 
                             return Ok(CStr::from_ptr(*(ptr as *const *const i8))
                                 .to_str()
