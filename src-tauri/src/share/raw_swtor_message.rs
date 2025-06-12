@@ -127,6 +127,19 @@ unsafe fn is_valid_ptr(ptr: *const u8) -> bool {
 fn try_resolve_cstr(ptr: *const i8) -> Option<String> {
 
     unsafe {
+
+        // Try as double pointer
+        let double_ptr = ptr as *const *const i8;
+        if is_valid_ptr(double_ptr as *const u8) {
+            let inner = *double_ptr;
+            if is_valid_ptr(inner as *const u8) {
+                let cstr = CStr::from_ptr(inner);
+                if let Ok(s) = cstr.to_str() {
+                    return Some(s.to_string());
+                }
+            }
+        }
+
         // Try as single pointer
         if is_valid_ptr(ptr as *const u8) {
 
@@ -141,17 +154,6 @@ fn try_resolve_cstr(ptr: *const i8) -> Option<String> {
 
         }
 
-        // Try as double pointer
-        let double_ptr = ptr as *const *const i8;
-        if is_valid_ptr(double_ptr as *const u8) {
-            let inner = *double_ptr;
-            if is_valid_ptr(inner as *const u8) {
-                let cstr = CStr::from_ptr(inner);
-                if let Ok(s) = cstr.to_str() {
-                    return Some(s.to_string());
-                }
-            }
-        }
     }
 
     None
