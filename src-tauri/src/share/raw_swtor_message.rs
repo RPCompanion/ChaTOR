@@ -4,6 +4,11 @@ use encoding_rs::WINDOWS_1252;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
+use windows::Win32::System::Memory::{
+    VirtualQuery, MEMORY_BASIC_INFORMATION, MEM_COMMIT, PAGE_NOACCESS,
+    PAGE_READONLY, PAGE_READWRITE, PAGE_EXECUTE_READ, PAGE_EXECUTE_READWRITE,
+};
+
 use thiserror::Error;
 use super::AsJson;
 
@@ -68,33 +73,11 @@ impl RawSwtorMessage {
 
         let converter = |ptr: *const i8, conv: StrConversion| -> Result<String, RawStrConversionError> {
 
-            unsafe {
-
-                match CStr::from_ptr(ptr).to_str() {
-                    Ok(s) => {
-
-                        let probably_double_ptr = 
-                            s.chars().any(|c| (c as u32) > 255 || (c as u32) < 32) || 
-                            s.len() == 0;
-
-                        if probably_double_ptr {
-
-                            return Ok(CStr::from_ptr(*(ptr as *const *const i8))
-                                .to_str()
-                                .unwrap()
-                                .to_string());
-
-                        }
-
-                        return Ok(s.to_string());
-
-                    },
-                    Err(_) => Ok(CStr::from_ptr(*(ptr as *const *const i8))
-                        .to_str()
-                        .unwrap()
-                        .to_string())
-                }
-
+            match try_resolve_cstr(ptr) {
+                Some(s) => {
+                    return Ok(s);
+                },
+                None => Err(RawStrConversionError::new(conv, "Invalid pointer or string".to_string())),
             }
 
         };
@@ -106,6 +89,72 @@ impl RawSwtorMessage {
         Ok(RawSwtorMessage::new(channel_id, t_from, t_to, t_chat_message))
 
     }
+
+}
+
+unsafe fn is_valid_ptr(ptr: *const u8) -> bool {
+
+    if ptr.is_null() {
+        return false;
+    }
+
+    let mut mbi = MEMORY_BASIC_INFORMATION::default();
+    unsafe {
+
+        let result = VirtualQuery(
+            Some(ptr as *const std::ffi::c_void),
+            &mut mbi,
+            std::mem::size_of::<MEMORY_BASIC_INFORMATION>(),
+        );
+
+        if result == 0 {
+            return false;
+        }
+
+    }
+
+    // Basic check: committed and readable
+    mbi.State == MEM_COMMIT
+        && matches!(
+            mbi.Protect,
+            PAGE_READONLY | PAGE_READWRITE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE
+        )
+        && (ptr as usize) >= mbi.BaseAddress as usize
+        && (ptr as usize) < (mbi.BaseAddress as usize + mbi.RegionSize)
+        
+}
+
+fn try_resolve_cstr(ptr: *const i8) -> Option<String> {
+
+    unsafe {
+        // Try as single pointer
+        if is_valid_ptr(ptr as *const u8) {
+
+            let cstr = CStr::from_ptr(ptr);
+            if let Ok(s) = cstr.to_str() {
+
+                if !s.is_empty() && s.chars().all(|c| (c as u32) < 256 || (c as u32) >= 32) {
+                    return Some(s.to_string());
+                }
+
+            }
+
+        }
+
+        // Try as double pointer
+        let double_ptr = ptr as *const *const i8;
+        if is_valid_ptr(double_ptr as *const u8) {
+            let inner = *double_ptr;
+            if is_valid_ptr(inner as *const u8) {
+                let cstr = CStr::from_ptr(inner);
+                if let Ok(s) = cstr.to_str() {
+                    return Some(s.to_string());
+                }
+            }
+        }
+    }
+
+    None
 
 }
 
