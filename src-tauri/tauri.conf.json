@@ -8,7 +8,7 @@
     },
     "package": {
         "productName": "ChaTOR",
-        "version": "0.1.36"
+        "version": "0.1.38"
     },
     "tauri": {
         "allowlist": {
