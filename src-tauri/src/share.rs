@@ -3,6 +3,7 @@ use raw_swtor_message::RawSwtorMessage;
 use serde::{Deserialize, Serialize};
 
 pub mod raw_swtor_message;
+pub mod module_ports;
 
 #[derive(Deserialize, Serialize, Debug)]
 pub enum CaptureMessage {

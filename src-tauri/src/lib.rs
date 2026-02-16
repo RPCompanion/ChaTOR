@@ -24,7 +24,7 @@ use windows::core::PCSTR;
 
 use lib_only::{submit_message, drain_messages};
 
-use crate::logging::init;
+use crate::share::module_ports::ModulePorts;
 
 static QUIT: AtomicBool = AtomicBool::new(false);
 
@@ -33,58 +33,46 @@ static CHATOR_PORT: AtomicU16 = AtomicU16::new(0);
 // TcpListener port for this injected module
 static LOCAL_PORT: AtomicU16  = AtomicU16::new(0);
 
-dll_syringe::payload_procedure!{
-
-    fn capture_module_initalized() -> bool {
-        CHATOR_PORT.load(Ordering::Relaxed) != 0
-    }
-
+#[no_mangle]
+extern "system" fn capture_module_initalized() -> bool {
+    CHATOR_PORT.load(Ordering::Relaxed) != 0
 }
 
-dll_syringe::payload_procedure! {
-
-    fn get_module_ports() -> (u16, u16) {
-        (CHATOR_PORT.load(Ordering::Relaxed), LOCAL_PORT.load(Ordering::Relaxed))
-    }
-
+#[no_mangle]
+extern "system" fn get_module_ports() -> ModulePorts {
+    ModulePorts::new(CHATOR_PORT.load(Ordering::Relaxed), LOCAL_PORT.load(Ordering::Relaxed))
 }
 
-dll_syringe::payload_procedure! {
-
-    fn set_chator_port(port: u16) {
-        CHATOR_PORT.store(port, Ordering::Relaxed);
-    }
-
+#[no_mangle]
+extern "system" fn set_chator_port(port: u16) {
+    CHATOR_PORT.store(port, Ordering::Relaxed);
 }
 
-dll_syringe::payload_procedure! {
+/* 
+    This function is called by the chator client to initialize the module.
+    Returns the port that the module is listening on.
+*/
+#[no_mangle]
+extern "system" fn init_capture_module(chator_port: u16) -> u16 {
 
-    /* 
-        This function is called by the chator client to initialize the module.
-        Returns the port that the module is listening on.
-    */
-    fn init_capture_module(chator_port: u16) -> u16 {
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let port     = listener.local_addr().unwrap().port();
 
-        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
-        let port     = listener.local_addr().unwrap().port();
+    CHATOR_PORT.store(chator_port, Ordering::Relaxed);
+    LOCAL_PORT.store(port, Ordering::Relaxed);
 
-        CHATOR_PORT.store(chator_port, Ordering::Relaxed);
-        LOCAL_PORT.store(port, Ordering::Relaxed);
+    set_panic_hook();
+    start_quit_listener(listener);
 
-        set_panic_hook();
-        start_quit_listener(listener);
-
-        if let Err(_) = start_tcp_messenger() {
-            return 0
-        }
-
-        unsafe {
-            begin_hook();
-        }
-
-        port
-
+    if let Err(_) = start_tcp_messenger() {
+        return 0
     }
+
+    unsafe {
+        begin_hook();
+    }
+
+    port
 
 }
 

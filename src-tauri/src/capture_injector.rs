@@ -89,7 +89,7 @@ fn start_injecting_thread(swtor_pid: u32, window: tauri::Window) {
 
             info!("Capture module already initialized");
             syringe_container.set_chator_port(chator_port);
-            syringe_container.get_module_ports().1
+            syringe_container.get_module_ports().local_port
 
         } else {
 

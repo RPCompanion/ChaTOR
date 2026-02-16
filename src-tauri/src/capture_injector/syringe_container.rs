@@ -1,12 +1,14 @@
 
-use dll_syringe::{error::EjectError, process::{BorrowedProcess, ProcessModule}, rpc::RemotePayloadProcedure, Syringe};
+use dll_syringe::{Syringe, error::EjectError, process::{BorrowedProcess, ProcessModule}, rpc::RemoteRawProcedure};
 use tracing::{info, error};
 
+use crate::share::module_ports::ModulePorts;
+
 struct RemoteFunctions {
-    capture_module_initalized: RemotePayloadProcedure<fn() -> bool>,
-    get_module_ports: RemotePayloadProcedure<fn() -> (u16, u16)>,
-    set_chator_port: RemotePayloadProcedure<fn(u16)>,
-    init_capture_module: RemotePayloadProcedure<fn(u16) -> u16>
+    capture_module_initalized: RemoteRawProcedure<extern "system" fn() -> bool>,
+    get_module_ports: RemoteRawProcedure<extern "system" fn() -> ModulePorts>,
+    set_chator_port: RemoteRawProcedure<extern "system" fn(u16)>,
+    init_capture_module: RemoteRawProcedure<extern "system" fn(u16) -> u16>
 }
 
 impl RemoteFunctions {
@@ -14,10 +16,10 @@ impl RemoteFunctions {
     pub fn new(syringe: &Syringe, injected_payload: ProcessModule<BorrowedProcess>) -> RemoteFunctions {
 
         RemoteFunctions {
-            capture_module_initalized: unsafe { syringe.get_payload_procedure::<fn() -> bool>(injected_payload, "capture_module_initalized") }.unwrap().unwrap(),
-            get_module_ports: unsafe { syringe.get_payload_procedure::<fn() -> (u16, u16)>(injected_payload, "get_module_ports") }.unwrap().unwrap(),
-            set_chator_port: unsafe { syringe.get_payload_procedure::<fn(u16)>(injected_payload, "set_chator_port") }.unwrap().unwrap(),
-            init_capture_module: unsafe { syringe.get_payload_procedure::<fn(u16) -> u16>(injected_payload, "init_capture_module") }.unwrap().unwrap()
+            capture_module_initalized: unsafe { syringe.get_raw_procedure::<extern "system" fn() -> bool>(injected_payload, "capture_module_initalized") }.unwrap().unwrap(),
+            get_module_ports: unsafe { syringe.get_raw_procedure::<extern "system" fn() -> ModulePorts>(injected_payload, "get_module_ports") }.unwrap().unwrap(),
+            set_chator_port: unsafe { syringe.get_raw_procedure::<extern "system" fn(u16)>(injected_payload, "set_chator_port") }.unwrap().unwrap(),
+            init_capture_module: unsafe { syringe.get_raw_procedure::<extern "system" fn(u16) -> u16>(injected_payload, "init_capture_module") }.unwrap().unwrap()
         }
 
     }
@@ -65,13 +67,13 @@ impl<'a> SyringeContainer<'a> {
     }
 
     /// Gets the ports that the module is listening on.
-    pub fn get_module_ports(&self) -> (u16, u16) {
+    pub fn get_module_ports(&self) -> ModulePorts {
         self.remote_functions.get_module_ports.call().unwrap()
     }
 
     /// Sets the port that the chator client is listening on.
     pub fn set_chator_port(&self, port: u16) {
-        self.remote_functions.set_chator_port.call(&port).unwrap();
+        self.remote_functions.set_chator_port.call(port).unwrap();
     }
 
     /// Checks if the capture module has been initialized.
@@ -81,7 +83,7 @@ impl<'a> SyringeContainer<'a> {
 
     /// Initializes the capture module.
     pub fn init_capture_module(&self, chator_port: u16) -> u16 {
-        self.remote_functions.init_capture_module.call(&chator_port).unwrap()
+        self.remote_functions.init_capture_module.call(chator_port).unwrap()
     }
 
 }
