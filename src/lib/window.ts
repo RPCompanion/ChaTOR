@@ -1,31 +1,33 @@
-
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
-import { settings } from "./network/settings";
-const appWindow = getCurrentWebviewWindow()
- 
-export async function init_window_events() {
+import { useAppStore } from "../store/useAppStore";
 
-    await appWindow.onResized((event) => {
+const appWindow = getCurrentWebviewWindow();
 
-        settings.update((s) => {
-            s.app.window.width = event.payload.width;
-            s.app.window.height = event.payload.height;
-            return s;
-        })
-
+export async function init_window_events(): Promise<() => void> {
+    const unlistenResize = await appWindow.onResized((event) => {
+        useAppStore.getState().updateSettings((draft) => {
+            draft.app.window.width = event.payload.width;
+            draft.app.window.height = event.payload.height;
+        });
     });
-    init_window_decoration();
 
+    const unsub = init_window_decoration();
+
+    return () => {
+        unlistenResize();
+        unsub();
+    };
 }
 
-function init_window_decoration() {
-
-    settings.subscribe((s) => {
-        if (s.app.show_window_decorations) {
-            appWindow.setDecorations(true);
-        } else {
-            appWindow.setDecorations(false);
+function init_window_decoration(): () => void {
+    return useAppStore.subscribe(
+        (state) => state.settings.app.show_window_decorations,
+        (show) => {
+            if (show) {
+                appWindow.setDecorations(true);
+            } else {
+                appWindow.setDecorations(false);
+            }
         }
-    });
-
+    );
 }

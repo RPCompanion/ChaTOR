@@ -1,28 +1,22 @@
-
-import { toast } from "@zerodevx/svelte-toast";
+import { toast } from "sonner";
 
 export function deep_copy<T>(obj: T): T {
     return JSON.parse(JSON.stringify(obj));
 }
 
 export function unicode_escape(str: string): string {
-
     return str.replace(/[\u00FF-\uFFFF]/g, (chr) => {
         return "\\u" + ("0000" + chr.charCodeAt(0).toString(16)).slice(-4);
     });
-
 }
 
 export function unicode_unescape(str: string): string {
-
     return str.replace(/\\u([\d\w]{4})/gi, (match, grp) => {
         return String.fromCharCode(parseInt(grp, 16));
     });
-
 }
 
 export function get_time_elapsed_since(date: Date): string {
-
     let now = new Date();
     let elapsed = now.getTime() - date.getTime();
     let seconds = Math.floor(elapsed / 1000);
@@ -39,16 +33,8 @@ export function get_time_elapsed_since(date: Date): string {
     } else {
         return `${seconds} ` + (seconds === 1 ? "second" : "seconds") + " ago";
     }
-
 }
 
 export function toast_error(message: string) {
-
-    toast.push(message, {
-        theme: {
-            "--toastBarBackground": "red",
-            "--toastColor": "#ffffff"
-        }
-    });
-
+    toast.error(message);
 }

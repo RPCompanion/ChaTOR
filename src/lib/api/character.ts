@@ -1,7 +1,6 @@
 import type { ICharacterSheet } from "../character_sheet/character_sheet";
 import { Result, Ok, Err } from "../result";
-import { session_token } from "./account";
-import { get } from "svelte/store";
+import { useAccountStore } from "../../store/useAccountStore";
 import { API_ENDPOINTS } from "../api";
 
 export interface ICreateCharacterResponse {
@@ -18,41 +17,31 @@ interface ICreateCharacterRequest extends ICreateCharacter {
     session_token: string;
 }
 
-/**
- * Creates a new character on the server.
-*/
 export async function create_character(character: ICreateCharacter): Promise<Result<ICreateCharacterResponse, string>> {
-
-    let t_session_token = get(session_token);
+    const t_session_token = useAccountStore.getState().sessionToken;
     if (t_session_token === null) {
         return Err("You are not logged in. Consider restarting the application.");
     }
 
-    let payload: ICreateCharacterRequest = {
+    const payload: ICreateCharacterRequest = {
         ...character,
-        session_token: t_session_token
-    }
+        session_token: t_session_token,
+    };
 
-    let request = new Request(API_ENDPOINTS.character.create.url, {
+    const request = new Request(API_ENDPOINTS.character.create.url, {
         method: API_ENDPOINTS.character.create.type,
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
     });
 
     try {
-
-        let response = await fetch(request);
-
+        const response = await fetch(request);
         if (response.ok) {
             return Ok(await response.json());
         } else {
             return Err(await response.text());
         }
-
     } catch (e) {
         return Err("Failed to create character.");
     }
-
 }

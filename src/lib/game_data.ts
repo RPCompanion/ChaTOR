@@ -1,5 +1,5 @@
 
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 import { Result, Ok, Err } from "./result";
 
 interface GameData {

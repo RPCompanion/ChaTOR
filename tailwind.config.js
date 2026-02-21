@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./src/**/*.svelte"],
+  content: ["./src/**/*.{tsx,ts,js,jsx}"],
   theme: {
     extend: {},
   },
@@ -8,4 +8,3 @@ export default {
     require("tailwind-scrollbar")
   ],
 }
-
