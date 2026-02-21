@@ -1,8 +1,8 @@
 
 <script lang="ts">
 
-    import { save } from "@tauri-apps/api/dialog";
-    import { writeTextFile } from "@tauri-apps/api/fs";
+    import { save } from "@tauri-apps/plugin-dialog";
+    import { writeTextFile } from "@tauri-apps/plugin-fs";
     import { invoke } from "@tauri-apps/api";
     import Flatpickr, { type HookProps } from 'svelte-flatpickr'
     import 'flatpickr/dist/flatpickr.css'

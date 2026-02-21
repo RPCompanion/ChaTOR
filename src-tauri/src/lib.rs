@@ -1,192 +1,230 @@
 
+use dal::db::settings::app_settings::TAURI_WINDOW_SETTINGS;
+use open;
+
+use native_dialog::{DialogBuilder, MessageLevel};
+use tauri::{Manager, PhysicalSize, WindowEvent};
+use share::AsJson;
+use tracing::{error, info};
+
+use crash_reporter::CrashReporter;
+use crash_reporter::sys_info::SysInfo;
+
+mod swtor_hook;
+mod dal;
 mod share;
-mod swtor;
 mod utils;
+mod swtor;
+mod crash_reporter;
+mod config;
 mod logging;
+mod network;
 
-mod lib_only;
 
-use std::io::prelude::*;
-use std::net::TcpListener;
-use std::net::TcpStream;
-use std::sync::atomic::{AtomicBool, AtomicU16, Ordering};
+#[cfg_attr(mobile, tauri::mobile_entry_point)]
+pub fn run() {
 
-use std::str;
-use std::thread;
-use std::time::Duration;
+    let _guard = logging::init();
 
-use lib_only::chat_message;
+    init_system();
+    info!("Starting ChaTOR");
+    info!("System Information {}", SysInfo::default().as_json());
+    info!("Client Settings {}", dal::db::settings::get_settings().as_json());
 
-use share::CaptureMessage;
+    let tauri_response = tauri::Builder::default()
+        .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_dialog::init())
+        /*.on_window_event(|event| match event.event() {
+            WindowEvent::Destroyed => {
 
-use windows::Win32::System::LibraryLoader::GetModuleHandleA;
-use windows::core::PCSTR;
+                todo!();
+                //capture_injector::stop_injecting_capture();
+                
+            }
+            _ => {}
+        })*/
+        .setup(|app| {
+            let window = app.get_webview_window("main").unwrap();
+            let mut settings = dal::db::settings::get_settings();
 
-use lib_only::{submit_message, drain_messages};
-
-use crate::share::module_ports::ModulePorts;
-
-static QUIT: AtomicBool = AtomicBool::new(false);
-
-// TcpListener port for the chator client
-static CHATOR_PORT: AtomicU16 = AtomicU16::new(0);
-// TcpListener port for this injected module
-static LOCAL_PORT: AtomicU16  = AtomicU16::new(0);
-
-#[no_mangle]
-extern "system" fn capture_module_initalized() -> bool {
-    CHATOR_PORT.load(Ordering::Relaxed) != 0
-}
-
-#[no_mangle]
-extern "system" fn get_module_ports() -> ModulePorts {
-    ModulePorts::new(CHATOR_PORT.load(Ordering::Relaxed), LOCAL_PORT.load(Ordering::Relaxed))
-}
-
-#[no_mangle]
-extern "system" fn set_chator_port(port: u16) {
-    CHATOR_PORT.store(port, Ordering::Relaxed);
-}
-
-/* 
-    This function is called by the chator client to initialize the module.
-    Returns the port that the module is listening on.
-*/
-#[no_mangle]
-extern "system" fn init_capture_module(chator_port: u16) -> u16 {
-
-    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
-    let port     = listener.local_addr().unwrap().port();
-
-    CHATOR_PORT.store(chator_port, Ordering::Relaxed);
-    LOCAL_PORT.store(port, Ordering::Relaxed);
-
-    set_panic_hook();
-    start_quit_listener(listener);
-
-    if let Err(_) = start_tcp_messenger() {
-        return 0
-    }
-
-    unsafe {
-        begin_hook();
-    }
-
-    port
-
-}
-
-fn should_quit() -> bool {
-    QUIT.load(Ordering::Relaxed)
-}
-
-fn start_tcp_messenger() -> Result<(), &'static str> {
-
-    let stream_connector = move || -> Result<TcpStream, &'static str> {
-
-        loop {
-
-            if should_quit() {
-                return Err("Quitting");
+            if TAURI_WINDOW_SETTINGS.width > settings.app.window.width
+                || TAURI_WINDOW_SETTINGS.height > settings.app.window.height
+            {
+                settings.app.window = *TAURI_WINDOW_SETTINGS;
+                dal::db::settings::update_settings(settings.clone());
             }
 
-            /* 
-                I'm making the assumption that the chator client might change the port later on (definitely possible in dev environments).
-                This is a simple way to handle that.
-            */
-            let ip_addr_str = format!("127.0.0.1:{}", CHATOR_PORT.load(Ordering::Relaxed));
+            window
+                .set_size(PhysicalSize {
+                    width: settings.app.window.width as f64,
+                    height: settings.app.window.height as f64,
+                })
+                .expect("error while setting window size.");
 
-            match TcpStream::connect(&ip_addr_str) {
-                Ok(stream) => { return Ok(stream); },
-                Err(_) => { thread::sleep(Duration::from_millis(1000)); }
-            }
+            window
+                .set_always_on_top(settings.app.always_on_top)
+                .expect("error while setting always on top.");
 
+            Ok(())
+        })
+        .invoke_handler(tauri::generate_handler![
+            //swtor_hook::start_swtor_hook,
+            //swtor_hook::is_hooked_in,
+            //swtor_hook::post::submit_post,
+            open_link,
+            dal::open_db_dir,
+            dal::db::account::get_account,
+            dal::db::account::save_account,
+            dal::db::account::character::save_character,
+            dal::db::account::character::get_all_characters,
+            dal::db::custom_emote::get_all_custom_emotes,
+            dal::db::custom_emote::create_custom_emote,
+            dal::db::custom_emote::delete_custom_emote,
+            dal::db::custom_emote::update_custom_emote,
+            dal::db::custom_emote::update_custom_emotes_batch,
+            dal::db::custom_channel::get_all_custom_channels,
+            dal::db::custom_channel::save_custom_channel,
+            dal::db::custom_channel::delete_custom_channel,
+            dal::db::settings::get_settings,
+            dal::db::settings::update_settings,
+            dal::local_characters::get_all_local_characters,
+            dal::db::chat_log::get_chat_log_from_date,
+            dal::db::chat_log::get_distinct_dates,
+            dal::db::chat_log::get_todays_chat_log,
+            dal::db::chat_log::datetags::get_all_date_tag_favourites,
+            dal::db::chat_log::datetags::save_date_tag,
+            dal::game_data::get_name_by_global_id,
+            //capture_injector::start_injecting_capture,
+            //capture_injector::stop_injecting_capture,
+            network::fetch_content,
+            network::fetch_jediapedia_content,
+            get_version
+        ])
+        .run(tauri::generate_context!());
+
+    if let Err(e) = tauri_response {
+        error!("Error starting Tauri: {:?}", e);
+
+        #[cfg(target_os = "windows")]
+        let text = "Error starting Tauri. You may need to install Microsoft WebView2. Do you want to open the download page?";
+
+        #[cfg(not(target_os = "windows"))]
+        let text = "Error starting Tauri. You may need to install your operating system's webview component via your package manager.";
+
+        let response = DialogBuilder::message()
+            .set_title("ChaTOR Error")
+            .set_text(text)
+            .set_level(MessageLevel::Error)
+            .confirm()
+            .show()
+            .unwrap_or(false);
+        
+        #[cfg(target_os = "windows")]
+        if response {
+            open_link(config::config().microsoft_webview2_url.clone());
         }
 
-    };
+    }
 
-    let mut stream = stream_connector()?;
+        info!("Thanks for using ChaTOR");
 
-    thread::spawn(move || {
-
-        loop {
-
-            if should_quit() {
-                break;
-            }
-
-            for message in drain_messages() {
-
-                if let Err(_) = stream.write(message.as_bytes()) {
-
-                    if should_quit() {
-                        break;
-                    }
-
-                    if let Ok(s) = stream_connector() {
-                        stream = s;
-                    } else {
-                        return;
-                    }
-
-                    stream.write(message.as_bytes()).unwrap();
-
-                }
-
-            }
-            thread::sleep(Duration::from_millis(100));
-
-        }
-
-    });
-    Ok(())
 
 }
 
-fn set_panic_hook() {
+#[tauri::command]
+fn open_link(link: String) {
+
+    let _ = open::that(link);
+
+}
+
+#[tauri::command]
+fn get_version() -> String {
+
+    env!("CARGO_PKG_VERSION").to_string()
+    
+}
+
+/// Initializes the system.
+/// Sets up panic hook, sigterm handler, config and data access layer
+fn init_system() {
+
+    setup_panic_hook();
+    setup_sigterm_handler();
+    setup_config();
+
+    dal::init();
+    
+}
+
+fn setup_config() {
+
+    /* 
+        If the user modified their config file in an invalid way, we need to exit.
+    */
+    if let Err(e) = config::init() {
+
+        error!("Error initializing config: {:?}", e);
+
+        let _ = DialogBuilder::message()
+            .set_title("ChaTOR Error")
+            .set_text("Error initializing config file. Have you modified it?")
+            .set_level(MessageLevel::Error)
+            .confirm()
+            .show()
+            .unwrap_or(false);
+
+        std::process::exit(1);
+
+    }
+
+}
+
+fn setup_sigterm_handler() {
+
+    ctrlc::set_handler(|| {
+        //capture_injector::stop_injecting_capture();
+        std::process::exit(0);
+    })
+    .expect("Error setting Ctrl-C handler.");
+
+}
+
+fn setup_panic_hook() {
 
     std::panic::set_hook(Box::new(|panic_info| {
-        submit_message(CaptureMessage::Panic(format!("Panic: {panic_info:?}")));
+
+        let open_log_dir = || {
+
+            match std::env::current_dir() {
+                Ok(dir) => {
+                    let _ = open::that(format!("{}/{}", dir.to_str().unwrap(), "logs"));
+                },
+                Err(_) => {}
+            }
+
+        };
+
+        error!("Panic: {:?}", panic_info);
+        //capture_injector::stop_injecting_capture();
+
+
+        let response = DialogBuilder::message()
+            .set_title("ChaTOR Crash")
+            .set_text("ChaTOR has crashed. Send a crash report?")
+            .set_level(MessageLevel::Error)
+            .confirm()
+            .show()
+            .unwrap_or(false);
+
+        if response {
+            CrashReporter::new(format!("{:?}", panic_info)).submit()
+        } else {
+            open_log_dir();
+        }        
+
     }));
 
 }
 
-fn start_quit_listener(listener: TcpListener) {
 
-    thread::spawn(move || {
-
-        listener.accept().unwrap();
-        end_detours();
-        QUIT.store(true, Ordering::Relaxed);
-
-    });
-
-
-}
-
-unsafe fn begin_hook() {
-
-    match GetModuleHandleA(PCSTR(b"swtor.exe\0".as_ptr())) {
-        Ok(hmodule) => {
-            submit_message(CaptureMessage::Info("Found module".to_string()));
-            submit_message(CaptureMessage::Info(format!("Module handle: {:?}", hmodule)));
-            begin_detours(hmodule.0);
-        },
-        Err(_) => {
-            submit_message(CaptureMessage::Info("Failed to find module".to_string()));
-        }
-    }
-
-}
-
-fn begin_detours(base_address: isize) {
-
-    chat_message::begin_detour(base_address);
-
-}
-
-fn end_detours() {
-
-    chat_message::end_detour();
-
-}

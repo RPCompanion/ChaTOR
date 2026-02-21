@@ -2,8 +2,8 @@
 
 <script lang="ts">
     
-    import { save } from "@tauri-apps/api/dialog";
-    import { writeTextFile } from "@tauri-apps/api/fs";
+    import { save } from "@tauri-apps/plugin-dialog";
+    import { writeTextFile } from "@tauri-apps/plugin-fs";
     import { createEventDispatcher } from "svelte";
     import VariableSizeButton from "../../lib/buttons/VariableSizeButton.svelte";
     import type { ICharacterSheet } from "../../lib/character_sheet/character_sheet";

@@ -8,6 +8,12 @@
 
 </script>
 
+<style>
+    .background-img {
+        background-image: url("../assets/watercolor.webp");
+    }
+</style>
+
 <div 
     class="flex flex-col min-h-screen bg-cover bg-no-repeat"
     style="opacity: {$settings.app.show_window_decorations ? 1.0 : $settings.app.opacity/100.0}"
@@ -28,8 +34,3 @@
     <FooterControls/>
 </div>
 
-<style>
-    .background-img {
-        background-image: url("../assets//watercolor.webp");
-    }
-</style>

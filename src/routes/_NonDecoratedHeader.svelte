@@ -1,8 +1,9 @@
 
 <script lang="ts">
     import { settings } from "../lib/network/settings";
-    import { appWindow } from "@tauri-apps/api/window";
+    import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
     import { X, Square, Minus, ArrowSquareDownLeft  } from "phosphor-svelte";
+const appWindow = getCurrentWebviewWindow()
 
     let is_maximized = false;
     function on_close() {

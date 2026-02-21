@@ -3,10 +3,11 @@
     import { invoke } from '@tauri-apps/api';
     import { Heart } from 'phosphor-svelte';
     import { settings } from '../lib/network/settings';
-    import { appWindow } from '@tauri-apps/api/window';
+    import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
     import Checkbox from '../lib/Checkbox.svelte';
     import { GithubLogo, DiscordLogo, Folder } from 'phosphor-svelte'
     import { open_link } from '../lib/network';
+const appWindow = getCurrentWebviewWindow()
 
     let version_string: string | undefined = undefined;
 

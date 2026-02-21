@@ -1,6 +1,7 @@
 
-import { appWindow } from "@tauri-apps/api/window";
+import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { settings } from "./network/settings";
+const appWindow = getCurrentWebviewWindow()
  
 export async function init_window_events() {
 

@@ -4,6 +4,7 @@ use std::sync::LazyLock;
 use serde::{Deserialize, Serialize};
 
 use crate::dal::db::settings::dimensions::WidthHeight;
+use tracing::debug;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct AppSettings {
@@ -30,7 +31,7 @@ pub const TAURI_CONFIG_FILE: &str = include_str!("../../../../tauri.conf.json");
 pub static TAURI_WINDOW_SETTINGS: LazyLock<WidthHeight> = LazyLock::new(|| {
     
     let conf: serde_json::Value = serde_json::from_str(TAURI_CONFIG_FILE).unwrap();
-    let windows = conf["tauri"]["windows"][0].clone();
+    let windows = conf["app"]["windows"][0].clone();
 
     WidthHeight {
         width: windows["width"].as_i64().unwrap() as i32,

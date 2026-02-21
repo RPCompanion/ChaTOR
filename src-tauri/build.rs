@@ -1,12 +1,8 @@
 fn main() {
-
     let mut windows = tauri_build::WindowsAttributes::new();
     if cfg!(debug_assertions) {
-
         tauri_build::build()
-
     } else {
-
         windows = windows.app_manifest(r#"
             <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
                 <dependency>
@@ -33,15 +29,11 @@ fn main() {
         let attrs = tauri_build::Attributes::new().windows_attributes(windows);
         tauri_build::try_build(attrs).expect("error while building tauri application");
         finalize_release();
-        
     }
-    
 }
 
 fn finalize_release() {
-    
     copy_blauncher();
-    
 }
 
 /*
@@ -49,10 +41,11 @@ fn finalize_release() {
     built through github actions.
 */
 fn copy_blauncher() {
-
-    match std::fs::copy("./misc/blauncher.exe", "./target/release/misc/blauncher.exe") {
+    match std::fs::copy(
+        "./misc/blauncher.exe",
+        "./target/release/misc/blauncher.exe",
+    ) {
         Ok(_) => println!("blauncher.exe copied successfully"),
-        Err(e) => println!("Error while copying blauncher.exe: {}", e)
+        Err(e) => println!("Error while copying blauncher.exe: {}", e),
     }
-
 }

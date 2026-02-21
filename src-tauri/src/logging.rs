@@ -1,6 +1,8 @@
 
 use std::fs;
 use std::path::Path;
+
+#[cfg(target_os = "windows")]
 use std::os::windows::fs::MetadataExt;
 
 use chrono::prelude::*;
@@ -73,7 +75,12 @@ fn delete_stale_files() {
         let metadata = fs::metadata(&file)
             .expect("error while reading file metadata");
 
+        #[cfg(target_os = "windows")]
         let date_time = DateTime::from_timestamp(metadata.last_write_unix_epoch(), 0).unwrap();
+        
+        #[cfg(not(target_os = "windows"))]
+        let date_time = DateTime::from_timestamp(metadata.modified().unwrap().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs() as i64, 0).unwrap();
+
         let current_time = Utc::now();
         if (current_time - date_time).num_days() >= 7 {
 
@@ -86,10 +93,12 @@ fn delete_stale_files() {
 
 }
 
+#[cfg(target_os = "windows")] 
 trait WinToUnix {
     fn last_write_unix_epoch(&self) -> i64;
 }
 
+#[cfg(target_os = "windows")] 
 impl<T: MetadataExt> WinToUnix for T {
 
     fn last_write_unix_epoch(&self) -> i64 {
