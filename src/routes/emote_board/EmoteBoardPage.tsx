@@ -1,5 +1,5 @@
 import React from "react";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { useEmoteStore } from "../../store/useEmoteStore";
 import { submit_post } from "../../lib/network";
 import PageFormatting from "../../components/PageFormatting";

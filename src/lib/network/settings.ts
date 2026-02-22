@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { useAppStore } from "../../store/useAppStore";
 import { set_initial_swtor_channels } from "./swtor_message/swtor_chat_tab_messages";
 import { init_active_local_character } from "./local_characters";

@@ -1,4 +1,4 @@
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { invoke } from "@tauri-apps/api/core";
 import { useEmoteStore } from "../../store/useEmoteStore";
 

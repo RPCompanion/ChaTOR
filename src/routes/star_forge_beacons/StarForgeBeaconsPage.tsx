@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import ReactMarkdown from "react-markdown";
 import { get_star_forge_beacons, type IStarForgeBeacon } from "../../lib/api/star_forge_beacons";
 import { get_time_elapsed_since } from "../../lib/utils";

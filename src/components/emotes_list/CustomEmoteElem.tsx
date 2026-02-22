@@ -3,7 +3,7 @@ import { ArrowsOutCardinal } from "@phosphor-icons/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import type { IDNDCustomEmote } from "../../lib/custom_emote_utils";
 import VariableSizeButton from "../../lib/buttons/VariableSizeButton";
 import { submit_post } from "../../lib/network";

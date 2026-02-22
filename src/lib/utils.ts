@@ -1,4 +1,4 @@
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 
 export function deep_copy<T>(obj: T): T {
     return JSON.parse(JSON.stringify(obj));

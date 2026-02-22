@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { createHashRouter, RouterProvider, Navigate } from "react-router-dom";
-import { Toaster } from "sonner";
+import { ToastContainer } from "react-toastify";
 import Layout from "./routes/Layout";
 import AutomaticPage from "./routes/automatic/AutomaticPage";
 import ManualPage from "./routes/manual/ManualPage";
@@ -58,7 +58,7 @@ export default function App() {
 
     return (
         <>
-            <Toaster position="top-right" />
+            <ToastContainer position="top-right" />
             <RouterProvider router={router} />
         </>
     );

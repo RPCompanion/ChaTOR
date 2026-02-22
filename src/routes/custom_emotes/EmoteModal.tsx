@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { GAME_MESSAGE_MAXIMUM } from "../../lib/messages";
 import { Result } from "../../lib/result";
 import { create_custom_emote } from "../../lib/network/custom_emote";

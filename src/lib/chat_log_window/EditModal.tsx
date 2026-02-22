@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { Result, Ok, Err } from "../result";
 import type { IChatTab } from "../network/settings";
 import { useAppStore } from "../../store/useAppStore";

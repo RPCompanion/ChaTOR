@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { useAppStore } from "../../store/useAppStore";
 import { useChatLogStore } from "../../store/useChatLogStore";
 import { submit_post } from "../../lib/network";

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { type INavbarSection, add_navbar_callback, trigger_navbar_callbacks } from "./navbar";
-import { AnimatePresence, motion } from "framer-motion";
 
 interface NavbarSectionProps {
     section: INavbarSection;
@@ -41,32 +40,24 @@ export default function NavbarSection({ section }: NavbarSectionProps) {
                     <div className="relative top-2 text-xs">&#9660;</div>
                 )}
             </button>
-            <AnimatePresence>
-                {show_dropdown && (
-                    <motion.div
-                        className="flex flex-col gap-1 bg-white p-2 absolute top-10 shadow-md w-36"
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        {section.elements?.map((element, idx) => (
-                            <React.Fragment key={element.name}>
-                                <button
-                                    type="button"
-                                    onClick={() => goto_link(element.link)}
-                                    className="hover:text-slate-500 text-center select-none"
-                                >
-                                    {element.name}
-                                </button>
-                                {idx !== (section.elements?.length ?? 0) - 1 && (
-                                    <div className="border-b-2 border-slate-500"></div>
-                                )}
-                            </React.Fragment>
-                        ))}
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {show_dropdown && (
+                <div className="flex flex-col gap-1 bg-white p-2 absolute top-10 shadow-md w-36 animate-fade-in">
+                    {section.elements?.map((element, idx) => (
+                        <React.Fragment key={element.name}>
+                            <button
+                                type="button"
+                                onClick={() => goto_link(element.link)}
+                                className="hover:text-slate-500 text-center select-none"
+                            >
+                                {element.name}
+                            </button>
+                            {idx !== (section.elements?.length ?? 0) - 1 && (
+                                <div className="border-b-2 border-slate-500"></div>
+                            )}
+                        </React.Fragment>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }
