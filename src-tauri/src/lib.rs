@@ -22,6 +22,7 @@ mod config;
 mod logging;
 mod network;
 mod service_connection;
+mod service_launcher;
 
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -63,6 +64,7 @@ pub fn run() {
                 .expect("error while setting always on top.");
 
             service_connection::start_server(app.handle().clone(), connection.clone());
+            service_launcher::launch_service();
 
             Ok(())
         })

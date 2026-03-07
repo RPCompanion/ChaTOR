@@ -98,7 +98,7 @@ impl ServiceConnection {
     }
 }
 
-const DEFAULT_PORT: u16 = 30100;
+pub const DEFAULT_PORT: u16 = 30100;
 
 pub fn start_server(app_handle: AppHandle, connection: Arc<ServiceConnection>) {
     thread::spawn(move || {
