@@ -19,6 +19,7 @@ mod dal;
 mod share;
 mod utils;
 mod swtor;
+mod steam;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]

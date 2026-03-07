@@ -1,6 +1,7 @@
 
 use std::fs;
 use std::fs::DirEntry;
+use std::path::PathBuf;
 
 use serde::{Serialize, Deserialize};
 use directories::ProjectDirs;
@@ -23,36 +24,35 @@ impl LocalCharacterInfo {
 
     pub fn get_all_characters() -> Result<Vec<LocalCharacterInfo>, &'static str> {
 
-        if let Some(project) = ProjectDirs::from("com", "SWTOR", "swtor") {
+        let path = Self::find_settings_path()
+            .ok_or("Could not find settings directory. Is SWTOR installed?")?;
 
-            let path = project.config_local_dir().parent().unwrap().join("settings");
-            let mut characters: Vec<LocalCharacterInfo> = Vec::new();
+        let entries = path.read_dir()
+            .map_err(|_| "Could not read settings directory. Is SWTOR installed?")?;
 
-            let entries = path.read_dir();
+        let mut characters: Vec<LocalCharacterInfo> = Vec::new();
 
-            if entries.is_err() {
-                return Err("Could not read settings directory. Is SWTOR installed?");
-            }
-
-            for entry in entries.unwrap() {
-
-                match entry {
-                    Ok(entry) => {
-                        let character = LocalCharacterInfo::get_character(entry);
-                        if character.is_some() {
-                            characters.push(character.unwrap());
-                        }
-                    },
-                    Err(_) => {}
+        for entry in entries {
+            if let Ok(entry) = entry {
+                if let Some(character) = LocalCharacterInfo::get_character(entry) {
+                    characters.push(character);
                 }
-
             }
-            return Ok(characters);
-
         }
 
-        Err("Could not find settings directory")
+        Ok(characters)
+    }
 
+    fn find_settings_path() -> Option<PathBuf> {
+        if cfg!(target_os = "windows") {
+            // Windows: AppData\Local\SWTOR\swtor\settings
+            let project = ProjectDirs::from("com", "SWTOR", "swtor")?;
+            Some(project.config_local_dir().parent()?.join("settings"))
+        } else {
+            // Linux: look inside the Proton prefix
+            let compat_data = crate::steam::find_compat_data_path()?;
+            Some(compat_data.join("pfx/drive_c/users/steamuser/AppData/Local/SWTOR/swtor/settings"))
+        }
     }
 
     fn get_character(entry: DirEntry) -> Option<LocalCharacterInfo> {

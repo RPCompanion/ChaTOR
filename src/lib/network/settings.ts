@@ -123,14 +123,14 @@ export function setup_chat_log_subscriber(): () => void {
         (state) => ({ settings: state.settings, chatLogActive: state.chatLogActive, hookedIn: state.hookedIn }),
         ({ settings, chatLogActive, hookedIn }) => {
             if (settings.chat_log.capture_chat_log && !chatLogActive && hookedIn) {
-                invoke("start_injecting_capture")
+                invoke("set_capture_chat_log", { enabled: true })
                     .then(() => {
                         useAppStore.getState().setChatLogActive(true);
                         toast.success("Chat logging active");
                     })
                     .catch(handle_capture_error as any);
             } else if ((!settings.chat_log.capture_chat_log && chatLogActive) || !hookedIn) {
-                invoke("stop_injecting_capture");
+                invoke("set_capture_chat_log", { enabled: false }).catch(() => {});
                 useAppStore.getState().setChatLogActive(false);
             }
         },
@@ -148,9 +148,9 @@ export function setup_chat_log_subscriber(): () => void {
             if (hookedIn && chatLogActive) {
                 return;
             } else if (hookedIn && !chatLogActive && settings.chat_log.capture_chat_log) {
-                invoke("start_injecting_capture").catch(() => {});
+                invoke("set_capture_chat_log", { enabled: true }).catch(() => {});
             } else if (!hookedIn && chatLogActive) {
-                invoke("stop_injecting_capture").catch(() => {});
+                invoke("set_capture_chat_log", { enabled: false }).catch(() => {});
                 useAppStore.getState().setChatLogActive(false);
             }
         }

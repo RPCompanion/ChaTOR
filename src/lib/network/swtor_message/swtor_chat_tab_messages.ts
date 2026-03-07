@@ -90,16 +90,12 @@ export function add_swtor_channel_message(message: SwtorMessage) {
 }
 
 export function set_swtor_channel_messages_to_read(chat_tab_name: string) {
-    const t_scm = useChatLogStore.getState().swtorChannelMessages.map((tab) => {
-        if (tab.chat_tab_name === chat_tab_name) {
-            return {
-                ...tab,
-                messages: tab.messages.map((m) => ({ ...m, read: true }))
-            };
-        }
-        return tab;
-    });
-    useChatLogStore.getState().setSwtorChannelMessages(t_scm);
+    const current = useChatLogStore.getState().swtorChannelMessages;
+    const tab = current.find((t) => t.chat_tab_name === chat_tab_name);
+    if (!tab || tab.messages.every((m) => m.read)) return;
+
+    tab.messages.forEach((m) => { m.read = true; });
+    useChatLogStore.getState().setSwtorChannelMessages([...current]);
 }
 
 export function clear_swtor_channel_messages(chat_tab_name: string) {

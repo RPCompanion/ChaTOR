@@ -72,15 +72,19 @@ export default function ChatLogWindow({ onWhisper }: ChatLogWindowProps) {
     }, [swtor_messages.length, auto_scroll]);
 
     // Resize observer for window height persistence
+    const savedHeight = useRef(settings.chat_log.window.window.height);
     useEffect(() => {
         if (!containerRef.current) return;
-        containerRef.current.style.height = settings.chat_log.window.window.height + "px";
+        containerRef.current.style.height = savedHeight.current + "px";
 
         const observer = new ResizeObserver((entries) => {
             for (const entry of entries) {
                 if (entry.target === containerRef.current) {
+                    const newHeight = entry.contentRect.height;
+                    if (Math.abs(newHeight - savedHeight.current) < 1) break;
+                    savedHeight.current = newHeight;
                     updateSettings((draft) => {
-                        draft.chat_log.window.window.height = entry.contentRect.height;
+                        draft.chat_log.window.window.height = newHeight;
                     });
                     break;
                 }

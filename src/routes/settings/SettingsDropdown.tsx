@@ -14,6 +14,7 @@ export default function SettingsDropdown({ options, choosen_option, onChange }: 
             value={choosen_option ?? ""}
             onChange={(e) => onChange(e.target.value || null)}
         >
+            <option value="">Select...</option>
             {options.map((option) => (
                 <option key={option} value={option}>{option}</option>
             ))}

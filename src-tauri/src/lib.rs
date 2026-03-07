@@ -23,6 +23,7 @@ mod logging;
 mod network;
 mod service_connection;
 mod service_launcher;
+mod steam;
 
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -71,6 +72,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             swtor_hook::start_swtor_hook,
             swtor_hook::is_hooked_in,
+            swtor_hook::set_capture_chat_log,
             swtor_hook::post::submit_post,
             open_link,
             dal::open_db_dir,
