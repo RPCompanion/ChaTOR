@@ -131,7 +131,7 @@ export default function ChatLogWindow({ onWhisper }: ChatLogWindowProps) {
                 </div>
                 <div
                     ref={containerRef}
-                    className="flex flex-col h-44 max-h-96 resize-y rounded-tr-md border-2 border-slate-700 overflow-y-auto scrollbar scrollbar-thumb-sky-800 scrollbar-track-slate-100 chat-container-background"
+                    className="flex flex-col h-44 max-h-96 resize-y rounded-tr-md border-2 border-slate-700 overflow-y-auto scrollbar-thin scrollbar-thumb-sky-800 scrollbar-track-slate-100 chat-container-background"
                 >
                     {swtor_messages.map((message, idx) => (
                         <div

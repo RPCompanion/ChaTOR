@@ -16,7 +16,7 @@ export default function Checkbox({ checked, onChange, size = "normal", children 
                 onChange={(e) => onChange(e.target.checked)}
                 className="ml-2 scale-150 cursor-pointer"
             />
-            {children}
+            <span className="ml-1">{children}</span>
         </label>
     );
 }
