@@ -14,18 +14,11 @@ use sysinfo::{ProcessesToUpdate, System};
 
 use native_dialog::{DialogBuilder, MessageLevel};
 
-mod swtor_hook;
+
 mod dal;
 mod share;
 mod utils;
 mod swtor;
-mod crash_reporter;
-mod config;
-mod logging;
-mod network;
-
-use crash_reporter::CrashReporter;
-use crash_reporter::sys_info::SysInfo;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]

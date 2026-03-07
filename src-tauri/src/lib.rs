@@ -1,9 +1,11 @@
 
+use std::sync::Arc;
+
 use dal::db::settings::app_settings::TAURI_WINDOW_SETTINGS;
 use open;
 
 use native_dialog::{DialogBuilder, MessageLevel};
-use tauri::{Manager, PhysicalSize, WindowEvent};
+use tauri::{Manager, PhysicalSize};
 use share::AsJson;
 use tracing::{error, info};
 
@@ -19,6 +21,7 @@ mod crash_reporter;
 mod config;
 mod logging;
 mod network;
+mod service_connection;
 
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -31,19 +34,13 @@ pub fn run() {
     info!("System Information {}", SysInfo::default().as_json());
     info!("Client Settings {}", dal::db::settings::get_settings().as_json());
 
+    let connection = Arc::new(service_connection::ServiceConnection::new());
+
     let tauri_response = tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
-        /*.on_window_event(|event| match event.event() {
-            WindowEvent::Destroyed => {
-
-                todo!();
-                //capture_injector::stop_injecting_capture();
-                
-            }
-            _ => {}
-        })*/
-        .setup(|app| {
+        .manage(connection.clone())
+        .setup(move |app| {
             let window = app.get_webview_window("main").unwrap();
             let mut settings = dal::db::settings::get_settings();
 
@@ -65,12 +62,14 @@ pub fn run() {
                 .set_always_on_top(settings.app.always_on_top)
                 .expect("error while setting always on top.");
 
+            service_connection::start_server(app.handle().clone(), connection.clone());
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            //swtor_hook::start_swtor_hook,
-            //swtor_hook::is_hooked_in,
-            //swtor_hook::post::submit_post,
+            swtor_hook::start_swtor_hook,
+            swtor_hook::is_hooked_in,
+            swtor_hook::post::submit_post,
             open_link,
             dal::open_db_dir,
             dal::db::account::get_account,
@@ -94,8 +93,6 @@ pub fn run() {
             dal::db::chat_log::datetags::get_all_date_tag_favourites,
             dal::db::chat_log::datetags::save_date_tag,
             dal::game_data::get_name_by_global_id,
-            //capture_injector::start_injecting_capture,
-            //capture_injector::stop_injecting_capture,
             network::fetch_content,
             network::fetch_jediapedia_content,
             get_version
