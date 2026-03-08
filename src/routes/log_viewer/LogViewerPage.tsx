@@ -6,6 +6,8 @@ import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/flatpickr.css";
 import { type IChatLogMessage } from "../../lib/network/chat_log_message";
 import { SwtorMessage } from "../../lib/network/swtor_message";
+import { DiceRoll, type IDiceRoll } from "../../lib/network/dice_roll";
+import { type ChatEntry, is_dice_roll } from "../../lib/network/swtor_message/swtor_chat_tab_messages";
 import { get_all_channel_dispatch } from "../../lib/network/swtor_channel";
 import { date_tag_new, get_all_date_tag_favourites, type IDateTag } from "../../lib/network/datetags";
 import PageFormatting from "../../components/PageFormatting";
@@ -23,9 +25,9 @@ export default function LogViewerPage() {
     const [channel_filters, setChannelFilters] = useState<ChannelDispatcher[]>(get_all_channel_dispatch());
     const [all_dates, setAllDates] = useState<string[]>([]);
     const [dates, setDates] = useState<string[]>([]);
-    const [date_messages, setDateMessages] = useState<SwtorMessage[]>([]);
+    const [date_messages, setDateMessages] = useState<ChatEntry[]>([]);
     const [players, setPlayers] = useState<IListElem<string>[]>([]);
-    const [filtered_messages, setFilteredMessages] = useState<SwtorMessage[]>([]);
+    const [filtered_messages, setFilteredMessages] = useState<ChatEntry[]>([]);
     const [active_date, setActiveDate] = useState<string | undefined>(undefined);
     const [date_tags, setDateTags] = useState<IDateTag[]>([]);
     const [show_only_favourites, setShowOnlyFavourites] = useState(false);
@@ -38,8 +40,14 @@ export default function LogViewerPage() {
     function set_filtered_messages(d_messages = date_messages, p = players, cn = channel_numbers) {
         setFilteredMessages(
             d_messages
-                .filter((m) => cn.includes(m.channel.type))
-                .filter((m) => p.find((p) => p.value === m.from)?.selected)
+                .filter((m) => {
+                    if (is_dice_roll(m)) return true; // always show dice rolls
+                    return cn.includes(m.channel.type);
+                })
+                .filter((m) => {
+                    const name = is_dice_roll(m) ? m.player_name : m.from;
+                    return p.find((p) => p.value === name)?.selected;
+                })
         );
     }
 
@@ -74,15 +82,37 @@ export default function LogViewerPage() {
         init_dates();
     }, []);
 
+    interface IDiceRollLogEntry {
+        dice_roll_log_id: number;
+        character_name: string;
+        timestamp: string;
+        result_text: string;
+    }
+
     function on_change(selected_dates: Date[], dateStr: string) {
         setActiveDate(dateStr);
-        invoke("get_chat_log_from_date", { date: dateStr }).then((response) => {
-            const msgs = (response as IChatLogMessage[]).map((m) => new SwtorMessage(m.message));
-            const player_names = [...new Set(msgs.map((m) => m.from))];
+        Promise.all([
+            invoke("get_chat_log_from_date", { date: dateStr }),
+            invoke("get_dice_rolls_for_date", { date: dateStr }),
+        ]).then(([chatResponse, rollResponse]) => {
+            const chatMsgs: ChatEntry[] = (chatResponse as IChatLogMessage[]).map((m) => new SwtorMessage(m.message));
+            const rollMsgs: ChatEntry[] = (rollResponse as IDiceRollLogEntry[]).map((r) => new DiceRoll({
+                timestamp: r.timestamp,
+                player_name: r.character_name,
+                result_text: r.result_text,
+            }));
+
+            const all: ChatEntry[] = [...chatMsgs, ...rollMsgs].sort((a, b) => {
+                const tA = is_dice_roll(a) ? a.timestamp : a.timestamp;
+                const tB = is_dice_roll(b) ? b.timestamp : b.timestamp;
+                return tA.localeCompare(tB);
+            });
+
+            const player_names = [...new Set(all.map((m) => is_dice_roll(m) ? m.player_name : m.from))];
             const p = player_names.map((name) => ({ value: name, selected: true }));
-            setDateMessages(msgs);
+            setDateMessages(all);
             setPlayers(p);
-            set_filtered_messages(msgs, p, channel_numbers);
+            set_filtered_messages(all, p, channel_numbers);
         });
     }
 
@@ -104,6 +134,9 @@ export default function LogViewerPage() {
         if (!filepath) return;
 
         const lines = filtered_messages.map((m) => {
+            if (is_dice_roll(m)) {
+                return `[${m.timestamp}] [Random] ${m.player_name} rolls ${m.result_text}`;
+            }
             let flat_message = "";
             m.message_fragments.forEach((f) => {
                 if (typeof f === "string") {
@@ -152,15 +185,24 @@ export default function LogViewerPage() {
             )}
             <div className="h-6"></div>
             <div className="flex flex-col h-96 resize-y max-h-full rounded-tr-md border-2 border-slate-700 overflow-y-auto scrollbar scrollbar-thumb-sky-800 scrollbar-track-slate-100 chat-container-background">
-                {filtered_messages.map((message, idx) => (
+                {filtered_messages.map((entry, idx) => (
                     <div
                         key={idx}
                         ref={idx === filtered_messages.length - 1 ? last_message_ref : undefined}
                         className="w-full opacity-100"
                     >
-                        <span className="text-white">[{message.timestamp}]</span>
-                        <span className="text-slate-200 cursor-pointer">{message.get_message_from()}</span>
-                        <Messages message={message} />
+                        {is_dice_roll(entry) ? (
+                            <>
+                                <span className="text-white">[{entry.timestamp}]</span>
+                                <span className="text-yellow-300"> [Random] {entry.player_name} rolls {entry.result_text}</span>
+                            </>
+                        ) : (
+                            <>
+                                <span className="text-white">[{entry.timestamp}]</span>
+                                <span className="text-slate-200 cursor-pointer">{entry.get_message_from()}</span>
+                                <Messages message={entry} />
+                            </>
+                        )}
                     </div>
                 ))}
             </div>

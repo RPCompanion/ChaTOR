@@ -9,6 +9,7 @@ import {
     remove_swtor_channel,
     clear_swtor_channel_messages,
     set_swtor_channel_messages_to_read,
+    is_dice_roll,
 } from "../network/swtor_message/swtor_chat_tab_messages";
 import EditModal from "./EditModal";
 import type { IChatTab } from "../network/settings";
@@ -38,7 +39,7 @@ export default function ChatTab({ chat_tab, index }: ChatTabProps) {
     const style = { transform: CSS.Transform.toString(transform), transition };
 
     const unread_message_count =
-        swtor_channel_messages.find((c) => c.chat_tab_name === chat_tab.name)?.messages.filter((m) => !m.read).length ?? 0;
+        swtor_channel_messages.find((c) => c.chat_tab_name === chat_tab.name)?.messages.filter((m) => !is_dice_roll(m) && !m.read).length ?? 0;
 
     function on_click() {
         if (active_chat_tab_index === index) {

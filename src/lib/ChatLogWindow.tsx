@@ -5,7 +5,9 @@ import { useAppStore } from "../store/useAppStore";
 import { useChatLogStore } from "../store/useChatLogStore";
 import {
     set_swtor_channel_messages_to_read,
+    is_dice_roll,
     type SwtorChatTabMessages,
+    type ChatEntry,
 } from "./network/swtor_message/swtor_chat_tab_messages";
 import type { SwtorMessage } from "./network/swtor_message";
 import Checkbox from "./Checkbox";
@@ -42,11 +44,14 @@ export default function ChatLogWindow({ onWhisper }: ChatLogWindowProps) {
     function get_swtor_channel_messages(
         channel_messages: SwtorChatTabMessages[],
         chat_tab_index: number
-    ): SwtorMessage[] {
+    ): ChatEntry[] {
         return (
             channel_messages
                 .find((c) => c.chat_tab_name === get_active_chat_tab_name(chat_tab_index))
-                ?.messages.filter((m) => players_filter.find((p) => p.value === m.from)?.selected) ?? []
+                ?.messages.filter((m) => {
+                    const name = is_dice_roll(m) ? m.player_name : m.from;
+                    return players_filter.find((p) => p.value === name)?.selected;
+                }) ?? []
         );
     }
 
@@ -133,20 +138,29 @@ export default function ChatLogWindow({ onWhisper }: ChatLogWindowProps) {
                     ref={containerRef}
                     className="flex flex-col h-44 max-h-96 resize-y rounded-tr-md border-2 border-slate-700 overflow-y-auto scrollbar-thin scrollbar-thumb-sky-800 scrollbar-track-slate-100 chat-container-background"
                 >
-                    {swtor_messages.map((message, idx) => (
+                    {swtor_messages.map((entry, idx) => (
                         <div
                             key={idx}
                             ref={idx === swtor_messages.length - 1 ? lastMessageRef : undefined}
                             className="w-full opacity-100"
                         >
-                            <span className="text-white">[{message.timestamp}]</span>
-                            <span
-                                className="text-slate-200 cursor-pointer"
-                                onClick={() => on_character_click(message)}
-                            >
-                                {message.get_message_from()}
-                            </span>
-                            <Messages message={message} />
+                            {is_dice_roll(entry) ? (
+                                <>
+                                    <span className="text-white">[{entry.timestamp}]</span>
+                                    <span className="text-yellow-300"> [Random] {entry.player_name} rolls {entry.result_text}</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span className="text-white">[{entry.timestamp}]</span>
+                                    <span
+                                        className="text-slate-200 cursor-pointer"
+                                        onClick={() => on_character_click(entry)}
+                                    >
+                                        {entry.get_message_from()}
+                                    </span>
+                                    <Messages message={entry} />
+                                </>
+                            )}
                         </div>
                     ))}
                 </div>

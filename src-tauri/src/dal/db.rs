@@ -10,6 +10,7 @@ pub mod settings;
 pub mod chat_log;
 pub mod user_character_messages;
 pub mod swtor_message;
+pub mod dice_roll;
 pub mod migration;
 pub mod custom_channel;
 pub mod cache;

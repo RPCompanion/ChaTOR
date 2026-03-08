@@ -94,6 +94,7 @@ pub fn run() {
             dal::db::chat_log::get_chat_log_from_date,
             dal::db::chat_log::get_distinct_dates,
             dal::db::chat_log::get_todays_chat_log,
+            dal::db::dice_roll::get_dice_rolls_for_date,
             dal::db::chat_log::datetags::get_all_date_tag_favourites,
             dal::db::chat_log::datetags::save_date_tag,
             dal::game_data::get_name_by_global_id,

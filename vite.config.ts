@@ -8,7 +8,8 @@ export default defineConfig({
         react(),
     ],
     build: {
-        target: "esnext"
+        target: "esnext",
+        outDir: "dist/client"
     },
     test: {
         environment: "jsdom",

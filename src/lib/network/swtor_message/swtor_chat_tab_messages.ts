@@ -6,10 +6,17 @@ import { Result, Ok, Err } from "../../result";
 import { add_player } from "../players";
 import type { IChatLogMessage } from "../chat_log_message";
 import { ESwtorChannel } from "../swtor_channel";
+import type { DiceRoll } from "../dice_roll";
+
+export type ChatEntry = SwtorMessage | DiceRoll;
+
+export function is_dice_roll(entry: ChatEntry): entry is DiceRoll {
+    return "player_name" in entry && "result_text" in entry;
+}
 
 export class SwtorChatTabMessages {
     public chat_tab_name: string;
-    public messages: SwtorMessage[] = [];
+    public messages: ChatEntry[] = [];
 
     constructor(chat_tab_name: string) {
         this.chat_tab_name = chat_tab_name;
@@ -89,12 +96,31 @@ export function add_swtor_channel_message(message: SwtorMessage) {
     useChatLogStore.getState().setSwtorChannelMessages(t_scm);
 }
 
+export function add_dice_roll_to_chat_tabs(roll: DiceRoll) {
+    const t_scm = useChatLogStore.getState().swtorChannelMessages.map((tab) => ({
+        ...tab,
+        messages: [...tab.messages]
+    }));
+
+    // Add dice rolls to all chat tabs (they're system-level events)
+    t_scm.forEach((chat_tab_messages) => {
+        chat_tab_messages.messages.push(roll);
+    });
+
+    useChatLogStore.getState().setSwtorChannelMessages(t_scm);
+}
+
 export function set_swtor_channel_messages_to_read(chat_tab_name: string) {
     const current = useChatLogStore.getState().swtorChannelMessages;
     const tab = current.find((t) => t.chat_tab_name === chat_tab_name);
-    if (!tab || tab.messages.every((m) => m.read)) return;
+    if (!tab || tab.messages.every((m) => {
+        if (is_dice_roll(m)) return true;
+        return m.read;
+    })) return;
 
-    tab.messages.forEach((m) => { m.read = true; });
+    tab.messages.forEach((m) => {
+        if (!is_dice_roll(m)) m.read = true;
+    });
     useChatLogStore.getState().setSwtorChannelMessages([...current]);
 }
 
@@ -115,7 +141,7 @@ export function restore_todays_messages() {
         // Clear all tabs
         const cleared = useChatLogStore.getState().swtorChannelMessages.map((tab) => ({
             ...tab,
-            messages: [] as SwtorMessage[]
+            messages: [] as ChatEntry[]
         }));
         useChatLogStore.getState().setSwtorChannelMessages(cleared);
 

@@ -5,6 +5,7 @@ import { Result, Ok, Err } from "./result";
 import { init_custom_emotes } from "./network/custom_emote";
 import { init_settings } from "./network/settings";
 import { init_swtor_message_listener } from "./network/swtor_message";
+import { init_dice_roll_listener } from "./network/dice_roll";
 import { init_active_local_character } from "./network/local_characters";
 import { init_custom_channels } from "./network/custom_channels";
 
@@ -23,6 +24,7 @@ export async function init_network(): Promise<() => void> {
 
     const cleanupHook = init_hook();
     init_swtor_message_listener();
+    init_dice_roll_listener();
     init_custom_emotes();
     init_custom_channels();
 

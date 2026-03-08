@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter};
 use tracing::{error, info};
 
+use crate::dal::db::dice_roll::DiceRoll;
 use crate::dal::db::swtor_message::SwtorMessage;
 use crate::dal::db::user_character_messages::UserCharacterMessages;
 
@@ -27,6 +28,7 @@ pub enum FromClient {
 pub enum FromService {
     IsHookedIn(bool),
     SwtorMessage(SwtorMessage),
+    DiceRoll(DiceRoll),
     SubmitPostResult {
         callback_id: i64,
         result: Result<(), String>,
@@ -154,8 +156,13 @@ fn read_loop(app: AppHandle, connection: Arc<ServiceConnection>, stream: TcpStre
                     continue;
                 }
                 match serde_json::from_str::<FromService>(&line) {
-                    Ok(msg) => handle_service_message(&app, &connection, msg),
-                    Err(e) => error!("Failed to parse FromService: {}", e),
+                    Ok(msg) => {
+                        if matches!(&msg, FromService::DiceRoll(_)) {
+                            info!("[ROLL] Parsed DiceRoll from service JSON");
+                        }
+                        handle_service_message(&app, &connection, msg);
+                    }
+                    Err(e) => error!("Failed to parse FromService: {} (line: {})", e, &line[..line.len().min(200)]),
                 }
             }
             Err(e) => {
@@ -180,6 +187,13 @@ fn handle_service_message(
         }
         FromService::SwtorMessage(swtor_message) => {
             let _ = app.emit("swtor_messages", vec![swtor_message]);
+        }
+        FromService::DiceRoll(dice_roll) => {
+            info!("[ROLL] Received dice roll from service: player={}, result={}", dice_roll.player_name, dice_roll.result_text);
+            dice_roll.save_to_db();
+            info!("[ROLL] Saved to DB, emitting dice_roll event to frontend");
+            let emit_result = app.emit("dice_roll", &dice_roll);
+            info!("[ROLL] Emit result: {:?}", emit_result);
         }
         FromService::SubmitPostResult { callback_id, result } => {
             connection.resolve_callback(callback_id, result);
