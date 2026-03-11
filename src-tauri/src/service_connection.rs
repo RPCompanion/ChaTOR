@@ -186,7 +186,9 @@ fn handle_service_message(
             );
         }
         FromService::SwtorMessage(swtor_message) => {
-            let _ = app.emit("swtor_messages", vec![swtor_message]);
+            let messages = vec![swtor_message];
+            SwtorMessage::save_messages_to_db(messages.clone());
+            let _ = app.emit("swtor_messages", messages);
         }
         FromService::DiceRoll(dice_roll) => {
             info!("[ROLL] Received dice roll from service: player={}, result={}", dice_roll.player_name, dice_roll.result_text);
