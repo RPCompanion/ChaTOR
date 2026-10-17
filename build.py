@@ -20,9 +20,10 @@ script (.github/workflows/build.yml).
 Pipeline
   service   chator-service/build.sh --release  ->  ChaTOR/src-tauri/service/{chator-service.exe, swtor_chat_capture.dll}
   frontend  npm install + (tauri build runs `npm run build` itself)
-  linux     tauri build                                   -> src-tauri/target/release/bundle/**
+  linux     tauri build                                   -> src-tauri/target/release/bundle/** (deb/rpm/AppImage)
+            then assemble ChaTOR/release/<version>/linux/ChaTOR/ (portable folder, same layout as Windows) + zip
   windows   tauri build --runner cargo-xwin --target x86_64-pc-windows-msvc --no-bundle
-            then assemble ChaTOR/release/<version>/windows/ChaTOR/ (exe, config, offsets, sql, gamedata, service, .itch.toml)
+            then assemble ChaTOR/release/<version>/windows/ChaTOR/ (exe, config, offsets, sql, gamedata, service, .itch.toml) + zip
   sign      optional; see release.example.toml (osslsigncode for Windows PE files, gpg for Linux artifacts)
   collect   copy every artifact into ChaTOR/release/<version>/ and write SHA256SUMS
 
@@ -153,13 +154,25 @@ def build_service() -> None:
         raise BuildError(f"chator-service not found at {SERVICE_CRATE} (set CHATOR_SERVICE_DIR)")
     require_tools("cargo-xwin")
     run([str(SERVICE_CRATE / "build.sh"), "--release"], env={"CHATOR_APP_DIR": str(APP)})
-    check_service_present()
 
 
-def check_service_present() -> None:
-    for name in ("chator-service.exe", "swtor_chat_capture.dll"):
-        if not DRY_RUN and not (SERVICE_DIR / name).is_file():
-            raise BuildError(f"{SERVICE_DIR / name} missing; run `uv run build.py service`")
+SERVICE_FILES = ("chator-service.exe", "swtor_chat_capture.dll")
+
+
+def stage_release_service() -> None:
+    """Put the *release* service into src-tauri/service before bundling.
+
+    chator-service/build.sh (debug, for development) copies into the same folder,
+    so never trust what is there: copy from the service's release output."""
+    src = SERVICE_CRATE / "target" / WIN_TARGET / "release"
+    note(f"bundling release service from {rel(src)}")
+    if DRY_RUN:
+        return
+    SERVICE_DIR.mkdir(parents=True, exist_ok=True)
+    for name in SERVICE_FILES:
+        if not (src / name).is_file():
+            raise BuildError(f"{src / name} missing; run without --skip-service (or `uv run build.py service`)")
+        shutil.copy2(src / name, SERVICE_DIR / name)
 
 
 def frontend_deps() -> None:
@@ -169,16 +182,48 @@ def frontend_deps() -> None:
     run(["npm", verb, "--legacy-peer-deps", "--no-audit", "--no-fund"], cwd=APP)
 
 
-def build_linux() -> list[Path]:
+LINUX_ITCH_MANIFEST = """
+[[actions]]
+name = "launch"
+path = "ChaTOR"
+platforms = "linux"
+"""
+
+
+def assemble_portable(out: Path, binary: Path, binary_name: str) -> None:
+    """Portable folder: app binary + config, offsets, sql, gamedata and the bundled service."""
+    note(f"assembling portable folder {rel(out)}")
+    if DRY_RUN:
+        return
+    shutil.rmtree(out, ignore_errors=True)
+    out.mkdir(parents=True)
+    shutil.copy2(binary, out / binary_name)
+    for f in ("config.toml", "offsets.json"):
+        shutil.copy2(TAURI / f, out / f)
+    for d in ("sql", "gamedata", "service"):
+        shutil.copytree(TAURI / d, out / d)
+
+
+def build_linux(version: str) -> tuple[list[Path], Path]:
     step("ChaTOR for Linux (tauri build)")
     run(["npx", "tauri", "build"], cwd=APP)
     bundle = TAURI / "target" / "release" / "bundle"
-    artifacts = [p for ext in ("*.deb", "*.rpm", "*.AppImage") for p in bundle.rglob(ext)]
-    for a in artifacts:
+    bundles = [p for ext in ("*.deb", "*.rpm", "*.AppImage") for p in bundle.rglob(ext)]
+    for a in bundles:
         note(f"built {rel(a)}  ({a.stat().st_size // 1024} KiB)")
-    if not DRY_RUN and not artifacts:
+    if not DRY_RUN and not bundles:
         raise BuildError("tauri build produced no Linux bundles")
-    return artifacts
+
+    target = TAURI / "target" / "release"
+    binary = next((target / n for n in ("ChaTOR", "chator") if (target / n).is_file()), None)
+    if not DRY_RUN and binary is None:
+        raise BuildError(f"no Linux executable found in {target}")
+    out = APP / "release" / version / "linux" / "ChaTOR"
+    assemble_portable(out, binary or target / "ChaTOR", "ChaTOR")
+    if not DRY_RUN:
+        (out / "ChaTOR").chmod(0o755)
+        (out / ".itch.toml").write_text(LINUX_ITCH_MANIFEST.lstrip())
+    return bundles, out
 
 
 def build_windows(version: str) -> tuple[Path, list[Path]]:
@@ -187,21 +232,12 @@ def build_windows(version: str) -> tuple[Path, list[Path]]:
     run(["npx", "tauri", "build", "--runner", "cargo-xwin", "--target", WIN_TARGET, "--no-bundle"], cwd=APP)
 
     out = APP / "release" / version / "windows" / "ChaTOR"
-    note(f"assembling portable folder {rel(out)}")
+    target = TAURI / "target" / WIN_TARGET / "release"
+    exe = next((target / n for n in ("ChaTOR.exe", "chator.exe") if (target / n).is_file()), None)
+    if not DRY_RUN and exe is None:
+        raise BuildError(f"no Windows executable found in {target}")
+    assemble_portable(out, exe or target / "ChaTOR.exe", "ChaTOR.exe")
     if not DRY_RUN:
-        shutil.rmtree(out, ignore_errors=True)
-        out.mkdir(parents=True)
-        target = TAURI / "target" / WIN_TARGET / "release"
-        exe = target / "ChaTOR.exe"
-        if not exe.exists():
-            exe = target / "chator.exe"
-        if not exe.exists():
-            raise BuildError(f"no Windows executable found in {target}")
-        shutil.copy2(exe, out / "ChaTOR.exe")
-        for f in ("config.toml", "offsets.json"):
-            shutil.copy2(TAURI / f, out / f)
-        for d in ("sql", "gamedata", "service"):
-            shutil.copytree(TAURI / d, out / d)
         shutil.copy2(TAURI / "misc" / ".itch.toml", out / ".itch.toml")
     pe_files = [out / "ChaTOR.exe", out / "service" / "chator-service.exe", out / "service" / "swtor_chat_capture.dll"]
     return out, pe_files
@@ -275,15 +311,18 @@ def collect(version: str, artifacts: list[Path]) -> None:
     if DRY_RUN:
         return
     dest.mkdir(parents=True, exist_ok=True)
-    lines = []
     for a in artifacts:
         target = a if a.is_relative_to(dest) else dest / a.name
         if target != a:
             shutil.copy2(a, target)
-        lines.append(f"{sha256(target)}  {target.relative_to(dest)}")
         note(f"{rel(target)}")
+    # Checksum every artifact in the version folder, not just this run's, so a
+    # single-platform rebuild keeps the other platform's entries.
+    patterns = ("*.deb", "*.rpm", "*.AppImage", "*.asc", "windows/*.zip", "linux/*.zip", "windows/*.asc", "linux/*.asc")
+    files = sorted({p for pat in patterns for p in dest.glob(pat) if p.is_file()})
+    lines = [f"{sha256(p)}  {p.relative_to(dest)}" for p in files]
     (dest / "SHA256SUMS").write_text("\n".join(lines) + "\n")
-    note("SHA256SUMS written")
+    note(f"SHA256SUMS written ({len(files)} files)")
 
 
 # --------------------------------------------------------------------------- main
@@ -310,16 +349,18 @@ def main(argv: list[str]) -> int:
             build_service()
             return 0
 
-        if args.skip_service:
-            check_service_present()
-        else:
+        if not args.skip_service:
             build_service()
+        stage_release_service()
         if not args.no_install:
             frontend_deps()
 
         artifacts: list[Path] = []
         if args.what in ("all", "linux"):
-            linux = build_linux()
+            bundles, folder = build_linux(version)
+            linux = list(bundles)
+            if not args.no_zip:
+                linux.append(zip_folder(folder, folder.parent / f"ChaTOR-{version}-linux-x64.zip"))
             if args.sign:
                 linux += sign_linux(linux, cfg.linux)
             artifacts += linux

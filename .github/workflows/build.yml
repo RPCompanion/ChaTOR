@@ -1,4 +1,4 @@
-# Builds ChaTOR for Linux (deb, rpm, AppImage) and Windows (portable zip) with
+# Builds ChaTOR for Linux (portable zip, deb, rpm, AppImage) and Windows (portable zip) with
 # chator-service bundled, on a single Ubuntu runner, using the same script as
 # local release builds (build.py). Windows is cross-compiled with cargo-xwin.
 #
@@ -173,6 +173,7 @@ jobs:
             ChaTOR/release/${{ steps.version.outputs.version }}/*.rpm
             ChaTOR/release/${{ steps.version.outputs.version }}/*.AppImage
             ChaTOR/release/${{ steps.version.outputs.version }}/windows/*.zip
+            ChaTOR/release/${{ steps.version.outputs.version }}/linux/*.zip
             ChaTOR/release/${{ steps.version.outputs.version }}/SHA256SUMS
           if-no-files-found: error
           retention-days: 30
@@ -201,6 +202,7 @@ jobs:
             dist/*.rpm
             dist/*.AppImage
             dist/windows/*.zip
+            dist/linux/*.zip
             dist/SHA256SUMS
           generate_release_notes: true
           prerelease: ${{ contains(github.ref_name, '-') }}
@@ -231,8 +233,8 @@ jobs:
       - name: Push builds
         run: |
           butler -V
-          # Windows: push the folder itself so .itch.toml sits at the build root.
+          # Push the unzipped folders so each .itch.toml sits at the build root.
           unzip -q "dist/windows/ChaTOR-$VERSION-windows-x64.zip" -d win
           butler push win/ChaTOR "$ITCH_PROJECT:win-64" --userversion "$VERSION"
-          mkdir linux && cp dist/*.AppImage linux/ && chmod +x linux/*.AppImage
-          butler push linux "$ITCH_PROJECT:linux-64" --userversion "$VERSION"
+          unzip -q "dist/linux/ChaTOR-$VERSION-linux-x64.zip" -d linux
+          butler push linux/ChaTOR "$ITCH_PROJECT:linux-64" --userversion "$VERSION"
