@@ -120,6 +120,9 @@ export function setup_chat_log_subscriber(): () => void {
         }
     };
 
+    // Single subscriber on (capture setting, chatLogActive, hookedIn). A second
+    // hookedIn-only subscriber used to duplicate the enable call whenever the
+    // game was detected, so the service received every start twice.
     const unsub_settings = useAppStore.subscribe(
         (state) => ({ settings: state.settings, chatLogActive: state.chatLogActive, hookedIn: state.hookedIn }),
         ({ settings, chatLogActive, hookedIn }) => {
@@ -142,23 +145,7 @@ export function setup_chat_log_subscriber(): () => void {
         }
     );
 
-    const unsub_hooked = useAppStore.subscribe(
-        (state) => state.hookedIn,
-        (hookedIn) => {
-            const { chatLogActive, settings } = useAppStore.getState();
-            if (hookedIn && chatLogActive) {
-                return;
-            } else if (hookedIn && !chatLogActive && settings.chat_log.capture_chat_log) {
-                invoke("set_capture_chat_log", { enabled: true }).catch(() => {});
-            } else if (!hookedIn && chatLogActive) {
-                invoke("set_capture_chat_log", { enabled: false }).catch(() => {});
-                useAppStore.getState().setChatLogActive(false);
-            }
-        }
-    );
-
     return () => {
         unsub_settings();
-        unsub_hooked();
     };
 }

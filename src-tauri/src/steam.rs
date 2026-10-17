@@ -2,7 +2,9 @@ use std::path::PathBuf;
 
 use tracing::{error, info};
 
-const SWTOR_APP_ID: &str = "1286830";
+pub const SWTOR_APP_ID: &str = "1286830";
+const SWTOR_INSTALL_DIR: &str = "Star Wars - The Old Republic";
+const SWTOR_EXE_RELATIVE: &str = "swtor/retailclient/swtor.exe";
 
 fn home_dir() -> Option<PathBuf> {
     std::env::var("HOME").ok().map(PathBuf::from)
@@ -48,6 +50,34 @@ pub fn find_steam_library_paths() -> Vec<PathBuf> {
     }
 
     libraries
+}
+
+/// `<library>/steamapps` for every Steam library, in the same form Steam
+/// passes to Proton as STEAM_COMPAT_LIBRARY_PATHS.
+pub fn find_steamapps_paths() -> Vec<PathBuf> {
+    find_steam_library_paths()
+        .into_iter()
+        .map(|l| l.join("steamapps"))
+        .filter(|p| p.exists())
+        .collect()
+}
+
+/// The SWTOR install directory (what Steam passes as STEAM_COMPAT_INSTALL_PATH).
+pub fn find_swtor_install_path() -> Option<PathBuf> {
+    for library in find_steam_library_paths() {
+        let install = library.join("steamapps/common").join(SWTOR_INSTALL_DIR);
+        if install.join(SWTOR_EXE_RELATIVE).exists() {
+            info!("Found SWTOR install at: {}", install.display());
+            return Some(install);
+        }
+    }
+    error!("Could not find SWTOR install directory in any Steam library");
+    None
+}
+
+/// Full path to swtor.exe on the host filesystem.
+pub fn find_swtor_exe_path() -> Option<PathBuf> {
+    find_swtor_install_path().map(|p| p.join(SWTOR_EXE_RELATIVE))
 }
 
 fn extract_vdf_value(line: &str) -> Option<&str> {

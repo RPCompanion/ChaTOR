@@ -23,14 +23,27 @@ pub fn set_capture_chat_log(
         // The service needs the offset table and the dynamic-lookup preference
         // before it injects, so push them first.
         let settings = crate::dal::db::settings::get_settings();
+        let table = crate::offsets::table();
+        tracing::info!(
+            "Sending ConfigureOffsets to service: dynamic_lookup={}, {} version(s)",
+            settings.chat_log.dynamic_offset_lookup,
+            table.versions.len()
+        );
         connection
             .send(FromClient::ConfigureOffsets {
                 dynamic_lookup: settings.chat_log.dynamic_offset_lookup,
-                table: crate::offsets::table(),
+                table,
             })
-            .map_err(|e| e.to_string())?;
+            .map_err(|e| {
+                tracing::error!("ConfigureOffsets not sent: {}", e);
+                e.to_string()
+            })?;
     }
+    tracing::info!("Sending CaptureChatLog({}) to service", enabled);
     connection
         .send(FromClient::CaptureChatLog(enabled))
-        .map_err(|e| e.to_string())
+        .map_err(|e| {
+            tracing::error!("CaptureChatLog({}) not sent: {}", enabled, e);
+            e.to_string()
+        })
 }

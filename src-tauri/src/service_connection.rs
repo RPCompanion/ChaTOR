@@ -7,7 +7,7 @@ use std::thread;
 
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter};
-use tracing::{error, info};
+use tracing::{error, info, warn};
 
 use crate::dal::db::dice_roll::DiceRoll;
 use crate::dal::db::swtor_message::SwtorMessage;
@@ -40,6 +40,9 @@ pub enum FromService {
     },
     KeepWindowInFocus(bool),
     HookReport(HookReport),
+    /// Status text from the service ("error" | "warn" | "info"), logged here
+    /// and shown as a toast.
+    ServiceNotice { level: String, message: String },
 }
 
 type CallbackSender = tokio::sync::oneshot::Sender<Result<(), String>>;
@@ -228,6 +231,17 @@ fn handle_service_message(
                 );
             }
             let _ = app.emit("hook_report", &report);
+        }
+        FromService::ServiceNotice { level, message } => {
+            match level.as_str() {
+                "error" => error!("[service] {}", message),
+                "warn" => warn!("[service] {}", message),
+                _ => info!("[service] {}", message),
+            }
+            let _ = app.emit(
+                "service_notice",
+                serde_json::json!({ "level": level, "message": message }),
+            );
         }
     }
 }

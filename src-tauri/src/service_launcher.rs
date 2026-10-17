@@ -142,15 +142,49 @@ fn launch_via_proton(binary_path: &str, address: &str) -> Option<Child> {
         address
     );
 
-    match Command::new("python3")
+    // Proton rewrites the prefix's drive letters on every `proton run`: without
+    // STEAM_COMPAT_LIBRARY_PATHS / STEAM_COMPAT_INSTALL_PATH it *removes* the
+    // game drive (S:) that Steam created when it launched SWTOR, which breaks
+    // the running game's own paths and stops the service from hashing
+    // swtor.exe. So we pass the same variables Steam does.
+    let library_paths = steam::find_steamapps_paths();
+    let library_paths_env = std::env::join_paths(&library_paths)
+        .map(|s| s.to_string_lossy().into_owned())
+        .unwrap_or_default();
+    let swtor_install = steam::find_swtor_install_path();
+    let swtor_exe = steam::find_swtor_exe_path();
+    // Fallback the service can read even if the S: drive letter is missing:
+    // Wine always maps Z: to the host root.
+    let swtor_exe_fallback = swtor_exe
+        .as_ref()
+        .map(|p| format!("Z:{}", p.display().to_string().replace('/', "\\")));
+
+    let mut command = Command::new("python3");
+    command
         .arg(&proton_path)
         .arg("run")
         .arg(binary_path)
         .arg(address)
         .env("STEAM_COMPAT_DATA_PATH", &compat_data_path)
         .env("STEAM_COMPAT_CLIENT_INSTALL_PATH", &steam_install_path)
-        .spawn()
-    {
+        .env("STEAM_COMPAT_APP_ID", steam::SWTOR_APP_ID)
+        .env("STEAM_COMPAT_LIBRARY_PATHS", &library_paths_env);
+    if let Some(install) = &swtor_install {
+        command.env("STEAM_COMPAT_INSTALL_PATH", install);
+    }
+    if let Some(fallback) = &swtor_exe_fallback {
+        command.env("CHATOR_SWTOR_EXE", fallback);
+    }
+
+    info!(
+        "Service environment:\n  STEAM_COMPAT_APP_ID={}\n  STEAM_COMPAT_LIBRARY_PATHS={}\n  STEAM_COMPAT_INSTALL_PATH={}\n  CHATOR_SWTOR_EXE={}",
+        steam::SWTOR_APP_ID,
+        library_paths_env,
+        swtor_install.as_ref().map(|p| p.display().to_string()).unwrap_or_else(|| "<not found>".into()),
+        swtor_exe_fallback.as_deref().unwrap_or("<not found>")
+    );
+
+    match command.spawn() {
         Ok(child) => {
             info!("Service launched via Proton (pid: {})", child.id());
             Some(child)

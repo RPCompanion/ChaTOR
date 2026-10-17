@@ -25,6 +25,7 @@ export async function init_network(): Promise<() => void> {
 
     const cleanupHook = init_hook();
     init_hook_report_listener();
+    init_service_notice_listener();
     init_swtor_message_listener();
     init_dice_roll_listener();
     init_custom_emotes();
@@ -75,6 +76,21 @@ function init_hook_report_listener() {
             toast.error(`Chat logging hooks failed to install (${names}). This game version may need updated offsets.`);
         } else {
             toast.warn(`Some chat logging hooks failed to install: ${names}.`);
+        }
+    });
+}
+
+/// Status messages from chator-service (checksum problems, unsupported build,
+/// injection waiting). Also written to the ChaTOR log by the Rust side.
+function init_service_notice_listener() {
+    listen("service_notice", (event: any) => {
+        const { level, message } = event.payload as { level: string; message: string };
+        if (level === "error") {
+            toast.error(message, { autoClose: false });
+        } else if (level === "warn") {
+            toast.warn(message);
+        } else {
+            toast.info(message);
         }
     });
 }
