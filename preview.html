@@ -1,7 +1,7 @@
 <!doctype html>
 <!-- Dev-only preview of the UI in a normal browser (no Tauri). Not part of the build.
      Open http://localhost:<vite port>/preview.html#/automatic
-     Query flags: capture=1 (chat log window), theme=dark|lighter|light -->
+     Query flags: capture=1 (chat log window), theme=dark|lighter|light, click=Label,Label (press buttons after load), hover=Text (show a tooltip) -->
 <html lang="en" data-theme="lighter">
   <head>
     <meta charset="UTF-8" />
@@ -49,6 +49,29 @@
         };
         window.__TAURI_INTERNALS__.invoke.__shim = true;
         const s = document.createElement("script"); s.type = "module"; s.src = "/src/main.tsx"; document.body.appendChild(s);
+        // ?click=<aria-label or button text>,<...>  clicks those buttons in order after load
+        const clicks = (q.get("click") || "").split(",").filter(Boolean);
+        if (clicks.length) {
+          let i = 0;
+          const tick = () => {
+            if (i >= clicks.length) return;
+            const want = clicks[i];
+            const btn = [...document.querySelectorAll("button")].find(
+              (b) => b.getAttribute("aria-label") === want || b.textContent.trim() === want
+            );
+            if (btn) { btn.click(); i++; }
+            setTimeout(tick, 300);
+          };
+          setTimeout(tick, 800);
+        }
+        // ?hover=<text>  fires mouseover on the first element containing that text (tooltips)
+        const hover = q.get("hover");
+        if (hover) {
+          setTimeout(() => {
+            const el = [...document.querySelectorAll("div,span,button")].find((e) => e.children.length === 0 && e.textContent.trim() === hover);
+            if (el) el.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+          }, 1200);
+        }
       })();
     </script>
   </head>

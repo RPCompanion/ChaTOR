@@ -5,10 +5,12 @@ import { AnimatePresence, motion } from "framer-motion";
 interface TooltipProps {
     tooltip_text: string;
     placement: Side;
+    /// Render line breaks and wrap long text (default: single line).
+    multiline?: boolean;
     children: React.ReactNode;
 }
 
-export default function Tooltip({ tooltip_text, placement, children }: TooltipProps) {
+export default function Tooltip({ tooltip_text, placement, multiline = false, children }: TooltipProps) {
     const elemRef = useRef<HTMLDivElement>(null);
     const tooltipRef = useRef<HTMLDivElement>(null);
     const [show_tooltip, setShowTooltip] = useState(false);
@@ -42,12 +44,13 @@ export default function Tooltip({ tooltip_text, placement, children }: TooltipPr
                 {show_tooltip && (
                     <motion.div
                         ref={tooltipRef}
-                        className="text-ink-100 text-xs absolute panel panel-glass px-2 py-1 select-none z-50 whitespace-nowrap"
+                        className={`text-ink-100 text-xs absolute panel panel-glass px-2.5 py-1.5 select-none z-50 pointer-events-none
+                            ${multiline ? "whitespace-pre-line max-w-72 leading-relaxed" : "whitespace-nowrap"}`}
                         style={{ left: pos.x, top: pos.y }}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 0.5 }}
+                        transition={{ duration: 0.15 }}
                     >
                         {tooltip_text}
                     </motion.div>

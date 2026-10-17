@@ -5,6 +5,7 @@ import { Heart, GithubLogo, DiscordLogo, Folder } from "@phosphor-icons/react";
 import { useAppStore } from "../store/useAppStore";
 import Checkbox from "../lib/Checkbox";
 import { open_link } from "../lib/network";
+import CaptureStatusIndicator from "../components/CaptureStatusIndicator";
 
 const appWindow = getCurrentWebviewWindow();
 
@@ -38,6 +39,7 @@ export default function FooterControls() {
                 )}
             </div>
             <div className="flex items-center gap-1">
+                <CaptureStatusIndicator />
                 <Checkbox
                     checked={settings.app.always_on_top}
                     onChange={(v) => updateSettings((draft) => { draft.app.always_on_top = v; })}

@@ -5,10 +5,25 @@ import type { ISettings } from '../lib/network/settings';
 import { default_settings } from '../lib/network/settings';
 import type { LocalCharacterInfo } from '../lib/network/local_characters';
 
+/// What the footer indicator shows about chat capture.
+///   off      capture disabled in settings
+///   no_game  capture on, SWTOR window not found
+///   pending  capture requested, waiting for the DLL's hook report
+///   active   chat hook installed (all hooks ok)
+///   partial  chat hook installed, some optional hooks failed
+///   failed   chat hook could not be installed
+export type CaptureStatus = "off" | "no_game" | "pending" | "active" | "partial" | "failed";
+export interface CaptureStatusDetail {
+    status: CaptureStatus;
+    detail?: string;
+}
+
 interface AppStore {
     settings: ISettings;
     chatLogActive: boolean;
     hookedIn: boolean;
+    captureStatus: CaptureStatusDetail;
+    setCaptureStatus: (s: CaptureStatus, detail?: string) => void;
     activeCharacter: LocalCharacterInfo | undefined;
     shownCharactersError: boolean;
     setSettings: (settings: ISettings) => void;
@@ -24,6 +39,8 @@ export const useAppStore = create<AppStore>()(
         settings: default_settings(),
         chatLogActive: false,
         hookedIn: false,
+        captureStatus: { status: "off" },
+        setCaptureStatus: (status, detail) => set({ captureStatus: { status, detail } }),
         activeCharacter: undefined,
         shownCharactersError: false,
         setSettings: (settings) => set({ settings }),

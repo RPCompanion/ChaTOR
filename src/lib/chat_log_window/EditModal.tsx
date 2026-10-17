@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
+import XButton from "../buttons/XButton";
 import { toast } from "react-toastify";
 import { Result, Ok, Err } from "../result";
 import type { IChatTab } from "../network/settings";
@@ -64,45 +65,67 @@ export default function EditModal({ index, chat_tab: initial_tab, onSave, onCanc
         onSave(trimmed);
     }
 
+    const selected_count = chat_tab.channels.length;
+
     return (
         <motion.div
-            className="w-72 min-h-48 panel panel-glass p-3 fixed z-20 flex flex-col gap-2"
-            style={{ top: "calc(50% - 12rem)", left: "calc(50% - 9rem)" }}
-            initial={{ y: -1000 }}
-            animate={{ y: 0 }}
-            exit={{ y: -1000 }}
-            transition={{ duration: 0.5 }}
+            className="fixed inset-0 z-20 grid place-items-center bg-space-950/60 backdrop-blur-[2px]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            onMouseDown={(e) => { if (e.target === e.currentTarget) onCancel(); }}
         >
-            <input
-                type="text"
-                value={chat_tab.name}
-                onChange={(e) => setChatTab((t) => ({ ...t, name: e.target.value }))}
-                maxLength={12}
-                className="input"
-                placeholder="tab name"
-            />
-            <p className="eyebrow mt-1">Channel subscriptions</p>
-            <ChannelList
-                channels={chat_tab.channels}
-                show_custom_channels={true}
-                onChannelInput={(channels) => setChatTab((t) => ({ ...t, channels }))}
-            />
-            <div className="flex flex-row gap-1">
-                <button
-                    type="button"
-                    className="btn w-1/2"
-                    onClick={on_save}
-                >
-                    Save
-                </button>
-                <button
-                    type="button"
-                    className="btn w-1/2"
-                    onClick={onCancel}
-                >
-                    Cancel
-                </button>
-            </div>
+            <motion.div
+                className="panel panel-glass w-[26rem] max-w-[92vw] max-h-[85vh] overflow-y-auto scrollbar-thin scrollbar-thumb-holo-900 scrollbar-track-space-950 p-4 flex flex-col gap-4"
+                initial={{ y: -24, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -24, opacity: 0 }}
+                transition={{ duration: 0.18 }}
+            >
+                <div className="flex items-center justify-between">
+                    <h1 className="eyebrow">{index == undefined ? "New chat tab" : "Edit chat tab"}</h1>
+                    <XButton onClick={onCancel} />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                    <label className="text-xs text-ink-300" htmlFor="chat-tab-name">Tab name</label>
+                    <div className="relative">
+                        <input
+                            id="chat-tab-name"
+                            type="text"
+                            value={chat_tab.name}
+                            onChange={(e) => setChatTab((t) => ({ ...t, name: e.target.value }))}
+                            onKeyDown={(e) => { if (e.key === "Enter") on_save(); if (e.key === "Escape") onCancel(); }}
+                            maxLength={CHAT_TAB_MAX_LENGTH}
+                            className="input pr-12"
+                            placeholder="e.g. Guild"
+                            autoFocus
+                        />
+                        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-ink-500 tabular-nums">
+                            {chat_tab.name.length}/{CHAT_TAB_MAX_LENGTH}
+                        </span>
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                    <div className="flex items-baseline justify-between">
+                        <span className="text-xs text-ink-300">Channels shown in this tab</span>
+                        <span className="text-[10px] text-ink-500 tabular-nums">{selected_count} selected</span>
+                    </div>
+                    <div className="holo-line mb-2"></div>
+                    <ChannelList
+                        channels={chat_tab.channels}
+                        show_custom_channels={true}
+                        onChannelInput={(channels) => setChatTab((t) => ({ ...t, channels }))}
+                    />
+                </div>
+
+                <div className="flex flex-row gap-2 pt-1">
+                    <button type="button" className="btn btn-primary w-1/2" onClick={on_save}>Save</button>
+                    <button type="button" className="btn w-1/2" onClick={onCancel}>Cancel</button>
+                </div>
+            </motion.div>
         </motion.div>
     );
 }

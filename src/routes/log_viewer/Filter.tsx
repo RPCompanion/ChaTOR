@@ -44,10 +44,11 @@ export default function Filter({ channel_filters, onChannelFiltersChange }: Filt
             {show_filters && (
                 <div
                     ref={dropdownRef}
-                    className="absolute top-10 z-10 panel panel-glass p-3 animate-fade-in"
+                    className="absolute top-10 z-10 panel panel-glass p-3 animate-fade-in w-80"
                 >
+                    <div className="eyebrow mb-2">Channels</div>
                     <ChannelList channels={channel_filters} onChannelInput={onChannelFiltersChange} />
-                    <div className="flex flex-row gap-2">
+                    <div className="flex flex-row gap-2 mt-3">
                         <SmallButton onClick={select_all_channels}>Select All</SmallButton>
                         <SmallButton onClick={deselect_all_channels}>Deselect All</SmallButton>
                     </div>

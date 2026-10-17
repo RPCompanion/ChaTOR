@@ -115,6 +115,9 @@ export function setup_chat_log_subscriber(): () => void {
     let shown_unsupported_version = false;
 
     const handle_capture_error = (e: CaptureError) => {
+        if (e !== "AlreadyInjected" && e !== "NotYetFullyReady") {
+            useAppStore.getState().setCaptureStatus("failed", String(e));
+        }
         if (e === "UnsupportedVersion") {
             if (!shown_unsupported_version) {
                 toast.error("Unsupported version of SWTOR detected. Chat log capture will not work.");
@@ -137,6 +140,7 @@ export function setup_chat_log_subscriber(): () => void {
                 // The "Chat logging active" toast is shown when the DLL's hook
                 // report arrives (see init_hook_report_listener), not here: this
                 // only means the request reached the service.
+                useAppStore.getState().setCaptureStatus("pending");
                 invoke("set_capture_chat_log", { enabled: true })
                     .then(() => {
                         useAppStore.getState().setChatLogActive(true);
@@ -147,6 +151,11 @@ export function setup_chat_log_subscriber(): () => void {
                 // guard a spurious CaptureChatLog(false) went out at startup.
                 invoke("set_capture_chat_log", { enabled: false }).catch(() => {});
                 useAppStore.getState().setChatLogActive(false);
+                useAppStore.getState().setCaptureStatus(settings.chat_log.capture_chat_log ? "no_game" : "off");
+            } else if (!settings.chat_log.capture_chat_log) {
+                useAppStore.getState().setCaptureStatus("off");
+            } else if (!hookedIn) {
+                useAppStore.getState().setCaptureStatus("no_game");
             }
         },
         { equalityFn: (a, b) =>

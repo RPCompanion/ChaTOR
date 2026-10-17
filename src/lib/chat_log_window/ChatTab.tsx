@@ -42,12 +42,16 @@ export default function ChatTab({ chat_tab, index }: ChatTabProps) {
         swtor_channel_messages.find((c) => c.chat_tab_name === chat_tab.name)?.messages.filter((m) => !is_dice_roll(m) && !m.read).length ?? 0;
 
     function on_click() {
-        if (active_chat_tab_index === index) {
-            setShowEditTab((v) => !v);
-            return;
-        }
+        setShowEditTab(false);
+        if (active_chat_tab_index === index) return;
         setActiveChatTabIndex(index);
         set_swtor_channel_messages_to_read(settings.chat_log.window.chat_tabs[index].name);
+    }
+
+    /// Right click opens the tab menu (Edit / Clear Chat / Delete).
+    function on_context_menu(event: React.MouseEvent) {
+        event.preventDefault();
+        setShowEditTab((v) => !v);
     }
 
     function on_delete() {
@@ -107,6 +111,8 @@ export default function ChatTab({ chat_tab, index }: ChatTabProps) {
                     type="button"
                     className={`chat-tab ${active_chat_tab_index === index ? "active" : ""}`}
                     onClick={on_click}
+                    onContextMenu={on_context_menu}
+                    title="Right click for options"
                 >
                     {chat_tab.name}
                 </button>

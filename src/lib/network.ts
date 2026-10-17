@@ -62,24 +62,30 @@ interface HookReport {
     hooks: HookStatus[];
 }
 
-/// Surfaces the DLL's hook installation result. Hooks that could not be
-/// installed mean that part of chat logging (chat, rolls, sending) is inactive.
+/// Turns the DLL's hook installation result into the footer capture indicator.
+/// Success is shown there (no toast); failures still toast because they need
+/// attention.
 function init_hook_report_listener() {
     listen("hook_report", (event: any) => {
         const report = event.payload as HookReport;
+        const setCaptureStatus = useAppStore.getState().setCaptureStatus;
         const failed = report.hooks.filter((h) => !h.installed);
+        const chat_ok = report.hooks.find((h) => h.name === "chat_recv")?.installed ?? false;
+        const summary = report.hooks
+            .map((h) => `${h.name}: ${h.installed ? "ok" : "failed"}${h.detail ? ` (${h.detail})` : ""}`)
+            .join("\n");
+
         if (failed.length === 0) {
-            toast.success("Chat logging active");
+            setCaptureStatus("active", summary);
             return;
         }
-        if (report.hooks.find((h) => h.name === "chat_recv")?.installed) {
-            toast.success("Chat logging active (some optional hooks failed)");
-        }
         const names = failed.map((h) => h.name).join(", ");
-        if (failed.length === report.hooks.length) {
-            toast.error(`Chat logging hooks failed to install (${names}). This game version may need updated offsets.`);
-        } else {
+        if (chat_ok) {
+            setCaptureStatus("partial", summary);
             toast.warn(`Some chat logging hooks failed to install: ${names}.`);
+        } else {
+            setCaptureStatus("failed", summary);
+            toast.error(`Chat logging hooks failed to install (${names}). This game version may need updated offsets.`);
         }
     });
 }

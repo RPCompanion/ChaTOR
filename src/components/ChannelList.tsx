@@ -6,82 +6,135 @@ import { ESwtorChannel } from "../lib/network/swtor_channel";
 interface ChannelListProps {
     channels: ChannelDispatcher[];
     show_custom_channels?: boolean;
+    /// Compact single group instead of labelled sections (used by the log filter).
+    compact?: boolean;
     onChannelInput: (channels: ChannelDispatcher[]) => void;
 }
 
-export default function ChannelList({ channels, show_custom_channels = false, onChannelInput }: ChannelListProps) {
+interface ChannelGroup {
+    title: string;
+    channels: { id: ESwtorChannel; label: string }[];
+}
+
+/// Human labels, grouped the way the game's chat settings present them.
+/// CUSTOM_CHANNEL is an internal marker and is never listed.
+export const CHANNEL_GROUPS: ChannelGroup[] = [
+    {
+        title: "Local",
+        channels: [
+            { id: ESwtorChannel.SAY, label: "Say" },
+            { id: ESwtorChannel.YELL, label: "Yell" },
+            { id: ESwtorChannel.EMOTE, label: "Emote" },
+            { id: ESwtorChannel.WHISPER, label: "Whisper" },
+        ],
+    },
+    {
+        title: "Global",
+        channels: [
+            { id: ESwtorChannel.GLOBAL, label: "Global" },
+            { id: ESwtorChannel.PVP, label: "PvP" },
+            { id: ESwtorChannel.TRADE, label: "Trade" },
+        ],
+    },
+    {
+        title: "Group & Guild",
+        channels: [
+            { id: ESwtorChannel.GROUP, label: "Group" },
+            { id: ESwtorChannel.OP, label: "Ops" },
+            { id: ESwtorChannel.OPS_OFFICER, label: "Ops Officer" },
+            { id: ESwtorChannel.OPS_ANNOUNCEMENT, label: "Ops Announcement" },
+            { id: ESwtorChannel.GUILD, label: "Guild" },
+            { id: ESwtorChannel.GUILD_OFFICER, label: "Guild Officer" },
+        ],
+    },
+];
+
+interface ChipProps {
+    label: string;
+    selected: boolean;
+    onToggle: () => void;
+}
+
+function Chip({ label, selected, onToggle }: ChipProps) {
+    return (
+        <button
+            type="button"
+            role="checkbox"
+            aria-checked={selected}
+            onClick={onToggle}
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xs border text-xs select-none transition-colors
+                ${selected
+                    ? "border-holo-500/70 bg-holo-500/15 text-holo-300 shadow-[0_0_10px_rgb(var(--holo-rgb)/0.2)]"
+                    : "border-holo-500/20 bg-space-800/50 text-ink-300 hover:text-ink-100 hover:border-holo-500/50"}`}
+        >
+            <span className={`inline-block w-1.5 h-1.5 rounded-full ${selected ? "bg-holo-500" : "bg-ink-500"}`}></span>
+            {label}
+        </button>
+    );
+}
+
+export default function ChannelList({ channels, show_custom_channels = false, compact = false, onChannelInput }: ChannelListProps) {
     const custom_channels = useChannelStore((s) => s.customChannels);
-    const channel_strings = Object.keys(ESwtorChannel).filter((key) => isNaN(Number(key)));
 
-    const select_channel_numbers = channels
-        .filter((c): c is { RegularDispatch: number } => "RegularDispatch" in c)
-        .map((c) => c.RegularDispatch);
+    const regular_selected = new Set(
+        channels.filter((c): c is { RegularDispatch: number } => "RegularDispatch" in c).map((c) => c.RegularDispatch)
+    );
+    const custom_selected = new Set(
+        channels.filter((c): c is { CustomDispatch: string } => "CustomDispatch" in c).map((c) => c.CustomDispatch)
+    );
 
-    const selected_custom_channels = channels
-        .filter((c): c is { CustomDispatch: string } => "CustomDispatch" in c)
-        .map((c) => c.CustomDispatch);
-
-    function on_channel_input(channel: string) {
-        const channel_number = Number(ESwtorChannel[channel as keyof typeof ESwtorChannel]);
-        const index = channels.findIndex((c) => "RegularDispatch" in c && c.RegularDispatch === channel_number);
-        let updated: ChannelDispatcher[];
-        if (index === -1) {
-            updated = [...channels, { RegularDispatch: channel_number }];
-        } else {
-            updated = channels.filter((_, i) => i !== index);
-        }
-        onChannelInput(updated);
+    function toggle_regular(id: number) {
+        const exists = channels.some((c) => "RegularDispatch" in c && c.RegularDispatch === id);
+        onChannelInput(exists
+            ? channels.filter((c) => !("RegularDispatch" in c && c.RegularDispatch === id))
+            : [...channels, { RegularDispatch: id }]);
     }
 
-    function on_custom_channel_input(channel: string) {
-        const index = channels.findIndex((c) => "CustomDispatch" in c && c.CustomDispatch === channel);
-        let updated: ChannelDispatcher[];
-        if (index === -1) {
-            updated = [...channels, { CustomDispatch: channel }];
-        } else {
-            updated = channels.filter((_, i) => i !== index);
-        }
-        onChannelInput(updated);
-    }
-
-    function swtor_channel_is_checked(channel: string): boolean {
-        return select_channel_numbers.includes(Number(ESwtorChannel[channel as keyof typeof ESwtorChannel]));
+    function toggle_custom(name: string) {
+        const exists = channels.some((c) => "CustomDispatch" in c && c.CustomDispatch === name);
+        onChannelInput(exists
+            ? channels.filter((c) => !("CustomDispatch" in c && c.CustomDispatch === name))
+            : [...channels, { CustomDispatch: name }]);
     }
 
     return (
-        <>
-            {channel_strings.map((channel) => (
-                <div key={channel} className="flex flex-row gap-1">
-                    <input
-                        type="checkbox"
-                        id={channel}
-                        name={channel}
-                        checked={swtor_channel_is_checked(channel)}
-                        onChange={() => on_channel_input(channel)}
-                        className="text-lg"
-                    />
-                    <label htmlFor={channel} className="text-ink-100 text-lg">{channel}</label>
+        <div className="flex flex-col gap-3">
+            {CHANNEL_GROUPS.map((group) => (
+                <div key={group.title}>
+                    {!compact && <div className="eyebrow text-[10px] mb-1.5">{group.title}</div>}
+                    <div className="flex flex-wrap gap-1.5">
+                        {group.channels.map((ch) => (
+                            <Chip
+                                key={ch.id}
+                                label={ch.label}
+                                selected={regular_selected.has(ch.id)}
+                                onToggle={() => toggle_regular(ch.id)}
+                            />
+                        ))}
+                    </div>
                 </div>
             ))}
             {show_custom_channels && (
-                <>
-                    <div className="border-2"></div>
-                    <p className="text-ink-100 text-lg"><b>Custom Channels</b></p>
-                    {custom_channels.map((channel) => (
-                        <div key={channel.channel_name} className="flex flex-row gap-1">
-                            <input
-                                type="checkbox"
-                                id={channel.channel_name}
-                                name={channel.channel_name}
-                                checked={selected_custom_channels.includes(channel.channel_name)}
-                                onChange={() => on_custom_channel_input(channel.channel_name)}
-                                className="text-lg"
-                            />
-                            <label htmlFor={channel.channel_name} className="text-ink-100 text-lg">{channel.channel_name}</label>
+                <div>
+                    <div className="eyebrow text-[10px] mb-1.5">Custom channels</div>
+                    {custom_channels.length === 0 ? (
+                        <div className="text-xs text-ink-500">
+                            None yet. Add them under Chat → Add/Edit Custom Channels.
                         </div>
-                    ))}
-                </>
+                    ) : (
+                        <div className="flex flex-wrap gap-1.5">
+                            {custom_channels.map((channel) => (
+                                <Chip
+                                    key={channel.channel_name}
+                                    label={channel.channel_name}
+                                    selected={custom_selected.has(channel.channel_name)}
+                                    onToggle={() => toggle_custom(channel.channel_name)}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </div>
             )}
-        </>
+        </div>
     );
 }

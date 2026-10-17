@@ -129,7 +129,7 @@ export default function ChatLogWindow({ onWhisper }: ChatLogWindowProps) {
                 <div className="grid grid-cols-[1fr_auto]">
                     <ChatTabs />
                     <div className="flex justify-end items-center">
-                        <button className="text-ink-100 hover:text-holo-300" onClick={() => setShowChannelColorPicker(true)}>
+                        <button className="text-ink-100 hover:text-holo-300" aria-label="Channel colors" title="Channel colors" onClick={() => setShowChannelColorPicker(true)}>
                             <Gear size={26} />
                         </button>
                     </div>

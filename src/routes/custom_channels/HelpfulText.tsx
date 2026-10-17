@@ -15,6 +15,9 @@ export default function HelpfulText() {
                 </span>
             </span>
             <p className="text-ink-100 text-sm">The channel name should match the in game channel that you joined.</p>
+            <p className="text-ink-300 text-sm mt-2">
+                Once added, right click a chat tab in the chat log window and choose <b>Edit</b> to show the channel in that tab.
+            </p>
         </div>
     );
 }
