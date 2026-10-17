@@ -10,11 +10,11 @@ export default function PageFormatting({ title, children }: PageFormattingProps)
     const settings = useAppStore((s) => s.settings);
 
     return (
-        <div className="p-10 relative">
+        <div className="px-8 py-6 relative">
             {title != undefined && settings.app.show_page_header && (
                 <>
-                    <div className="text-white text-2xl text-center bg-slate-600 select-none">{title}</div>
-                    <div className="h-8"></div>
+                    <div className="title-bar select-none">{title}</div>
+                    <div className="h-6"></div>
                 </>
             )}
             {children}

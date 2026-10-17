@@ -25,7 +25,7 @@ export default function EmoteBoardPage() {
                             onClick={() => on_emote_click(emote)}
                             my_classes={
                                 emote.favourite
-                                    ? "bg-yellow-500 text-black text-2xl px-2 rounded-md hover:text-white"
+                                    ? "bg-ember-500 text-black text-lg px-2 rounded-sm hover:text-ink-100"
                                     : undefined
                             }
                         >

@@ -4,6 +4,7 @@ import SettingSection from "./SettingSection";
 import SettingsToggle from "./SettingsToggle";
 import SettingsRangeSlider from "./SettingsRangeSlider";
 import Setting from "./Setting";
+import { THEMES, type Theme } from "../../lib/network/settings";
 
 export default function AppSettings() {
     const settings = useAppStore((s) => s.settings);
@@ -11,11 +12,16 @@ export default function AppSettings() {
 
     return (
         <SettingSection section="App Settings">
-            <Setting setting="Show background image">
-                <SettingsToggle
-                    checked={settings.app.show_background_image}
-                    onChange={(v) => updateSettings((d) => { d.app.show_background_image = v; })}
-                />
+            <Setting setting="Theme" sub_text="Dark, the default lighter navy, or a light palette.">
+                <select
+                    className="input w-44 py-1 text-sm"
+                    value={settings.app.theme ?? "lighter"}
+                    onChange={(e) => updateSettings((d) => { d.app.theme = e.target.value as Theme; })}
+                >
+                    {THEMES.map((t) => (
+                        <option key={t.value} value={t.value}>{t.label}</option>
+                    ))}
+                </select>
             </Setting>
             <Setting setting="Show window decorations" sub_text="Disable setting for a more seamless looking window.">
                 <SettingsToggle

@@ -47,7 +47,7 @@ export default function EmoteModal({ show_modal, onSave, onCancel }: EmoteModalP
         <AnimatePresence>
             {show_modal && (
                 <motion.div
-                    className="w-2/3 bg-slate-800 h-32 rounded-md shadow-md fixed z-50"
+                    className="w-2/3 panel panel-glass py-4 fixed z-50"
                     style={{ top: "calc(33% - 4rem)", left: "calc(50% - 33%)" }}
                     initial={{ y: -500 }}
                     animate={{ y: 0 }}
@@ -65,7 +65,7 @@ export default function EmoteModal({ show_modal, onSave, onCancel }: EmoteModalP
                                 name="EmoteName"
                                 autoComplete="off"
                                 placeholder="Emote Name"
-                                className="w-1/2 px-1 text-xl outline-hidden"
+                                className="input w-1/2 py-1"
                                 value={emote_name}
                                 onChange={(e) => setEmoteName(e.target.value)}
                             />
@@ -74,15 +74,15 @@ export default function EmoteModal({ show_modal, onSave, onCancel }: EmoteModalP
                                 name="UniqueEmote"
                                 autoComplete="off"
                                 placeholder="Emote"
-                                className={`w-1/2 px-1 text-xl outline-hidden ${emote.length > GAME_MESSAGE_MAXIMUM ? "outline-red-500" : ""}`}
+                                className={`input w-1/2 py-1 ${emote.length > GAME_MESSAGE_MAXIMUM ? "border-danger-500!" : ""}`}
                                 value={emote}
                                 onChange={(e) => setEmote(e.target.value)}
                             />
                             <button type="submit" className="hidden">Submit</button>
                         </form>
                         <div className="flex flex-row gap-2">
-                            <button type="button" className="bg-slate-700 text-white text-xl px-2 rounded-md" onClick={on_save}>Save</button>
-                            <button type="button" className="bg-slate-700 text-white text-xl px-2 rounded-md" onClick={on_cancel}>Cancel</button>
+                            <button type="button" className="btn btn-primary" onClick={on_save}>Save</button>
+                            <button type="button" className="btn" onClick={on_cancel}>Cancel</button>
                         </div>
                     </div>
                 </motion.div>

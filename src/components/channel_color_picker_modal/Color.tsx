@@ -25,7 +25,7 @@ export default function Color({ text, color, onColorChange }: ColorProps) {
 
     return (
         <div className="grid grid-cols-2">
-            <p className="text-white">{text}</p>
+            <p className="text-ink-100">{text}</p>
             <HexColorPicker color={to_hex(color)} onChange={(hex) => onColorChange(from_hex(hex))} />
         </div>
     );

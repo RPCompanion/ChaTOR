@@ -44,20 +44,20 @@ export default function AutomaticConfirmation({
     return (
         <AnimatePresence>
             {show_modal && (
-                <div className="z-20 w-full h-full absolute left-0 top-0">
+                <div className="z-20 fixed inset-0 bg-space-950/60 backdrop-blur-[2px]">
                     <motion.div
-                        className="flex flex-col gap-2 absolute w-3/4 bg-slate-700 rounded-md border-black border-2"
+                        className="panel panel-glass flex flex-col gap-3 absolute w-3/4 p-4"
                         style={{ left: "calc(50% - 37.5%)", top: "100px" }}
-                        initial={{ y: -500 }}
-                        animate={{ y: 0 }}
-                        exit={{ y: -500 }}
-                        transition={{ duration: 0.4 }}
+                        initial={{ y: -24, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: -24, opacity: 0 }}
+                        transition={{ duration: 0.18 }}
                     >
-                        <div className="text-white text-2xl text-center">Auto format - Final edits</div>
+                        <div className="title-bar">Final edits</div>
                         {messages.map((message, idx) => (
                             <textarea
                                 key={idx}
-                                className="w-full outline-hidden p-1 rounded-md border-2 resize-none"
+                                className="input resize-none"
                                 maxLength={GAME_MESSAGE_MAXIMUM}
                                 value={message}
                                 onChange={(e) => {
@@ -68,8 +68,8 @@ export default function AutomaticConfirmation({
                             />
                         ))}
                         <div className="flex flex-row gap-2">
-                            <button type="button" className="bg-slate-800 text-white w-1/2" onClick={onSubmit}>Submit</button>
-                            <button type="button" className="bg-slate-800 text-white w-1/2" onClick={onCancel}>Cancel</button>
+                            <button type="button" className="btn btn-primary w-1/2" onClick={onSubmit}>Submit</button>
+                            <button type="button" className="btn w-1/2" onClick={onCancel}>Cancel</button>
                         </div>
                     </motion.div>
                 </div>

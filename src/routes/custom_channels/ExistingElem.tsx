@@ -50,10 +50,10 @@ export default function ExistingElem({ channel: initial_channel }: ExistingElemP
                 value={channel.channel_name}
                 onChange={(e) => setChannel((c) => ({ ...c, channel_name: e.target.value }))}
                 onBlur={on_change}
-                className="rounded-md outline-slate-700 border-2 border-slate-700 px-2"
+                className="input w-auto py-1"
             />
             <div className="flex flex-row gap-2">
-                <div className="text-white text-xl">Channel Number</div>
+                <div className="text-ink-100 text-lg">Channel Number</div>
                 <select
                     value={channel.channel_number}
                     onChange={(e) => {
@@ -61,7 +61,7 @@ export default function ExistingElem({ channel: initial_channel }: ExistingElemP
                         setChannel(updated);
                         custom_channel_save(updated);
                     }}
-                    className="rounded-md outline-slate-700 border-2 border-slate-700 px-2"
+                    className="input w-auto py-1"
                 >
                     {get_available_channels(channel.channel_number).map((n) => (
                         <option key={n} value={n}>{n}</option>

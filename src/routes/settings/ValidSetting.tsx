@@ -9,7 +9,7 @@ interface ValidSettingProps {
 export default function ValidSetting({ setting, valid }: ValidSettingProps) {
     return (
         <div className="flex flex-row gap-1">
-            <div className="text-white">{setting}</div>
+            <div className="text-ink-100">{setting}</div>
             <div>
                 {valid ? <SealCheck size={24} color="green" /> : <XCircle size={24} color="red" />}
             </div>

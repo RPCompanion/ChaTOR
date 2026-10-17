@@ -13,7 +13,7 @@ import { useAppStore } from "../../store/useAppStore";
 import { useChatLogStore } from "../../store/useChatLogStore";
 import ChatTab from "./ChatTab";
 import EditModal from "./EditModal";
-import { add_swtor_channel, set_swtor_channel_messages_to_read } from "../network/swtor_message/swtor_chat_tab_messages";
+import { add_swtor_channel } from "../network/swtor_message/swtor_chat_tab_messages";
 import type { IChatTab } from "../network/settings";
 import { deep_copy } from "../utils";
 
@@ -21,11 +21,14 @@ export default function ChatTabs() {
     const settings = useAppStore((s) => s.settings);
     const updateSettings = useAppStore((s) => s.updateSettings);
     const active_chat_tab_index = useChatLogStore((s) => s.activeChatTabIndex);
+    const setActiveChatTabIndex = useChatLogStore((s) => s.setActiveChatTabIndex);
     const [show_edit_modal, setShowEditModal] = useState(false);
     const sensors = useSensors(useSensor(PointerSensor));
 
     const chat_tabs = settings.chat_log.window.chat_tabs;
-    const items = chat_tabs.map((_, index) => index);
+    // Sortable ids must identify the *tab*, not its slot. With index ids the
+    // dragged item snapped back to its old slot while the labels swapped.
+    const items = chat_tabs.map((tab) => tab.name);
 
     function on_modal_save(new_tab: IChatTab) {
         updateSettings((draft) => {
@@ -38,13 +41,19 @@ export default function ChatTabs() {
     function on_drag_end(event: DragEndEvent) {
         const { active, over } = event;
         if (!over || active.id === over.id) return;
-        const old_index = items.indexOf(active.id as number);
-        const new_index = items.indexOf(over.id as number);
+        const old_index = items.indexOf(active.id as string);
+        const new_index = items.indexOf(over.id as string);
+        if (old_index === -1 || new_index === -1) return;
+        const active_tab_name = chat_tabs[active_chat_tab_index]?.name;
         const reordered = arrayMove(chat_tabs, old_index, new_index);
         updateSettings((draft) => {
             draft.chat_log.window.chat_tabs = reordered;
         });
-        set_swtor_channel_messages_to_read(reordered[active_chat_tab_index]?.name ?? "");
+        // Keep the same tab selected after it (or a neighbour) moved.
+        const new_active = reordered.findIndex((t) => t.name === active_tab_name);
+        if (new_active !== -1 && new_active !== active_chat_tab_index) {
+            setActiveChatTabIndex(new_active);
+        }
     }
 
     return (
@@ -53,7 +62,7 @@ export default function ChatTabs() {
                 <SortableContext items={items} strategy={horizontalListSortingStrategy}>
                     <div className="flex flex-row gap-1 relative">
                         {chat_tabs.map((chat_tab, index) => (
-                            <ChatTab key={index} chat_tab={deep_copy(chat_tab)} index={index} />
+                            <ChatTab key={chat_tab.name} chat_tab={deep_copy(chat_tab)} index={index} />
                         ))}
                     </div>
                 </SortableContext>
@@ -61,7 +70,7 @@ export default function ChatTabs() {
             <div className="relative">
                 <button
                     type="button"
-                    className="chat-container-background text-white text-xl px-2 rounded-t-md hover:text-gray-400 select-none"
+                    className="chat-tab select-none"
                     onClick={() => setShowEditModal(true)}
                 >
                     +

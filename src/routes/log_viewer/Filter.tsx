@@ -33,7 +33,7 @@ export default function Filter({ channel_filters, onChannelFiltersChange }: Filt
         <>
             <Tooltip tooltip_text="Filter out by channels" placement="left">
                 <button
-                    className="hover:text-gray-400 text-white"
+                    className="hover:text-holo-300 text-ink-100"
                     onClick={() => setShowFilters((v) => !v)}
                     onMouseEnter={() => setMouseOver(true)}
                     onMouseLeave={() => setMouseOver(false)}
@@ -44,7 +44,7 @@ export default function Filter({ channel_filters, onChannelFiltersChange }: Filt
             {show_filters && (
                 <div
                     ref={dropdownRef}
-                    className="absolute top-10 z-10 bg-slate-600 p-2 rounded-md shadow-md animate-fade-in"
+                    className="absolute top-10 z-10 panel panel-glass p-3 animate-fade-in"
                 >
                     <ChannelList channels={channel_filters} onChannelInput={onChannelFiltersChange} />
                     <div className="flex flex-row gap-2">

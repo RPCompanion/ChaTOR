@@ -9,9 +9,11 @@ export default function SettingsToggle({ checked, onChange }: SettingsToggleProp
     return (
         <input
             type="checkbox"
+            role="switch"
+            aria-checked={checked}
             checked={checked}
             onChange={(e) => onChange(e.target.checked)}
-            className="scale-150"
+            className="switch"
         />
     );
 }

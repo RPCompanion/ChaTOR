@@ -66,7 +66,7 @@ export default function EditModal({ index, chat_tab: initial_tab, onSave, onCanc
 
     return (
         <motion.div
-            className="w-72 min-h-48 bg-slate-700 p-2 border-2 border-slate-800 fixed z-20 flex flex-col gap-1"
+            className="w-72 min-h-48 panel panel-glass p-3 fixed z-20 flex flex-col gap-2"
             style={{ top: "calc(50% - 12rem)", left: "calc(50% - 9rem)" }}
             initial={{ y: -1000 }}
             animate={{ y: 0 }}
@@ -78,10 +78,10 @@ export default function EditModal({ index, chat_tab: initial_tab, onSave, onCanc
                 value={chat_tab.name}
                 onChange={(e) => setChatTab((t) => ({ ...t, name: e.target.value }))}
                 maxLength={12}
-                className="outline-hidden border-2 border-slate-800 text-xl"
+                className="input"
                 placeholder="tab name"
             />
-            <p className="text-white text-xl"><b>Channel subscriptions</b></p>
+            <p className="eyebrow mt-1">Channel subscriptions</p>
             <ChannelList
                 channels={chat_tab.channels}
                 show_custom_channels={true}
@@ -90,14 +90,14 @@ export default function EditModal({ index, chat_tab: initial_tab, onSave, onCanc
             <div className="flex flex-row gap-1">
                 <button
                     type="button"
-                    className="text-white border-slate-800 border-2 rounded-md w-1/2 text-xl"
+                    className="btn w-1/2"
                     onClick={on_save}
                 >
                     Save
                 </button>
                 <button
                     type="button"
-                    className="text-white border-slate-800 border-2 rounded-md w-1/2 text-xl"
+                    className="btn w-1/2"
                     onClick={onCancel}
                 >
                     Cancel

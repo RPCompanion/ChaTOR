@@ -27,9 +27,9 @@ export default function SelectList({ elems, search, onInput }: SelectListProps) 
                         type="checkbox"
                         checked={elem.selected}
                         onChange={() => on_input(elem)}
-                        className="text-xl"
+                        className="text-lg"
                     />
-                    <label className="text-white text-xl">{elem.value}</label>
+                    <label className="text-ink-100 text-lg">{elem.value}</label>
                 </div>
             ))}
         </>

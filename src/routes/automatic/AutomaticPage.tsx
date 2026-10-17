@@ -14,6 +14,7 @@ import AutomaticConfirmation from "./AutomaticConfirmation";
 import CustomEmotesList from "../../components/emotes_list/CustomEmotesList";
 import ChatLogWindow from "../../lib/ChatLogWindow";
 import CustomCommand from "../../components/CustomCommand";
+import RollBar from "../../components/RollBar";
 
 export default function AutomaticPage() {
     const settings = useAppStore((s) => s.settings);
@@ -83,26 +84,27 @@ export default function AutomaticPage() {
             <PageFormatting title="Automatic Formatting Mode">
                 <div className="flex flex-col gap-2">
                     {show_chat_log && <ChatLogWindow onWhisper={on_whisper} />}
-                    {!settings.chat.clear_chat_after_posting && (
-                        <div className="relative h-6">
+                    <div className="relative flex items-center h-7">
+                        <RollBar />
+                        {!settings.chat.clear_chat_after_posting && (
                             <button
                                 type="button"
-                                className="bg-slate-800 text-white rounded-xs shadow-xs w-32 absolute right-0"
+                                className="btn btn-ghost btn-sm absolute right-0"
                                 onClick={() => setMessage("")}
                             >
                                 Clear chat
                             </button>
-                        </div>
-                    )}
+                        )}
+                    </div>
                     <div className="relative">
                         <textarea
                             ref={textarea_ref}
-                            className="w-full min-h-36 outline-hidden p-1 rounded-md border-2 resize-none border-slate-700 chat-container-background text-white"
+                            className="input min-h-36 resize-none chat-container-background"
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
                             onKeyDown={on_key_down}
                         />
-                        <div className="absolute bottom-1 right-2 text-white select-none">
+                        <div className="absolute bottom-1 right-2 text-xs text-ink-300 select-none tabular-nums">
                             {unicode_escape(message).length}
                         </div>
                         {show_chat_log && <CustomCommand />}

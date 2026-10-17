@@ -50,13 +50,13 @@ export default function Navbar() {
     useClickOutside(navRef, () => trigger_navbar_callbacks());
 
     return (
-        <div ref={navRef} className="w-full h-12 bg-slate-700 relative shadow-md grid grid-cols-2 z-10">
-            <div className="flex flex-row gap-2">
+        <div ref={navRef} className="w-full h-11 relative z-10 flex items-stretch justify-between px-1 bg-space-900/80 border-b border-holo-500/25 backdrop-blur-sm">
+            <div className="flex flex-row items-stretch">
                 <NavbarSection section={chat_section} />
                 <NavbarSection section={EMOTE_SECTION} />
                 <NavbarSection section={ROLEPLAY_SECTION} />
             </div>
-            <div className="flex flex-row-reverse">
+            <div className="flex flex-row-reverse items-stretch">
                 <NavbarSection section={SETTINGS_SECTION} />
             </div>
         </div>

@@ -8,12 +8,12 @@ interface SettingProps {
 
 export default function Setting({ setting, sub_text, children }: SettingProps) {
     return (
-        <div className="grid grid-cols-2 w-full">
+        <div className="grid grid-cols-[1fr_auto] gap-6 items-center w-full py-2 border-b border-holo-500/10 last:border-b-0">
             <div className="flex flex-col">
-                <div className="text-xl text-white">{setting}</div>
-                {sub_text && <div className="text-sm text-gray-400">{sub_text}</div>}
+                <div className="text-ink-100">{setting}</div>
+                {sub_text && <div className="text-xs text-ink-300 mt-0.5">{sub_text}</div>}
             </div>
-            <div>{children}</div>
+            <div className="flex items-center justify-end min-w-44">{children}</div>
         </div>
     );
 }

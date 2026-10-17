@@ -58,7 +58,7 @@ export default function App() {
 
     return (
         <>
-            <ToastContainer position="top-right" />
+            <ToastContainer position="top-right" theme="dark" />
             <RouterProvider router={router} />
         </>
     );

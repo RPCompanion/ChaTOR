@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { CaretDown } from "@phosphor-icons/react";
 import { type INavbarSection, add_navbar_callback, trigger_navbar_callbacks } from "./navbar";
 
 interface NavbarSectionProps {
@@ -8,7 +9,12 @@ interface NavbarSectionProps {
 
 export default function NavbarSection({ section }: NavbarSectionProps) {
     const navigate = useNavigate();
+    const location = useLocation();
     const [show_dropdown, setShowDropdown] = useState(false);
+
+    const is_active =
+        section.link === location.pathname ||
+        (section.elements?.some((e) => e.link === location.pathname) ?? false);
 
     function goto_link(link: string) {
         trigger_navbar_callbacks();
@@ -29,32 +35,32 @@ export default function NavbarSection({ section }: NavbarSectionProps) {
     });
 
     return (
-        <div className="relative">
+        <div className="relative flex items-stretch">
             <button
                 type="button"
                 onClick={section_click}
-                className="flex flex-row gap-1 relative text-white px-2 top-2 hover:text-gray-400 select-none"
+                className={`nav-item ${is_active ? "active" : ""}`}
             >
-                <div className="text-xl">{section.name}</div>
+                <span>{section.name}</span>
                 {section.link == undefined && (
-                    <div className="relative top-2 text-xs">&#9660;</div>
+                    <CaretDown
+                        size={12}
+                        weight="bold"
+                        className={`transition-transform ${show_dropdown ? "rotate-180" : ""}`}
+                    />
                 )}
             </button>
             {show_dropdown && (
-                <div className="flex flex-col gap-1 bg-white p-2 absolute top-10 shadow-md w-36 animate-fade-in">
-                    {section.elements?.map((element, idx) => (
-                        <React.Fragment key={element.name}>
-                            <button
-                                type="button"
-                                onClick={() => goto_link(element.link)}
-                                className="hover:text-slate-500 text-center select-none"
-                            >
-                                {element.name}
-                            </button>
-                            {idx !== (section.elements?.length ?? 0) - 1 && (
-                                <div className="border-b-2 border-slate-500"></div>
-                            )}
-                        </React.Fragment>
+                <div className="panel panel-glass absolute top-11 left-0 w-52 p-1 flex flex-col animate-fade-in">
+                    {section.elements?.map((element) => (
+                        <button
+                            key={element.name}
+                            type="button"
+                            onClick={() => goto_link(element.link)}
+                            className={`menu-item ${element.link === location.pathname ? "text-holo-300" : ""}`}
+                        >
+                            {element.name}
+                        </button>
                     ))}
                 </div>
             )}

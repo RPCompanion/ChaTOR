@@ -129,14 +129,14 @@ export default function ChatLogWindow({ onWhisper }: ChatLogWindowProps) {
                 <div className="grid grid-cols-[1fr_auto]">
                     <ChatTabs />
                     <div className="flex justify-end items-center">
-                        <button className="text-white hover:text-gray-400" onClick={() => setShowChannelColorPicker(true)}>
+                        <button className="text-ink-100 hover:text-holo-300" onClick={() => setShowChannelColorPicker(true)}>
                             <Gear size={26} />
                         </button>
                     </div>
                 </div>
                 <div
                     ref={containerRef}
-                    className="flex flex-col h-44 max-h-96 resize-y rounded-tr-md border-2 border-slate-700 overflow-y-auto scrollbar-thin scrollbar-thumb-sky-800 scrollbar-track-slate-100 chat-container-background"
+                    className="flex flex-col h-44 max-h-96 resize-y rounded-tr-sm rounded-b-sm border border-holo-500/30 overflow-y-auto scrollbar-thin scrollbar-thumb-holo-900 scrollbar-track-space-950 chat-container-background p-1 text-sm"
                 >
                     {swtor_messages.map((entry, idx) => (
                         <div
@@ -146,14 +146,14 @@ export default function ChatLogWindow({ onWhisper }: ChatLogWindowProps) {
                         >
                             {is_dice_roll(entry) ? (
                                 <>
-                                    <span className="text-white">[{entry.timestamp}]</span>
-                                    <span className="text-yellow-300"> [Random] {entry.player_name} rolls {entry.result_text}</span>
+                                    <span className="text-ink-500 text-xs tabular-nums">[{entry.timestamp}]</span>
+                                    <span className="text-ember-400"> [Random] {entry.player_name} rolls {entry.result_text}</span>
                                 </>
                             ) : (
                                 <>
-                                    <span className="text-white">[{entry.timestamp}]</span>
+                                    <span className="text-ink-500 text-xs tabular-nums">[{entry.timestamp}]</span>
                                     <span
-                                        className="text-slate-200 cursor-pointer"
+                                        className="text-ink-200 cursor-pointer"
                                         onClick={() => on_character_click(entry)}
                                     >
                                         {entry.get_message_from()}

@@ -35,8 +35,8 @@ export default function ChatTab({ chat_tab, index }: ChatTabProps) {
     const tabRef = useRef<HTMLDivElement>(null);
     useClickOutside(tabRef, () => setShowEditTab(false));
 
-    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: index });
-    const style = { transform: CSS.Transform.toString(transform), transition };
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: chat_tab.name });
+    const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 20 : undefined };
 
     const unread_message_count =
         swtor_channel_messages.find((c) => c.chat_tab_name === chat_tab.name)?.messages.filter((m) => !is_dice_roll(m) && !m.read).length ?? 0;
@@ -83,7 +83,7 @@ export default function ChatTab({ chat_tab, index }: ChatTabProps) {
         >
             <div ref={tabRef} className="relative">
                 {unread_message_count > 0 && (
-                    <div className="absolute -right-1 -top-2 bg-red-900 text-white px-2 rounded-full shadow-md text-sm">
+                    <div className="absolute -right-1 -top-2 bg-ember-500 text-white font-semibold px-1.5 rounded-full shadow-[0_0_8px_rgb(242_146_51/0.6)] text-[10px] leading-4">
                         {unread_message_count > 9 ? "9+" : unread_message_count}
                     </div>
                 )}
@@ -99,24 +99,23 @@ export default function ChatTab({ chat_tab, index }: ChatTabProps) {
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.5 }}
                         >
-                            <ArrowsOutCardinal className="text-white" />
+                            <ArrowsOutCardinal className="text-ink-100" />
                         </motion.div>
                     )}
                 </AnimatePresence>
                 <button
                     type="button"
-                    className="chat-container-background text-white text-xl px-2 rounded-t-md hover:text-gray-400"
-                    style={active_chat_tab_index === index ? { backgroundColor: "rgba(36, 85, 105, 1.0)" } : undefined}
+                    className={`chat-tab ${active_chat_tab_index === index ? "active" : ""}`}
                     onClick={on_click}
                 >
                     {chat_tab.name}
                 </button>
                 {show_edit_tab && (
-                    <div className="flex flex-col gap-1 w-36 shadow-md bg-slate-700 absolute p-2 border-2 border-slate-800 z-10">
-                        <button type="button" className="text-white hover:text-gray-400" onClick={() => { setShowEditTab(false); setShowEditModal(true); }}>Edit</button>
-                        <button type="button" className="text-white hover:text-gray-400" onClick={on_clear_chat}>Clear Chat</button>
+                    <div className="flex flex-col w-40 panel panel-glass absolute p-1 z-10 animate-fade-in">
+                        <button type="button" className="menu-item" onClick={() => { setShowEditTab(false); setShowEditModal(true); }}>Edit</button>
+                        <button type="button" className="menu-item" onClick={on_clear_chat}>Clear Chat</button>
                         {settings.chat_log.window.chat_tabs.length > 1 && (
-                            <button type="button" className="text-white hover:text-gray-400" onClick={on_delete}>Delete</button>
+                            <button type="button" className="menu-item" onClick={on_delete}>Delete</button>
                         )}
                     </div>
                 )}

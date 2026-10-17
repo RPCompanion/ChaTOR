@@ -9,7 +9,7 @@ interface TabProps {
 export default function Tab({ tab, selected_tab, onTabClicked }: TabProps) {
     return (
         <div
-            className={`bg-slate-700 text-white p-2 cursor-pointer rounded-t-md ${selected_tab === tab ? "rounded-md" : ""}`}
+            className={`chat-tab cursor-pointer ${selected_tab === tab ? "active" : ""}`}
             onClick={() => onTabClicked(tab)}
         >
             {tab}

@@ -1,4 +1,5 @@
 import React from "react";
+import PageFormatting from "../../components/PageFormatting";
 import AppSettings from "./AppSettings";
 import ChatSection from "./ChatSection";
 import ChatManualSection from "./ChatManualSection";
@@ -8,9 +9,8 @@ import ChatLogWindowSettings from "./ChatLogWindowSettings";
 
 export default function SettingsPage() {
     return (
-        <>
-            <div className="relative text-center text-2xl bg-slate-800 opacity-95 text-white h-12">Settings</div>
-            <div className="relative bg-slate-800 opacity-95 rounded-b-sm shadow-md p-2 flex flex-col gap-2">
+        <PageFormatting title="Settings">
+            <div className="flex flex-col gap-3">
                 <AppSettings />
                 <ChatSection />
                 <ChatManualSection />
@@ -18,6 +18,6 @@ export default function SettingsPage() {
                 <ChatLogging />
                 <ChatLogWindowSettings />
             </div>
-        </>
+        </PageFormatting>
     );
 }

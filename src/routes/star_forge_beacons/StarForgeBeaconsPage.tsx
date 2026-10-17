@@ -27,7 +27,7 @@ export default function StarForgeBeaconsPage() {
         <PageFormatting title="Star Forge Beacons">
             <div className="flex flex-col gap-4">
                 {beacons.map((beacon, idx) => (
-                    <div key={idx} className="bg-white p-2 rounded-md shadow-md">
+                    <div key={idx} className="panel p-3">
                         <div className="flex flex-row gap-1">
                             {beacon.avatar_url != undefined && (
                                 <img src={beacon.avatar_url} className="w-12 h-12 rounded-full" alt="avatar" />

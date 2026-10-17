@@ -48,24 +48,24 @@ export default function Emote({ emote: initial_emote, favourite }: EmoteProps) {
                 type="text"
                 value={emote.emote_name}
                 onChange={(e) => on_name_change(e.target.value)}
-                className={`w-1/2 text-xl outline-hidden border-2 rounded-md px-1 ${favourite ? "border-yellow-500" : "border-slate-500"}`}
+                className={`input w-1/2 py-1 ${favourite ? "border-ember-500/70!" : ""}`}
                 onBlur={() => update_custom_emote(emote)}
             />
-            <div {...attributes} {...listeners} className="text-white cursor-grab">
+            <div {...attributes} {...listeners} className="text-ink-100 cursor-grab">
                 <DotsSix size={24} />
             </div>
             <input
                 type="text"
                 value={emote.emote}
                 onChange={(e) => on_emote_change(e.target.value)}
-                className={`w-1/2 text-xl outline-hidden border-2 rounded-md px-1 ${favourite ? "border-yellow-500" : "border-slate-500"}`}
+                className={`input w-1/2 py-1 ${favourite ? "border-ember-500/70!" : ""}`}
                 onBlur={() => update_custom_emote(emote)}
             />
             <AnimatePresence>
                 {show_other_buttons && (
                     <>
                         <motion.button
-                            className="absolute left-0 bottom-4 text-yellow-500"
+                            className="absolute left-0 bottom-4 text-ember-500"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}

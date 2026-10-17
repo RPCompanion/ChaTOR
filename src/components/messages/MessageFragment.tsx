@@ -44,7 +44,7 @@ export default function MessageFragment({ fragment, channel_type }: MessageFragm
     }
 
     if (fragment instanceof HyperLinkGuild) {
-        return <span className="wrap-break-word text-yellow-300">{fragment.as_string().unwrap()}</span>;
+        return <span className="wrap-break-word text-ember-400">{fragment.as_string().unwrap()}</span>;
     }
     if (fragment instanceof HyperLinkItem) {
         return <ExternalFragment fragment={fragment} />;

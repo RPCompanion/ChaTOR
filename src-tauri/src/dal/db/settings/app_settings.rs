@@ -19,11 +19,12 @@ pub struct AppSettings {
     #[serde(default = "default_opacity")]
     pub opacity: i32,
 
-    #[serde(default = "default_show_background_image")]
-    pub show_background_image: bool,
-
     #[serde(default = "default_show_page_header")]
-    pub show_page_header: bool
+    pub show_page_header: bool,
+
+    /// UI palette: "dark", "lighter" (default) or "light".
+    #[serde(default = "default_theme")]
+    pub theme: String
 
 }
 
@@ -52,12 +53,12 @@ fn default_opacity() -> i32 {
     100
 }
 
-fn default_show_background_image() -> bool {
-    false
-}
-
 fn default_show_page_header() -> bool {
     true
+}
+
+fn default_theme() -> String {
+    "lighter".to_string()
 }
 
 impl Default for AppSettings {
@@ -71,8 +72,8 @@ impl Default for AppSettings {
             show_window_decorations: false,
             always_on_top: false,
             opacity: 100,
-            show_background_image: false,
-            show_page_header: true
+            show_page_header: true,
+            theme: default_theme()
 
         }
 

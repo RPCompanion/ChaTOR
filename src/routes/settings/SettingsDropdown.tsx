@@ -10,7 +10,7 @@ export default function SettingsDropdown({ options, choosen_option, onChange }: 
     return (
         <select
             name="characters"
-            className="w-1/2"
+            className="input w-44 py-1 text-sm"
             value={choosen_option ?? ""}
             onChange={(e) => onChange(e.target.value || null)}
         >

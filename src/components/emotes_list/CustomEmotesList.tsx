@@ -31,7 +31,7 @@ export default function CustomEmotesList() {
 
     return (
         <>
-            <div className="bg-gray-500 text-white text-xl text-center border-t-2 border-b-2 border-slate-500 select-none">
+            <div className="title-bar select-none">
                 Favourite Emotes
             </div>
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={on_drag_end}>

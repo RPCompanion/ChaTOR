@@ -42,7 +42,7 @@ export default function Tooltip({ tooltip_text, placement, children }: TooltipPr
                 {show_tooltip && (
                     <motion.div
                         ref={tooltipRef}
-                        className="text-white text-md absolute bg-slate-600 rounded-md px-2 select-none z-50"
+                        className="text-ink-100 text-xs absolute panel panel-glass px-2 py-1 select-none z-50 whitespace-nowrap"
                         style={{ left: pos.x, top: pos.y }}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}

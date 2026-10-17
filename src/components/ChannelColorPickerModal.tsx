@@ -24,7 +24,7 @@ export default function ChannelColorPickerModal({ show, onClose }: ChannelColorP
         <AnimatePresence>
             {show && (
                 <motion.div
-                    className="fixed p-1 w-52 bg-slate-500 rounded-md border border-black z-10 shadow-md"
+                    className="fixed p-3 w-60 panel panel-glass z-10"
                     style={{ left: "calc(50% - 6.5rem)" }}
                     initial={{ y: -500 }}
                     animate={{ y: 0 }}
@@ -32,7 +32,7 @@ export default function ChannelColorPickerModal({ show, onClose }: ChannelColorP
                     transition={{ duration: 0.5 }}
                 >
                     <div className="flex flex-row gap-1">
-                        <h1 className="text-white text-xl">Channel Colors</h1>
+                        <h1 className="eyebrow">Channel Colors</h1>
                         <div className="relative left-8">
                             <XButton onClick={onClose} />
                         </div>
@@ -40,7 +40,7 @@ export default function ChannelColorPickerModal({ show, onClose }: ChannelColorP
                     <Color text="Global"     color={channel_colors.global}     onColorChange={make_handler("global")} />
                     <Color text="PVP"        color={channel_colors.pvp}        onColorChange={make_handler("pvp")} />
                     <Color text="Trade"      color={channel_colors.trade}      onColorChange={make_handler("trade")} />
-                    <div className="h-1 bg-slate-300"></div>
+                    <div className="holo-line my-2"></div>
                     <Color text="Say"        color={channel_colors.say}        onColorChange={make_handler("say")} />
                     <Color text="Yell"       color={channel_colors.yell}       onColorChange={make_handler("yell")} />
                     <Color text="Emote"      color={channel_colors.emote}      onColorChange={make_handler("emote")} />

@@ -3,7 +3,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { save } from "@tauri-apps/plugin-dialog";
 import { writeTextFile } from "@tauri-apps/plugin-fs";
 import Flatpickr from "react-flatpickr";
-import "flatpickr/dist/flatpickr.css";
+import "flatpickr/dist/themes/dark.css";
 import { type IChatLogMessage } from "../../lib/network/chat_log_message";
 import { SwtorMessage } from "../../lib/network/swtor_message";
 import { DiceRoll, type IDiceRoll } from "../../lib/network/dice_roll";
@@ -165,7 +165,7 @@ export default function LogViewerPage() {
                         options={{ enable: dates }}
                         onChange={on_change}
                         placeholder="Select a date"
-                        className="outline-hidden border-2 border-slate-700 rounded-md px-2 text-xl"
+                        className="input w-56 py-1"
                     />
                 </div>
                 <div className="flex flex-row-reverse relative w-full gap-2">
@@ -184,7 +184,7 @@ export default function LogViewerPage() {
                 </>
             )}
             <div className="h-6"></div>
-            <div className="flex flex-col h-96 resize-y max-h-full rounded-tr-md border-2 border-slate-700 overflow-y-auto scrollbar scrollbar-thumb-sky-800 scrollbar-track-slate-100 chat-container-background">
+            <div className="flex flex-col h-96 resize-y max-h-full rounded-sm border border-holo-500/30 overflow-y-auto scrollbar scrollbar-thumb-holo-900 scrollbar-track-space-950 chat-container-background p-1 text-sm">
                 {filtered_messages.map((entry, idx) => (
                     <div
                         key={idx}
@@ -193,13 +193,13 @@ export default function LogViewerPage() {
                     >
                         {is_dice_roll(entry) ? (
                             <>
-                                <span className="text-white">[{entry.timestamp}]</span>
-                                <span className="text-yellow-300"> [Random] {entry.player_name} rolls {entry.result_text}</span>
+                                <span className="text-ink-500 text-xs tabular-nums">[{entry.timestamp}]</span>
+                                <span className="text-ember-400"> [Random] {entry.player_name} rolls {entry.result_text}</span>
                             </>
                         ) : (
                             <>
-                                <span className="text-white">[{entry.timestamp}]</span>
-                                <span className="text-slate-200 cursor-pointer">{entry.get_message_from()}</span>
+                                <span className="text-ink-500 text-xs tabular-nums">[{entry.timestamp}]</span>
+                                <span className="text-ink-200 cursor-pointer">{entry.get_message_from()}</span>
                                 <Messages message={entry} />
                             </>
                         )}

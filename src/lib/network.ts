@@ -69,7 +69,11 @@ function init_hook_report_listener() {
         const report = event.payload as HookReport;
         const failed = report.hooks.filter((h) => !h.installed);
         if (failed.length === 0) {
+            toast.success("Chat logging active");
             return;
+        }
+        if (report.hooks.find((h) => h.name === "chat_recv")?.installed) {
+            toast.success("Chat logging active (some optional hooks failed)");
         }
         const names = failed.map((h) => h.name).join(", ");
         if (failed.length === report.hooks.length) {

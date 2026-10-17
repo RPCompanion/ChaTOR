@@ -9,7 +9,7 @@ export default function StandardMenuButton({ text, onClick }: StandardMenuButton
     return (
         <button
             type="button"
-            className="bg-slate-700 text-white rounded-xs shadow-xs hover:text-gray-300 text-xl"
+            className="btn btn-primary btn-block py-1.5"
             onClick={onClick}
         >
             {text}

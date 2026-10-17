@@ -11,6 +11,7 @@ import ConfirmationModal from "../../lib/ConfirmationModal";
 import StandardMenuButton from "../../lib/buttons/StandardMenuButton";
 import CustomEmotesList from "../../components/emotes_list/CustomEmotesList";
 import ChatLogWindow from "../../lib/ChatLogWindow";
+import RollBar from "../../components/RollBar";
 
 const MAX_MESSAGES = 5;
 
@@ -93,14 +94,15 @@ export default function ManualPage() {
             <PageFormatting title="Manual Formatting Mode">
                 <div className="flex flex-col gap-2">
                     {show_chat_log && <ChatLogWindow onWhisper={on_whisper} />}
-                    <div className="relative h-6">
+                    <div className="relative flex items-center gap-3 h-7">
                         <Checkbox checked={automated_posting} onChange={setAutomatedPosting} size="small">
                             Automated posting
                         </Checkbox>
+                        <RollBar />
                         {!settings.chat.clear_chat_after_posting && (
                             <button
                                 type="button"
-                                className="bg-slate-700 text-white rounded-xs shadow-xs w-32 absolute right-0 hover:text-gray-300"
+                                className="btn btn-ghost btn-sm absolute right-0"
                                 onClick={() => setMessages([""])}
                             >
                                 Clear chat
@@ -112,9 +114,9 @@ export default function ManualPage() {
                         return (
                             <div key={idx} className="relative">
                                 <textarea
-                                    className={`w-full min-h-24 outline-hidden p-1 resize-none rounded-md border-2 border-slate-700 chat-container-background text-white
-                                        ${escaped_len >= 200 && escaped_len <= 255 ? "border-yellow-400" : ""}
-                                        ${escaped_len > 255 ? "border-red-500" : ""}`}
+                                    className={`input min-h-24 resize-none chat-container-background
+                                        ${escaped_len >= 200 && escaped_len <= 255 ? "border-ember-400!" : ""}
+                                        ${escaped_len > 255 ? "border-danger-500!" : ""}`}
                                     value={message}
                                     onChange={(e) => update_message(idx, e.target.value)}
                                 />
@@ -123,11 +125,11 @@ export default function ManualPage() {
                                         <XButton onClick={() => delete_message(idx)} />
                                     </div>
                                 )}
-                                <div className="absolute bottom-1 right-0 text-white">{escaped_len}/255</div>
+                                <div className="absolute bottom-1 right-2 text-xs text-ink-300 tabular-nums">{escaped_len}/255</div>
                                 {!automated_posting && (
                                     <button
                                         type="button"
-                                        className="bg-slate-700 text-white rounded-xs shadow-xs px-2 absolute top-1/3 -right-8 hover:text-gray-300"
+                                        className="btn btn-sm absolute top-1/3 -right-14"
                                         onClick={() => on_single_post(idx)}
                                     >
                                         Post
@@ -139,7 +141,7 @@ export default function ManualPage() {
                     <div className="w-full h-6 flex flex-row-reverse">
                         <button
                             type="button"
-                            className="bg-slate-700 text-white rounded-xs shadow-xs w-32 hover:text-gray-300"
+                            className="btn btn-sm w-32"
                             onClick={on_new_message}
                         >
                             New

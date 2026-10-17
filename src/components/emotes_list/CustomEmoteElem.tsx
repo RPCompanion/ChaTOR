@@ -33,7 +33,7 @@ export default function CustomEmoteElem({ emote, favourite = false }: CustomEmot
         <div
             ref={setNodeRef}
             style={style}
-            className="relative rounded-md"
+            className="relative rounded-sm"
             onMouseEnter={() => setShowDragHandle(true)}
             onMouseLeave={() => setShowDragHandle(false)}
         >
@@ -49,13 +49,13 @@ export default function CustomEmoteElem({ emote, favourite = false }: CustomEmot
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <ArrowsOutCardinal className="text-white" />
+                        <ArrowsOutCardinal className="text-ink-100" />
                     </motion.div>
                 )}
             </AnimatePresence>
             <VariableSizeButton
                 onClick={on_click}
-                my_classes="bg-yellow-500 text-black text-2xl px-2 rounded-md hover:text-white"
+                my_classes="bg-ember-500 text-black text-lg px-2 rounded-sm hover:text-ink-100"
             >
                 {emote.emote_name}
             </VariableSizeButton>

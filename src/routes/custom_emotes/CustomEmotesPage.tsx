@@ -18,7 +18,7 @@ export default function CustomEmotesPage() {
                     <div className="h-2"></div>
                     {fav_emotes.length > 0 && (
                         <>
-                            <p className="text-white text-2xl text-center">Favourite Emotes</p>
+                            <div className="title-bar">Favourite Emotes</div>
                             <div className="h-2"></div>
                         </>
                     )}
@@ -26,7 +26,7 @@ export default function CustomEmotesPage() {
                     {non_fav_emotes.length > 0 && fav_emotes.length > 0 && (
                         <>
                             <div className="h-1"></div>
-                            <p className="text-white text-2xl text-center">Emotes</p>
+                            <div className="title-bar">Emotes</div>
                             <div className="h-2"></div>
                         </>
                     )}
@@ -35,7 +35,7 @@ export default function CustomEmotesPage() {
                 <div className="h-6"></div>
                 <div className="flex flex-row justify-center">
                     <button
-                        className="bg-slate-700 text-white text-xl px-2 rounded-md w-32 hover:text-gray-500"
+                        className="btn btn-primary w-40"
                         onClick={() => setShowModal(true)}
                     >
                         New Emote

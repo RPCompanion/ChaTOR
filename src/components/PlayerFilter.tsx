@@ -41,7 +41,7 @@ export default function PlayerFilter({ elems, onElemsChange }: PlayerFilterProps
         <>
             <Tooltip placement="left" tooltip_text="Filter out players">
                 <button
-                    className="hover:text-gray-400 text-white"
+                    className="hover:text-holo-300 text-ink-100"
                     onClick={toggle_show_filters}
                     onMouseEnter={() => setMouseOver(true)}
                     onMouseLeave={() => setMouseOver(false)}
@@ -52,16 +52,16 @@ export default function PlayerFilter({ elems, onElemsChange }: PlayerFilterProps
             {show_filters && (
                 <div
                     ref={dropdownRef}
-                    className="absolute top-10 z-10 bg-slate-600 p-2 rounded-md shadow-md animate-fade-in"
+                    className="absolute top-10 z-10 panel panel-glass p-3 animate-fade-in w-64"
                 >
-                    <div className="text-white text-xl text-center">Players</div>
+                    <div className="eyebrow text-center mb-2">Players</div>
                     <div className="w-full">
                         <input
                             type="text"
                             value={player_search}
                             onChange={(e) => setPlayerSearch(e.target.value)}
                             placeholder="Search for player"
-                            className="w-full px-2 rounded-md outline-hidden border-2 border-slate-700"
+                            className="input py-1 text-sm"
                         />
                     </div>
                     <div className="h-2"></div>

@@ -58,15 +58,15 @@ export default function ChannelList({ channels, show_custom_channels = false, on
                         name={channel}
                         checked={swtor_channel_is_checked(channel)}
                         onChange={() => on_channel_input(channel)}
-                        className="text-xl"
+                        className="text-lg"
                     />
-                    <label htmlFor={channel} className="text-white text-xl">{channel}</label>
+                    <label htmlFor={channel} className="text-ink-100 text-lg">{channel}</label>
                 </div>
             ))}
             {show_custom_channels && (
                 <>
                     <div className="border-2"></div>
-                    <p className="text-white text-xl"><b>Custom Channels</b></p>
+                    <p className="text-ink-100 text-lg"><b>Custom Channels</b></p>
                     {custom_channels.map((channel) => (
                         <div key={channel.channel_name} className="flex flex-row gap-1">
                             <input
@@ -75,9 +75,9 @@ export default function ChannelList({ channels, show_custom_channels = false, on
                                 name={channel.channel_name}
                                 checked={selected_custom_channels.includes(channel.channel_name)}
                                 onChange={() => on_custom_channel_input(channel.channel_name)}
-                                className="text-xl"
+                                className="text-lg"
                             />
-                            <label htmlFor={channel.channel_name} className="text-white text-xl">{channel.channel_name}</label>
+                            <label htmlFor={channel.channel_name} className="text-ink-100 text-lg">{channel.channel_name}</label>
                         </div>
                     ))}
                 </>

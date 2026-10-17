@@ -1,0 +1,58 @@
+<!doctype html>
+<!-- Dev-only preview of the UI in a normal browser (no Tauri). Not part of the build.
+     Open http://localhost:<vite port>/preview.html#/automatic
+     Query flags: capture=1 (chat log window), theme=dark|lighter|light -->
+<html lang="en" data-theme="lighter">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ChaTOR preview</title>
+    <script>
+      (async () => {
+        const defaults = await fetch("/src/lib/network/default_settings.json").then((r) => r.json());
+        const q = new URLSearchParams(location.search);
+        // ?capture=1 shows the chat log window with sample messages
+        if (q.get("capture") === "1") {
+          defaults.chat_log.capture_chat_log = true;
+          defaults.chat_log.window.show_chat_log_window = true;
+        }
+        if (q.get("decorations") === "1") defaults.app.show_window_decorations = true;
+        if (q.get("theme")) defaults.app.theme = q.get("theme");
+        let cb_id = 0;
+        const sample_messages = [
+          { timestamp: new Date().toISOString(), from: "Elizala", to: "", channel: { type: 3 }, message_fragments: [{ type: "Text", text: "Elizala looks around the cantina." }], message: "Elizala looks around the cantina." },
+        ];
+        window.__TAURI_INTERNALS__ = {
+          metadata: {
+            currentWindow: { label: "main" },
+            currentWebview: { label: "main", windowLabel: "main" },
+            windows: [{ label: "main" }],
+            webviews: [{ label: "main", windowLabel: "main" }],
+          },
+          transformCallback(cb) { const id = ++cb_id; window[`_${id}`] = cb; return id; },
+          convertFileSrc(p) { return p; },
+          async invoke(cmd, args) {
+            switch (cmd) {
+              case "get_settings": return defaults;
+              case "get_version": return "0.1.43";
+              case "get_account": return null;
+              case "get_todays_chat_log": case "get_distinct_dates": case "get_all_date_tag_favourites": return [];
+              case "plugin:event|listen": return 1;
+              case "plugin:window|is_maximized": return false;
+              case "plugin:window|inner_size": case "plugin:window|outer_size": return { width: 800, height: 900 };
+              default:
+                if (cmd.startsWith("get_all")) return [];
+                if (cmd.startsWith("get_")) return null;
+                return null;
+            }
+          },
+        };
+        window.__TAURI_INTERNALS__.invoke.__shim = true;
+        const s = document.createElement("script"); s.type = "module"; s.src = "/src/main.tsx"; document.body.appendChild(s);
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

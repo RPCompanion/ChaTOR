@@ -58,7 +58,7 @@ export default function CustomCommand() {
                 <select
                     value={select_value}
                     onChange={on_change}
-                    className="rounded-md outline-hidden border-none px-1 select-none cursor-pointer"
+                    className="input w-auto py-0 px-1 text-xs select-none cursor-pointer"
                 >
                     <option value="none">none</option>
                     {channels.map((channel) => (

@@ -9,14 +9,18 @@ interface CheckboxProps {
 
 export default function Checkbox({ checked, onChange, size = "normal", children }: CheckboxProps) {
     return (
-        <label className={`text-white bg-slate-500 rounded-md shadow-lg p-1 cursor-pointer select-none ${size === "small" ? "text-md" : "text-xl"}`}>
+        <label
+            className={`inline-flex items-center gap-2 px-2 py-1 rounded-xs border border-holo-500/25 bg-space-800/70
+                text-ink-200 cursor-pointer select-none transition-colors hover:border-holo-500/60 hover:text-ink-100
+                ${size === "small" ? "text-xs" : "text-sm"}`}
+        >
             <input
                 type="checkbox"
                 checked={checked}
                 onChange={(e) => onChange(e.target.checked)}
-                className="ml-2 scale-150 cursor-pointer"
+                className="cursor-pointer w-3.5 h-3.5"
             />
-            <span className="ml-1">{children}</span>
+            <span>{children}</span>
         </label>
     );
 }

@@ -40,7 +40,7 @@ export default function AddModal({ onCancel }: AddModalProps) {
 
     return (
         <motion.div
-            className="absolute bg-slate-600 rounded-md w-1/2 p-2"
+            className="absolute panel panel-glass w-1/2 p-4"
             style={{ left: "50%", transform: "translate(-50%, -50%)" }}
             initial={{ y: -1000 }}
             animate={{ y: 0 }}
@@ -50,15 +50,15 @@ export default function AddModal({ onCancel }: AddModalProps) {
             <div className="w-full flex flex-col gap-2 items-center">
                 <input
                     type="text"
-                    className="rounded-md outline-hidden border-2 border-slate-700 px-2"
+                    className="input w-auto py-1"
                     placeholder="channel name"
                     value={channel_name}
                     onChange={on_channel_input}
                 />
-                <label htmlFor="channel-select" className="text-white text-xl">Channel</label>
+                <label htmlFor="channel-select" className="text-ink-100 text-lg">Channel</label>
                 <select
                     id="channel-select"
-                    className="rounded-md w-1/3 outline-slate-700 border-2 border-slate-700"
+                    className="input w-1/3 py-1"
                     value={channel_number}
                     onChange={(e) => setChannelNumber(Number(e.target.value))}
                 >

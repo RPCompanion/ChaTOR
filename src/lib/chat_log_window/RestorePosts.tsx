@@ -25,7 +25,7 @@ export default function RestorePosts() {
                 >
                     <Tooltip tooltip_text="Restore today's posts" placement="right">
                         <button
-                            className="text-3xl text-white hover:text-gray-400 cursor-pointer"
+                            className="text-3xl text-ink-100 hover:text-holo-300 cursor-pointer"
                             onClick={on_restore_posts}
                         >
                             <ArrowClockwise />

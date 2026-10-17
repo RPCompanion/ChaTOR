@@ -1,38 +1,481 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/exo-2';
 
 @plugin 'tailwind-scrollbar';
 
+/* ---------------------------------------------------------------------------
+   ChaTOR theme — "holo terminal"
+   Navy panels, translucent glass, thin cyan holographic borders, amber accents.
+
+   Three palettes, selected by <html data-theme="dark|lighter|light"> (set from
+   settings.app.theme in Layout.tsx; "lighter" is the default). The Tailwind
+   tokens in @theme hold the "lighter" values; the other two palettes override
+   the same custom properties below, so every utility (bg-space-800,
+   text-holo-300, border-ember-500/40 ...) and component class follows along.
+
+   Component classes never hard-code colors: they use the *-rgb channel
+   variables so the alpha-blended borders/glows retheme too.
+   --------------------------------------------------------------------------- */
 @theme {
-  --animate-fade-in: fade-in 100ms ease;
+  --font-sans: 'Exo 2 Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Exo 2 Variable', ui-sans-serif, system-ui, sans-serif;
 
+  /* surfaces, darkest → lightest (semantic: 950 window base, 800 panel, 700 fill, 600 control) */
+  --color-space-950: #142338;
+  --color-space-900: #1a2e46;
+  --color-space-800: #213a55;
+  --color-space-700: #2a4866;
+  --color-space-600: #35587a;
+  --color-space-500: #42688d;
+
+  /* holographic cyan accent (300 = brightest text, 900 = dim fill) */
+  --color-holo-900: #175068;
+  --color-holo-700: #15607f;
+  --color-holo-500: #2fb7e8;
+  --color-holo-400: #6fd2f5;
+  --color-holo-300: #a9e6fb;
+
+  /* amber accent (primary actions, highlights, item links) */
+  --color-ember-600: #d9741c;
+  --color-ember-500: #f29233;
+  --color-ember-400: #ffb264;
+  --color-ember-300: #ffd1a3;
+
+  /* text (100 = primary) */
+  --color-ink-100: #e8f1f8;
+  --color-ink-200: #c9d8e6;
+  --color-ink-300: #93a9bf;
+  --color-ink-500: #7d93a9;
+
+  --color-danger-400: #ff7a7a;
+  --color-danger-500: #ef4d4d;
+  --color-danger-600: #b83232;
+
+  --animate-fade-in: fade-in 120ms ease;
   @keyframes fade-in {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
+    0% { opacity: 0; transform: translateY(-2px); }
+    100% { opacity: 1; transform: translateY(0); }
   }
 }
 
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
+/* ---- palette plumbing for component classes (lighter = default) ---------- */
+:root {
+  --holo-rgb: 47 183 232;
+  --ember-rgb: 242 146 51;
+  --danger-rgb: 239 77 77;
+  --panel-rgb: 42 72 102;       /* .panel fill */
+  --panel-alpha: 0.88;
+  --input-rgb: 20 35 56;        /* .input fill */
+  --input-alpha: 0.5;
+  --chat-rgb: 22 56 80;         /* composer / chat log fill */
+  --chat-alpha: 0.7;
+  --btn-top-rgb: 53 88 122;
+  --btn-bot-rgb: 33 58 85;
+  --shell-top: #213a55;         /* window gradient */
+  --shell-bottom: #142338;
+  --shell-glow-holo: 0.16;
+  --shell-glow-ember: 0.10;
+  --glow: 1;                    /* multiplier for neon glows */
+  --hairline: rgb(47 183 232 / 0.28);
+  --panel-shadow: 0 10px 30px rgb(0 0 0 / 0.28);
+  --knob-rgb: 147 169 191;      /* switch knob (off) */
 
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
+  /* react-toastify */
+  --toastify-color-dark: #213a55;
+  --toastify-text-color-dark: #e8f1f8;
+  --toastify-color-light: #213a55;
+  --toastify-text-color-light: #e8f1f8;
+  --toastify-color-info: #2fb7e8;
+  --toastify-color-success: #3ccf91;
+  --toastify-color-warning: #f29233;
+  --toastify-color-error: #ef4d4d;
+  --toastify-font-family: 'Exo 2 Variable', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ---- DARK: near-black space, maximum glow ------------------------------- */
+:root[data-theme="dark"] {
+  --color-space-950: #05090f;
+  --color-space-900: #0a1119;
+  --color-space-800: #0f1a26;
+  --color-space-700: #152333;
+  --color-space-600: #1d3044;
+  --color-space-500: #274058;
+  --color-holo-900: #0d3a52;
+  --color-ink-500: #5f748a;
+
+  --panel-rgb: 15 26 38;
+  --panel-alpha: 0.9;
+  --input-rgb: 5 9 15;
+  --input-alpha: 0.6;
+  --chat-rgb: 8 30 44;
+  --chat-alpha: 0.78;
+  --btn-top-rgb: 29 48 68;
+  --btn-bot-rgb: 15 26 38;
+  --shell-top: #0a1119;
+  --shell-bottom: #05090f;
+  --shell-glow-holo: 0.12;
+  --shell-glow-ember: 0.08;
+  --hairline: rgb(47 183 232 / 0.22);
+  --panel-shadow: 0 10px 30px rgb(0 0 0 / 0.35);
+
+  --toastify-color-dark: #0f1a26;
+  --toastify-color-light: #0f1a26;
+}
+
+/* ---- LIGHT: pale blue-grey, dark navy text, deeper cyan/amber ----------- */
+:root[data-theme="light"] {
+  --color-space-950: #d9e3ed;   /* window base */
+  --color-space-900: #e4ecf3;
+  --color-space-800: #eef3f8;   /* panels */
+  --color-space-700: #f7fafc;   /* fills */
+  --color-space-600: #cbd8e4;   /* controls (switch off) */
+  --color-space-500: #b4c5d6;
+
+  --color-holo-900: #a9d5e8;    /* dim fill (switch on, scrollbar thumb) */
+  --color-holo-700: #4fb3dc;
+  --color-holo-500: #0b86b8;
+  --color-holo-400: #0a6f99;
+  --color-holo-300: #0a5a7d;    /* accent text */
+
+  --color-ember-600: #8a4409;
+  --color-ember-500: #c96a12;
+  --color-ember-400: #a85410;
+  --color-ember-300: #8a4409;   /* primary button text */
+
+  --color-ink-100: #13243a;
+  --color-ink-200: #22364e;
+  --color-ink-300: #4a6076;
+  --color-ink-500: #7a8ea3;
+
+  --color-danger-400: #b42323;
+  --color-danger-500: #d13b3b;
+  --color-danger-600: #a32020;
+
+  --holo-rgb: 11 134 184;
+  --ember-rgb: 201 106 18;
+  --danger-rgb: 209 59 59;
+  --panel-rgb: 255 255 255;
+  --panel-alpha: 0.72;
+  --input-rgb: 255 255 255;
+  --input-alpha: 0.85;
+  --chat-rgb: 225 238 246;
+  --chat-alpha: 0.85;
+  --btn-top-rgb: 255 255 255;
+  --btn-bot-rgb: 228 236 243;
+  --shell-top: #eef3f8;
+  --shell-bottom: #d9e3ed;
+  --shell-glow-holo: 0.14;
+  --shell-glow-ember: 0.10;
+  --glow: 0.35;
+  --hairline: rgb(11 134 184 / 0.35);
+  --panel-shadow: 0 8px 24px rgb(19 36 58 / 0.12);
+  --knob-rgb: 90 110 132;
+
+  color-scheme: light;
+  --toastify-color-dark: #ffffff;
+  --toastify-text-color-dark: #13243a;
+  --toastify-color-light: #ffffff;
+  --toastify-text-color-light: #13243a;
+  --toastify-color-info: #0b86b8;
+  --toastify-color-warning: #c96a12;
+  --toastify-color-error: #d13b3b;
+}
+
 @layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
+  html { color-scheme: dark; }
+  html[data-theme="light"] { color-scheme: light; }
+
+  body {
+    background: var(--color-space-950);
+    color: var(--color-ink-100);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
   }
+
+  /* Tailwind v4 default border is currentcolor; use the holo hairline instead
+     so bare `border` utilities match the theme. */
+  *, ::after, ::before, ::backdrop, ::file-selector-button {
+    border-color: var(--hairline);
+  }
+
+  ::selection { background: rgb(var(--holo-rgb) / 0.35); }
+
+  input[type="checkbox"], input[type="radio"], input[type="range"] {
+    accent-color: var(--color-holo-500);
+  }
+
+  select {
+    background-color: var(--color-space-800);
+    color: var(--color-ink-100);
+  }
+  option { background-color: var(--color-space-800); }
+
+  textarea::placeholder, input::placeholder { color: var(--color-ink-500); }
+
+  /* flatpickr (dark theme css is imported by the log viewer) retinted to the palette */
+  .flatpickr-calendar {
+    background: var(--color-space-800);
+    border: 1px solid rgb(var(--holo-rgb) / 0.3);
+    box-shadow: var(--panel-shadow);
+    font-family: var(--font-sans);
+  }
+  .flatpickr-months .flatpickr-month, .flatpickr-weekdays, span.flatpickr-weekday {
+    background: var(--color-space-700);
+    color: var(--color-ink-200);
+  }
+  .flatpickr-day { color: var(--color-ink-100); }
+  .flatpickr-day.flatpickr-disabled, .flatpickr-day.flatpickr-disabled:hover { color: var(--color-ink-500); }
+  .flatpickr-day.selected, .flatpickr-day.selected:hover {
+    background: var(--color-holo-700);
+    border-color: var(--color-holo-500);
+    color: #fff;
+  }
+  .flatpickr-day:hover { background: rgb(var(--holo-rgb) / 0.15); border-color: transparent; }
 }
 
-.chat-container-background {
-    background-color: rgba(7, 56, 76, 0.8);
+@layer components {
+  /* Window background when no image is set: gradient with faint glows. */
+  .app-shell {
+    background:
+      radial-gradient(1100px 500px at 15% -10%, rgb(var(--holo-rgb) / var(--shell-glow-holo)), transparent 60%),
+      radial-gradient(800px 500px at 110% 110%, rgb(var(--ember-rgb) / var(--shell-glow-ember)), transparent 60%),
+      linear-gradient(180deg, var(--shell-top), var(--shell-bottom));
+  }
+
+
+  .panel {
+    background: rgb(var(--panel-rgb) / var(--panel-alpha));
+    border: 1px solid var(--hairline);
+    border-radius: 0.25rem;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), var(--panel-shadow);
+  }
+  .panel-glass { backdrop-filter: blur(8px); }
+
+  /* thin gradient rule */
+  .holo-line {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgb(var(--holo-rgb) / 0.7), transparent);
+  }
+
+  /* Section / page heading: small caps tracked label with rules on both sides */
+  .title-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-size: 0.8rem;
+    color: var(--color-holo-300);
+    text-shadow: 0 0 12px rgb(var(--holo-rgb) / calc(0.35 * var(--glow)));
+  }
+  .title-bar::before, .title-bar::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgb(var(--holo-rgb) / 0.55));
+  }
+  .title-bar::after {
+    background: linear-gradient(90deg, rgb(var(--holo-rgb) / 0.55), transparent);
+  }
+
+  .eyebrow {
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.7rem;
+    color: var(--color-holo-400);
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.9rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    line-height: 1.25rem;
+    color: var(--color-ink-200);
+    background: linear-gradient(180deg, rgb(var(--btn-top-rgb) / 0.9), rgb(var(--btn-bot-rgb) / 0.9));
+    border: 1px solid rgb(var(--holo-rgb) / 0.4);
+    border-radius: 0.2rem;
+    transition: color 0.15s, border-color 0.15s, box-shadow 0.15s, background 0.15s, transform 0.05s;
+    user-select: none;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn:hover {
+    color: var(--color-holo-300);
+    border-color: rgb(var(--holo-rgb) / 0.8);
+    box-shadow:
+      0 0 14px rgb(var(--holo-rgb) / calc(0.25 * var(--glow))),
+      inset 0 0 12px rgb(var(--holo-rgb) / calc(0.08 * var(--glow)));
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+
+  .btn-primary {
+    color: var(--color-ember-300);
+    border-color: rgb(var(--ember-rgb) / 0.55);
+    background: linear-gradient(180deg, rgb(var(--ember-rgb) / 0.22), rgb(var(--ember-rgb) / 0.08));
+  }
+  .btn-primary:hover {
+    color: var(--color-ink-100);
+    border-color: rgb(var(--ember-rgb) / 0.95);
+    box-shadow:
+      0 0 16px rgb(var(--ember-rgb) / calc(0.35 * var(--glow))),
+      inset 0 0 12px rgb(var(--ember-rgb) / calc(0.1 * var(--glow)));
+  }
+
+  .btn-ghost { background: transparent; border-color: transparent; box-shadow: none; }
+  .btn-ghost:hover { background: rgb(var(--holo-rgb) / 0.08); border-color: rgb(var(--holo-rgb) / 0.35); box-shadow: none; }
+
+  .btn-danger { color: var(--color-danger-400); border-color: rgb(var(--danger-rgb) / 0.45); }
+  .btn-danger:hover {
+    color: #fff;
+    background: rgb(var(--danger-rgb) / 0.8);
+    border-color: rgb(var(--danger-rgb) / 0.9);
+    box-shadow: 0 0 14px rgb(var(--danger-rgb) / calc(0.3 * var(--glow)));
+  }
+
+  .btn-block { width: 100%; }
+  .btn-sm { padding: 0.15rem 0.6rem; font-size: 0.7rem; }
+
+  /* Icon-only square button (window chrome, footer links) */
+  .icon-btn {
+    display: inline-grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2rem;
+    color: var(--color-ink-300);
+    border-radius: 0.2rem;
+    transition: color 0.15s, background 0.15s;
+  }
+  .icon-btn:hover { color: var(--color-holo-300); background: rgb(var(--holo-rgb) / 0.1); }
+
+  /* Text inputs, textareas, selects */
+  .input {
+    width: 100%;
+    background: rgb(var(--input-rgb) / var(--input-alpha));
+    color: var(--color-ink-100);
+    border: 1px solid rgb(var(--holo-rgb) / 0.3);
+    border-radius: 0.2rem;
+    padding: 0.35rem 0.6rem;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .input:focus {
+    border-color: rgb(var(--holo-rgb) / 0.75);
+    box-shadow:
+      0 0 0 3px rgb(var(--holo-rgb) / 0.15),
+      0 0 16px rgb(var(--holo-rgb) / calc(0.12 * var(--glow)));
+  }
+
+  /* Chat composer / chat log background (teal tint, translucent) */
+  .chat-container-background {
+    background: rgb(var(--chat-rgb) / var(--chat-alpha));
+  }
+
+  /* Toggle switch built on a native checkbox */
+  .switch {
+    appearance: none;
+    position: relative;
+    width: 2.6rem;
+    height: 1.4rem;
+    border-radius: 9999px;
+    background: var(--color-space-600);
+    border: 1px solid rgb(var(--holo-rgb) / 0.3);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+    vertical-align: middle;
+  }
+  .switch::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 9999px;
+    background: rgb(var(--knob-rgb));
+    transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
+  }
+  .switch:hover { border-color: rgb(var(--holo-rgb) / 0.6); }
+  .switch:checked {
+    background: var(--color-holo-900);
+    border-color: rgb(var(--holo-rgb) / 0.8);
+    box-shadow: 0 0 10px rgb(var(--holo-rgb) / calc(0.3 * var(--glow)));
+  }
+  .switch:checked::before {
+    transform: translateX(1.2rem);
+    background: var(--color-holo-500);
+    box-shadow: 0 0 8px rgb(var(--holo-rgb) / calc(0.8 * var(--glow)));
+  }
+
+  /* Navbar entries */
+  .nav-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    height: 100%;
+    padding: 0 0.75rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.78rem;
+    color: var(--color-ink-200);
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+    user-select: none;
+  }
+  .nav-item:hover { color: var(--color-holo-300); background: rgb(var(--holo-rgb) / 0.06); }
+  .nav-item.active {
+    color: var(--color-holo-300);
+    border-bottom-color: var(--color-holo-500);
+    text-shadow: 0 0 10px rgb(var(--holo-rgb) / calc(0.5 * var(--glow)));
+  }
+
+  .menu-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.85rem;
+    color: var(--color-ink-200);
+    border-radius: 0.15rem;
+    user-select: none;
+  }
+  .menu-item:hover { color: var(--color-holo-300); background: rgb(var(--holo-rgb) / 0.1); }
+
+  /* Chat log tab */
+  .chat-tab {
+    padding: 0.2rem 0.75rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.72rem;
+    color: var(--color-ink-300);
+    background: rgb(var(--chat-rgb) / calc(var(--chat-alpha) * 0.6));
+    border: 1px solid rgb(var(--holo-rgb) / 0.25);
+    border-bottom: none;
+    border-radius: 0.2rem 0.2rem 0 0;
+    user-select: none;
+    transition: color 0.15s, background 0.15s;
+  }
+  .chat-tab:hover { color: var(--color-holo-300); }
+  .chat-tab.active {
+    color: var(--color-holo-300);
+    background: rgb(var(--chat-rgb) / var(--chat-alpha));
+    border-color: rgb(var(--holo-rgb) / 0.5);
+    box-shadow: inset 0 2px 0 var(--color-holo-500);
+  }
 }

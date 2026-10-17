@@ -61,13 +61,20 @@ export interface IWidthHeight {
     height: number;
 }
 
+export type Theme = "dark" | "lighter" | "light";
+export const THEMES: { value: Theme; label: string }[] = [
+    { value: "lighter", label: "Lighter (default)" },
+    { value: "dark", label: "Dark" },
+    { value: "light", label: "Light" },
+];
+
 export interface IAppSettings {
     window: IWidthHeight;
     show_window_decorations: boolean;
     opacity: number;
     always_on_top: boolean;
-    show_background_image: boolean;
     show_page_header: boolean;
+    theme: Theme;
 }
 
 export interface ISettings {
@@ -127,13 +134,17 @@ export function setup_chat_log_subscriber(): () => void {
         (state) => ({ settings: state.settings, chatLogActive: state.chatLogActive, hookedIn: state.hookedIn }),
         ({ settings, chatLogActive, hookedIn }) => {
             if (settings.chat_log.capture_chat_log && !chatLogActive && hookedIn) {
+                // The "Chat logging active" toast is shown when the DLL's hook
+                // report arrives (see init_hook_report_listener), not here: this
+                // only means the request reached the service.
                 invoke("set_capture_chat_log", { enabled: true })
                     .then(() => {
                         useAppStore.getState().setChatLogActive(true);
-                        toast.success("Chat logging active");
                     })
                     .catch(handle_capture_error as any);
-            } else if ((!settings.chat_log.capture_chat_log && chatLogActive) || !hookedIn) {
+            } else if (chatLogActive && (!settings.chat_log.capture_chat_log || !hookedIn)) {
+                // Only send a stop if capture was actually running; before this
+                // guard a spurious CaptureChatLog(false) went out at startup.
                 invoke("set_capture_chat_log", { enabled: false }).catch(() => {});
                 useAppStore.getState().setChatLogActive(false);
             }

@@ -9,7 +9,7 @@ interface SettingsRangeSliderProps {
 
 export default function SettingsRangeSlider({ value, min, max, onChange }: SettingsRangeSliderProps) {
     return (
-        <div>
+        <div className="flex items-center gap-3 w-56">
             <input
                 type="range"
                 value={value}
@@ -18,10 +18,7 @@ export default function SettingsRangeSlider({ value, min, max, onChange }: Setti
                 onChange={(e) => onChange(Number(e.target.value))}
                 className="w-full cursor-pointer"
             />
-            <div className="flex justify-between text-white text-xl">
-                <span>{min}%</span>
-                <span>{max}%</span>
-            </div>
+            <span className="eyebrow text-ink-200 w-12 text-right tabular-nums">{value}%</span>
         </div>
     );
 }

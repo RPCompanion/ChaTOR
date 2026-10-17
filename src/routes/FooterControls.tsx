@@ -28,42 +28,33 @@ export default function FooterControls() {
     }
 
     return (
-        <>
-            {version_string && (
-                <div className="text-white text-xl text-end px-1">{version_string}</div>
-            )}
-            <div className="relative w-full grid grid-cols-2 px-1 pb-1">
-                <div className="flex flex-row gap-1">
-                    <div className="flex flex-row gap-1">
-                        <span className="text-white text-xl">Made with</span>
-                        <Heart size={28} color="red" />
-                        <span className="text-white text-xl">by emmadear</span>
-                    </div>
-                </div>
-                <div className="flex flex-row-reverse gap-1">
-                    <button
-                        className="cursor-pointer bg-slate-500 rounded-md px-2"
-                        onClick={() => open_link("https://github.com/Davenport-Physics/SWTOR-Chat")}
-                    >
-                        <GithubLogo size={32} color="white" />
-                    </button>
-                    <button
-                        className="cursor-pointer bg-slate-500 rounded-md px-2"
-                        onClick={() => open_link("https://discord.gg/TwfBK94ree")}
-                    >
-                        <DiscordLogo size={32} color="white" />
-                    </button>
-                    <button className="cursor-pointer bg-slate-500 rounded-md px-2" onClick={open_db_dir}>
-                        <Folder size={32} color="white" />
-                    </button>
-                    <Checkbox
-                        checked={settings.app.always_on_top}
-                        onChange={(v) => updateSettings((draft) => { draft.app.always_on_top = v; })}
-                    >
-                        Always on top
-                    </Checkbox>
-                </div>
+        <div className="relative w-full flex items-center justify-between px-3 py-1.5 border-t border-holo-500/20 bg-space-950/60">
+            <div className="flex items-center gap-1.5 text-xs text-ink-300 select-none">
+                <span>Made with</span>
+                <Heart size={14} weight="fill" className="text-ember-500" />
+                <span>by emmadear</span>
+                {version_string && (
+                    <span className="ml-3 eyebrow text-[10px] tracking-[0.2em] text-ink-500">{version_string}</span>
+                )}
             </div>
-        </>
+            <div className="flex items-center gap-1">
+                <Checkbox
+                    checked={settings.app.always_on_top}
+                    onChange={(v) => updateSettings((draft) => { draft.app.always_on_top = v; })}
+                    size="small"
+                >
+                    Always on top
+                </Checkbox>
+                <button className="icon-btn" onClick={open_db_dir} title="Open database folder">
+                    <Folder size={18} />
+                </button>
+                <button className="icon-btn" onClick={() => open_link("https://discord.gg/TwfBK94ree")} title="Discord">
+                    <DiscordLogo size={18} />
+                </button>
+                <button className="icon-btn" onClick={() => open_link("https://github.com/Davenport-Physics/SWTOR-Chat")} title="GitHub">
+                    <GithubLogo size={18} />
+                </button>
+            </div>
+        </div>
     );
 }
