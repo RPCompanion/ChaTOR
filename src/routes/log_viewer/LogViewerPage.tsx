@@ -165,7 +165,7 @@ export default function LogViewerPage() {
                         options={{ enable: dates }}
                         onChange={on_change}
                         placeholder="Select a date"
-                        className="outline-none border-2 border-slate-700 rounded-md px-2 text-xl"
+                        className="outline-hidden border-2 border-slate-700 rounded-md px-2 text-xl"
                     />
                 </div>
                 <div className="flex flex-row-reverse relative w-full gap-2">

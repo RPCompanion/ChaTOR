@@ -34,6 +34,7 @@
     },
     "resources": [
       "./config.toml",
+      "./offsets.json",
       "./sql",
       "./misc/.itch.toml",
       "./post-build.bat",

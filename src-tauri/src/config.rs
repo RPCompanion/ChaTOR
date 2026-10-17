@@ -9,6 +9,9 @@ pub struct Config {
     pub crash_reporter_url: String,
     pub microsoft_webview2_url: String,
     pub service_binary_path: String,
+    /// GET endpoint returning an offsets.json document for recent swtor.exe builds.
+    #[serde(default)]
+    pub offsets_url: Option<String>,
 }
 
 static CONFIG: OnceLock<Config> = OnceLock::new();

@@ -100,7 +100,7 @@ export default function ManualPage() {
                         {!settings.chat.clear_chat_after_posting && (
                             <button
                                 type="button"
-                                className="bg-slate-700 text-white rounded-sm shadow-sm w-32 absolute right-0 hover:text-gray-300"
+                                className="bg-slate-700 text-white rounded-xs shadow-xs w-32 absolute right-0 hover:text-gray-300"
                                 onClick={() => setMessages([""])}
                             >
                                 Clear chat
@@ -112,7 +112,7 @@ export default function ManualPage() {
                         return (
                             <div key={idx} className="relative">
                                 <textarea
-                                    className={`w-full min-h-24 outline-none p-1 resize-none rounded-md border-2 border-slate-700 chat-container-background text-white
+                                    className={`w-full min-h-24 outline-hidden p-1 resize-none rounded-md border-2 border-slate-700 chat-container-background text-white
                                         ${escaped_len >= 200 && escaped_len <= 255 ? "border-yellow-400" : ""}
                                         ${escaped_len > 255 ? "border-red-500" : ""}`}
                                     value={message}
@@ -127,7 +127,7 @@ export default function ManualPage() {
                                 {!automated_posting && (
                                     <button
                                         type="button"
-                                        className="bg-slate-700 text-white rounded-sm shadow-sm px-2 absolute top-1/3 -right-8 hover:text-gray-300"
+                                        className="bg-slate-700 text-white rounded-xs shadow-xs px-2 absolute top-1/3 -right-8 hover:text-gray-300"
                                         onClick={() => on_single_post(idx)}
                                     >
                                         Post
@@ -139,7 +139,7 @@ export default function ManualPage() {
                     <div className="w-full h-6 flex flex-row-reverse">
                         <button
                             type="button"
-                            className="bg-slate-700 text-white rounded-sm shadow-sm w-32 hover:text-gray-300"
+                            className="bg-slate-700 text-white rounded-xs shadow-xs w-32 hover:text-gray-300"
                             onClick={on_new_message}
                         >
                             New

@@ -63,6 +63,15 @@ export default function ChatLogging() {
                     </Setting>
                 </>
             )}
+            <Setting
+                setting="Dynamic offset lookup"
+                sub_text="Locate the chat hook by scanning the game at runtime so it keeps working after game updates. Disable to use only the offsets table. Takes effect the next time chat logging starts."
+            >
+                <SettingsToggle
+                    checked={settings.chat_log.dynamic_offset_lookup}
+                    onChange={(v) => updateSettings((d) => { d.chat_log.dynamic_offset_lookup = v; })}
+                />
+            </Setting>
         </SettingSection>
     );
 }

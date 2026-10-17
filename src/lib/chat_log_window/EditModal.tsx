@@ -78,7 +78,7 @@ export default function EditModal({ index, chat_tab: initial_tab, onSave, onCanc
                 value={chat_tab.name}
                 onChange={(e) => setChatTab((t) => ({ ...t, name: e.target.value }))}
                 maxLength={12}
-                className="outline-none border-2 border-slate-800 text-xl"
+                className="outline-hidden border-2 border-slate-800 text-xl"
                 placeholder="tab name"
             />
             <p className="text-white text-xl"><b>Channel subscriptions</b></p>

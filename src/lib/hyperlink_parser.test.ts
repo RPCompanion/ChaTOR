@@ -1,7 +1,6 @@
 
 import { expect, test } from 'vitest';
 import { parse_hyperlink } from './hyperlink_parser';
-import type { Result } from './result';
 
 test("hyperlink_parser jediapedia item case", () => {
 
@@ -17,10 +16,9 @@ test("hyperlink_parser jediapedia item case", () => {
                 { id: 0n, modifier: 0n, unknown: 0n }
             ],
             final33: 33n
-        },
-        error: null
+        }
     };
-    expect(parse_hyperlink(hyperlink)).toEqual(expected);
+    expect(parse_hyperlink(hyperlink).unwrap()).toEqual(expected.ok);
 
 });
 
@@ -33,10 +31,9 @@ test("hyerlink_parser jediapedia quest case", () => {
             id: 16141142274106277946n,
             const1: 1n,
             quest_step: 2n
-        },
-        error: null
+        }
     }
-    expect(parse_hyperlink(hyperlink)).toEqual(expected);
+    expect(parse_hyperlink(hyperlink).unwrap()).toEqual(expected.ok);
 
 });
 
@@ -47,10 +44,9 @@ test("hyperlink_parser jediapedia url case", () => {
         ok: {
             type: "url",
             index: 14n
-        },
-        error: null
+        }
     }
-    expect(parse_hyperlink(hyperlink)).toEqual(expected);
+    expect(parse_hyperlink(hyperlink).unwrap()).toEqual(expected.ok);
 
 })
 
@@ -64,10 +60,9 @@ test("hyperlink_parser jediapedia achievement case", () => {
             character: "Example",
             completed: new Date("2014-10-12T16:15:56.985Z"),
             objectives: [1n, 1n, 1n, 1n]
-        },
-        error: null
+        }
     }
-    expect(parse_hyperlink(hyperlink)).toEqual(expected);
+    expect(parse_hyperlink(hyperlink).unwrap()).toEqual(expected.ok);
 
 })
 
@@ -79,9 +74,8 @@ test("hyperlink_parser jediapedia guild case", () => {
             type: "guild",
             id: 4611689395149764762n,
             name: "The Old Republic"
-        },
-        error: null  
+        }
     }
-    expect(parse_hyperlink(hyperlink)).toEqual(expected);
+    expect(parse_hyperlink(hyperlink).unwrap()).toEqual(expected.ok);
 
 });

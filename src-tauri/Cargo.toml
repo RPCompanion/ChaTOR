@@ -22,23 +22,23 @@ futures = "0.3"
 tokio = { version = "1", features = ["time", "macros"] }
 
 # Database
-rusqlite = { version = "0.32", features = ["bundled", "uuid", "serde_json"] }
+rusqlite = { version = "0.40", features = ["bundled", "uuid", "serde_json"] }
 
 # GUI
 tauri = { version = "2", features = [ "devtools"] }
 
 # Hashing
-sha2 = "0.10"
-base64 = "0.22"
+sha2 = "0.11"
+base64 = "0.23"
 uuid = "1.10"
 
 # Helpers
 int-enum = "1.1"
 
 # Local System
-directories = "5.0.1"
+directories = "6.0"
 open = "5.1"
-sysinfo = "0.32"
+sysinfo = "0.39"
 
 # Logging
 tracing = "0.1"
@@ -61,11 +61,12 @@ em-libs = { git = "https://github.com/Davenport-Physics/EmLibs" }
 rust-ini = "0.21"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-toml = "0.8"
+toml = "1.1"
 
 # Web
-reqwest = { version = "0.12", features = ["blocking"] }
-scraper = "0.19"
+# reqwest 0.13 defaults to rustls/aws-lc; keep the native TLS backend (OpenSSL / Schannel) used before.
+reqwest = { version = "0.13", default-features = false, features = ["blocking", "native-tls", "charset", "http2", "system-proxy"] }
+scraper = "0.27"
 tauri-plugin-dialog = "2"
 tauri-plugin-fs = "2"
 native-dialog = "0.9.6"

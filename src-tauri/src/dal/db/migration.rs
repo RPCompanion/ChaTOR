@@ -5,6 +5,7 @@ use std::fs::{self, DirEntry};
 
 use tracing::error;
 use rusqlite::{Row, Batch, params, Connection};
+use rusqlite::fallible_iterator::FallibleIterator;
 
 mod chat_tab_migration;
 

@@ -21,6 +21,7 @@ mod crash_reporter;
 mod config;
 mod logging;
 mod network;
+mod offsets;
 mod service_connection;
 mod service_launcher;
 mod steam;
@@ -64,8 +65,16 @@ pub fn run() {
                 .set_always_on_top(settings.app.always_on_top)
                 .expect("error while setting always on top.");
 
-            service_connection::start_server(app.handle().clone(), connection.clone());
-            service_launcher::launch_service();
+            offsets::init();
+            match service_connection::start_server(app.handle().clone(), connection.clone()) {
+                Ok(()) => service_launcher::start_supervisor(),
+                Err(_) => {
+                    error!(
+                        "Not launching chator-service: port {} is in use. Is another ChaTOR already running?",
+                        service_connection::DEFAULT_PORT
+                    );
+                }
+            }
 
             Ok(())
         })
@@ -102,9 +111,19 @@ pub fn run() {
             network::fetch_jediapedia_content,
             get_version
         ])
-        .run(tauri::generate_context!());
+        .build(tauri::generate_context!());
 
-    if let Err(e) = tauri_response {
+    match tauri_response {
+        Ok(app) => {
+            app.run(|_app_handle, event| {
+                if matches!(event, tauri::RunEvent::ExitRequested { .. } | tauri::RunEvent::Exit) {
+                    // Stops the supervisor from relaunching the service while we exit.
+                    // The service itself exits when its connection to us closes.
+                    service_launcher::mark_shutting_down();
+                }
+            });
+        }
+        Err(e) => {
         error!("Error starting Tauri: {:?}", e);
 
         #[cfg(target_os = "windows")]
@@ -125,10 +144,11 @@ pub fn run() {
         if response {
             open_link(config::config().microsoft_webview2_url.clone());
         }
-
+        }
     }
 
-        info!("Thanks for using ChaTOR");
+    service_launcher::mark_shutting_down();
+    info!("Thanks for using ChaTOR");
 
 
 }

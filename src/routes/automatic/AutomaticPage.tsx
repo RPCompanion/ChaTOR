@@ -87,7 +87,7 @@ export default function AutomaticPage() {
                         <div className="relative h-6">
                             <button
                                 type="button"
-                                className="bg-slate-800 text-white rounded-sm shadow-sm w-32 absolute right-0"
+                                className="bg-slate-800 text-white rounded-xs shadow-xs w-32 absolute right-0"
                                 onClick={() => setMessage("")}
                             >
                                 Clear chat
@@ -97,7 +97,7 @@ export default function AutomaticPage() {
                     <div className="relative">
                         <textarea
                             ref={textarea_ref}
-                            className="w-full min-h-36 outline-none p-1 rounded-md border-2 resize-none border-slate-700 chat-container-background text-white"
+                            className="w-full min-h-36 outline-hidden p-1 rounded-md border-2 resize-none border-slate-700 chat-container-background text-white"
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
                             onKeyDown={on_key_down}

@@ -8,6 +8,7 @@ import { init_swtor_message_listener } from "./network/swtor_message";
 import { init_dice_roll_listener } from "./network/dice_roll";
 import { init_active_local_character } from "./network/local_characters";
 import { init_custom_channels } from "./network/custom_channels";
+import { toast } from "react-toastify";
 
 export type MessageType = "ButtonEmote" | "ChatMessage";
 
@@ -23,6 +24,7 @@ export async function init_network(): Promise<() => void> {
     });
 
     const cleanupHook = init_hook();
+    init_hook_report_listener();
     init_swtor_message_listener();
     init_dice_roll_listener();
     init_custom_emotes();
@@ -43,6 +45,38 @@ function init_hook(): () => void {
     return () => {
         unlisten.then((fn) => fn());
     };
+}
+
+interface HookStatus {
+    name: string;
+    rva: number | null;
+    source: "Dynamic" | "Table" | "None";
+    installed: boolean;
+    detail: string | null;
+}
+
+interface HookReport {
+    sha256: string | null;
+    dynamic_lookup: boolean;
+    hooks: HookStatus[];
+}
+
+/// Surfaces the DLL's hook installation result. Hooks that could not be
+/// installed mean that part of chat logging (chat, rolls, sending) is inactive.
+function init_hook_report_listener() {
+    listen("hook_report", (event: any) => {
+        const report = event.payload as HookReport;
+        const failed = report.hooks.filter((h) => !h.installed);
+        if (failed.length === 0) {
+            return;
+        }
+        const names = failed.map((h) => h.name).join(", ");
+        if (failed.length === report.hooks.length) {
+            toast.error(`Chat logging hooks failed to install (${names}). This game version may need updated offsets.`);
+        } else {
+            toast.warn(`Some chat logging hooks failed to install: ${names}.`);
+        }
+    });
 }
 
 export async function submit_post(message_type: MessageType, messages: string[]): Promise<Result<[], string>> {

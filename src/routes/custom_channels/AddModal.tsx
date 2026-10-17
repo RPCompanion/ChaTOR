@@ -50,7 +50,7 @@ export default function AddModal({ onCancel }: AddModalProps) {
             <div className="w-full flex flex-col gap-2 items-center">
                 <input
                     type="text"
-                    className="rounded-md outline-none border-2 border-slate-700 px-2"
+                    className="rounded-md outline-hidden border-2 border-slate-700 px-2"
                     placeholder="channel name"
                     value={channel_name}
                     onChange={on_channel_input}

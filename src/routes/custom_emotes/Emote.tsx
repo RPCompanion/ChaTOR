@@ -48,7 +48,7 @@ export default function Emote({ emote: initial_emote, favourite }: EmoteProps) {
                 type="text"
                 value={emote.emote_name}
                 onChange={(e) => on_name_change(e.target.value)}
-                className={`w-1/2 text-xl outline-none border-2 rounded-md px-1 ${favourite ? "border-yellow-500" : "border-slate-500"}`}
+                className={`w-1/2 text-xl outline-hidden border-2 rounded-md px-1 ${favourite ? "border-yellow-500" : "border-slate-500"}`}
                 onBlur={() => update_custom_emote(emote)}
             />
             <div {...attributes} {...listeners} className="text-white cursor-grab">
@@ -58,7 +58,7 @@ export default function Emote({ emote: initial_emote, favourite }: EmoteProps) {
                 type="text"
                 value={emote.emote}
                 onChange={(e) => on_emote_change(e.target.value)}
-                className={`w-1/2 text-xl outline-none border-2 rounded-md px-1 ${favourite ? "border-yellow-500" : "border-slate-500"}`}
+                className={`w-1/2 text-xl outline-hidden border-2 rounded-md px-1 ${favourite ? "border-yellow-500" : "border-slate-500"}`}
                 onBlur={() => update_custom_emote(emote)}
             />
             <AnimatePresence>

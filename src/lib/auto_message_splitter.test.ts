@@ -10,32 +10,32 @@ import { default_settings } from './network/settings';
 test("auto_message_split simple string", () => {
 
     const input  = "Hello, my name is Liza.";
-    let expected = { ok: ["/e Hello, my name is Liza."], error: null }
+    let expected = { ok: ["/e Hello, my name is Liza."] }
 
     let splitter = new AutoMessageSplitter(input, default_settings());
 
-    expect(splitter.split()).toEqual(expected);
+    expect(splitter.split().unwrap()).toEqual(expected.ok);
 
 })
 
 test("auto_message_split long string", () => {
 
     const input  = "Hello, my name is Liza. I am a software engineer.";
-    let expected = { ok: ["/e Hello, my name is Liza. I am a software engineer."], error: null }
+    let expected = { ok: ["/e Hello, my name is Liza. I am a software engineer."] }
 
     let splitter = new AutoMessageSplitter(input, default_settings());
 
-    expect(splitter.split()).toEqual(expected)
+    expect(splitter.split().unwrap()).toEqual(expected.ok)
 
 })
 
 test("auto_message_split long string with quotes", () => {
 
     const input  = "\"Hello, my name is Liza.\" she said.";
-    let expected = { ok: ["/say \"Hello, my name is Liza.\" she said."], error: null }
+    let expected = { ok: ["/say \"Hello, my name is Liza.\" she said."] }
 
     let splitter = new AutoMessageSplitter(input, default_settings());
-    expect(splitter.split()).toEqual(expected)
+    expect(splitter.split().unwrap()).toEqual(expected.ok)
 
 })
 
@@ -56,13 +56,12 @@ test("auto_message_split single paragraph string", () => {
             "/e amidst the chaos, a street musician played a gentle melody on his guitar, his soulful voice rising above the din of traffic. A young couple stopped to listen, hand in hand, lost in the moment.",
             "/e the aroma of freshly baked bread wafted from a nearby bakery, mingling with the scent of blooming flowers from the corner florist.", 
             "/e it was a perfect snapshot of urban life, a reminder of the beauty and vibrancy that could be found in even the most ordinary of moments."
-        ],
-        error: null
+        ]
     };
 
     let splitter = new AutoMessageSplitter(input, default_settings());
 
-    expect(splitter.split()).toEqual(expected);
+    expect(splitter.split().unwrap()).toEqual(expected.ok);
 
 });
 
@@ -77,12 +76,11 @@ test("auto_message_split ellipsis", () => {
             "/e made a face like she really didn't want to answer that particular question.",
             `/say "Well ... I'm getting assigned to a new post. At least that's the word coming from up top. No idea where I'm off to next, but I do know that I'm not going to have an immediate C.O" she stated. "Instead ..." she gazed off into the distance.`,
             `/say "I'll be directly reporting to a Sith."`
-        ],
-        error: null
+        ]
     }
 
     let splitter = new AutoMessageSplitter(input, default_settings());
-    expect(splitter.split()).toEqual(expected);
+    expect(splitter.split().unwrap()).toEqual(expected.ok);
 
 })
 
@@ -103,12 +101,11 @@ test("auto_message_split multiple question marks in a quote", () => {
             "/e had a faint smile grace her lips, a fleeting acknowledgement of the Sith's words that hinted at a measure of approval.",
             "/e though she refrained from voicing her thoughts on the matter, there was a sense that she found him to be a 'good Sith,' or at least as close to one as the Empire would allow.",
             `/e straightening her posture, Elizala met his gaze, her brows furrowing slightly as a question formed on her tongue. "If I may inquire, my lord," she began, "who will serve as my commanding officer in this new role? Or shall I be reporting to you?"`
-        ],
-        error: null
+        ]
     }
 
     let splitter = new AutoMessageSplitter(input, default_settings());
-    expect(splitter.split()).toEqual(expected);
+    expect(splitter.split().unwrap()).toEqual(expected.ok);
 
 })
 
@@ -128,12 +125,11 @@ test("auto_message_split custom command", () => {
             "/g had a faint smile grace her lips, a fleeting acknowledgement of the Sith's words that hinted at a measure of approval.",
             "/g though she refrained from voicing her thoughts on the matter, there was a sense that she found him to be a 'good Sith,' or at least as close to one as the Empire would allow.",
             `/g straightening her posture, Elizala met his gaze, her brows furrowing slightly as a question formed on her tongue. "If I may inquire, my lord," she began, "who will serve as my commanding officer in this new role? Or shall I be reporting to you?"`
-        ],
-        error: null
+        ]
     }
 
     let splitter = new AutoMessageSplitter(input, default_settings());
-    expect(splitter.split()).toEqual(expected); 
+    expect(splitter.split().unwrap()).toEqual(expected.ok); 
 })
 
 test("auto_message_split first last name whisper", () => {
@@ -150,12 +146,11 @@ test("auto_message_split first last name whisper", () => {
             "/w Somebodyyy bodyy: Ah okay! I got my bachelors of science in physics and then got into a PhD program in high energy physics. I was the computer geek of the group.",
             "/w Somebodyyy bodyy: i wrote simulation code for the detector we were building, and detectors that already existed. All that code was in C++, Lua and a little bit of python. Then I left the program.",
             "/w Somebodyyy bodyy: the time required to be a successful physicist wasn't conducive to having a work/life balance. Nowadays I program in rust."
-        ],
-        error: null
+        ]
     }
 
     let splitter = new AutoMessageSplitter(input, default_settings());
-    expect(splitter.split()).toEqual(expected);
+    expect(splitter.split().unwrap()).toEqual(expected.ok);
 
 });
 
@@ -182,7 +177,7 @@ test("auto_message_split multi-sentence quotes", () => {
     }
 
     let splitter = new AutoMessageSplitter(input, default_settings());
-    expect(splitter.split()).toEqual(expected);
+    expect(splitter.split().unwrap()).toEqual(expected.ok);
 
 })
 

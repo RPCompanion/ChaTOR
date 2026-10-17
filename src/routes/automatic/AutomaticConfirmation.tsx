@@ -57,7 +57,7 @@ export default function AutomaticConfirmation({
                         {messages.map((message, idx) => (
                             <textarea
                                 key={idx}
-                                className="w-full outline-none p-1 rounded-md border-2 resize-none"
+                                className="w-full outline-hidden p-1 rounded-md border-2 resize-none"
                                 maxLength={GAME_MESSAGE_MAXIMUM}
                                 value={message}
                                 onChange={(e) => {

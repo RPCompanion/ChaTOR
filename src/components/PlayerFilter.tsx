@@ -61,7 +61,7 @@ export default function PlayerFilter({ elems, onElemsChange }: PlayerFilterProps
                             value={player_search}
                             onChange={(e) => setPlayerSearch(e.target.value)}
                             placeholder="Search for player"
-                            className="w-full px-2 rounded-md outline-none border-2 border-slate-700"
+                            className="w-full px-2 rounded-md outline-hidden border-2 border-slate-700"
                         />
                     </div>
                     <div className="h-2"></div>

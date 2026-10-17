@@ -2,7 +2,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { toast } from "react-toastify";
 import { useAppStore } from "../../store/useAppStore";
 import { set_initial_swtor_channels } from "./swtor_message/swtor_chat_tab_messages";
-import { init_active_local_character } from "./local_characters";
+import { init_active_local_character, IColor } from "./local_characters";
 import default_settings_obj from "./default_settings.json";
 
 export type ChannelDispatcher =
@@ -51,6 +51,7 @@ export interface IChatLogSettings {
     capture_chat_log: boolean;
     log_global_chat: boolean;
     retry_message_submission: boolean;
+    dynamic_offset_lookup: boolean;
     character_ini_to_pull_from: string | null;
     window: IChatLogWindow;
 }

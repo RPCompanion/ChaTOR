@@ -2,3 +2,6 @@
 crash_reporter_url     = "https://apiv2.rpcompanion.com/crash_reports/chator"
 microsoft_webview2_url = "https://developer.microsoft.com/en-us/microsoft-edge/webview2/?form=MA13LH"
 service_binary_path    = "/mnt/5b56d12f-f85a-4f65-9999-144bbc80d08b/Software/ChaTOR Project/chator-service/target/x86_64-pc-windows-msvc/debug/chator-service.exe"
+# GET endpoint serving an offsets.json document (same schema as offsets.json)
+# with hook offsets for the latest swtor.exe builds. Leave unset to skip.
+# offsets_url = "https://example.invalid/chator/offsets.json"

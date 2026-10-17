@@ -63,11 +63,11 @@ export default function ExternalFragment({ fragment }: ExternalFragmentProps) {
     return (
         <>
             {name != undefined ? (
-                <span className="break-words text-yellow-300 cursor-pointer select-none" onClick={on_click}>
+                <span className="wrap-break-word text-yellow-300 cursor-pointer select-none" onClick={on_click}>
                     {"{" + name + "}"}
                 </span>
             ) : (
-                <span className="break-words text-yellow-300 select-none">{"<Loading>"}</span>
+                <span className="wrap-break-word text-yellow-300 select-none">{"<Loading>"}</span>
             )}
             <AnimatePresence>
                 {show_content && content != undefined && (

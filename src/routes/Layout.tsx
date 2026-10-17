@@ -23,7 +23,7 @@ export default function Layout() {
                     <div className="h-8"></div>
                 </>
             )}
-            <div className="flex-grow">
+            <div className="grow">
                 <Navbar />
                 <Outlet />
             </div>

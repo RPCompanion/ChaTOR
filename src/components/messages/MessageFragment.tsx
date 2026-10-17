@@ -40,11 +40,11 @@ export default function MessageFragment({ fragment, channel_type }: MessageFragm
     const color_hex = get_channel_color(settings, channel_type);
 
     if (typeof fragment === "string") {
-        return <span className="break-words" style={{ color: color_hex }}>{unicode_unescape(fragment)}</span>;
+        return <span className="wrap-break-word" style={{ color: color_hex }}>{unicode_unescape(fragment)}</span>;
     }
 
     if (fragment instanceof HyperLinkGuild) {
-        return <span className="break-words text-yellow-300">{fragment.as_string().unwrap()}</span>;
+        return <span className="wrap-break-word text-yellow-300">{fragment.as_string().unwrap()}</span>;
     }
     if (fragment instanceof HyperLinkItem) {
         return <ExternalFragment fragment={fragment} />;
@@ -55,5 +55,5 @@ export default function MessageFragment({ fragment, channel_type }: MessageFragm
     if (fragment instanceof HyperLinkAchievement) {
         return <ExternalFragment fragment={fragment} />;
     }
-    return <span className="break-words" style={{ color: color_hex }}>{"<Unknown>"}</span>;
+    return <span className="wrap-break-word" style={{ color: color_hex }}>{"<Unknown>"}</span>;
 }

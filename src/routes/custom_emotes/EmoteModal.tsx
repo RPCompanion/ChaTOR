@@ -65,7 +65,7 @@ export default function EmoteModal({ show_modal, onSave, onCancel }: EmoteModalP
                                 name="EmoteName"
                                 autoComplete="off"
                                 placeholder="Emote Name"
-                                className="w-1/2 px-1 text-xl outline-none"
+                                className="w-1/2 px-1 text-xl outline-hidden"
                                 value={emote_name}
                                 onChange={(e) => setEmoteName(e.target.value)}
                             />
@@ -74,7 +74,7 @@ export default function EmoteModal({ show_modal, onSave, onCancel }: EmoteModalP
                                 name="UniqueEmote"
                                 autoComplete="off"
                                 placeholder="Emote"
-                                className={`w-1/2 px-1 text-xl outline-none ${emote.length > GAME_MESSAGE_MAXIMUM ? "outline-red-500" : ""}`}
+                                className={`w-1/2 px-1 text-xl outline-hidden ${emote.length > GAME_MESSAGE_MAXIMUM ? "outline-red-500" : ""}`}
                                 value={emote}
                                 onChange={(e) => setEmote(e.target.value)}
                             />

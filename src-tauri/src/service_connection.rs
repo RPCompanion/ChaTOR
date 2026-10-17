@@ -12,6 +12,7 @@ use tracing::{error, info};
 use crate::dal::db::dice_roll::DiceRoll;
 use crate::dal::db::swtor_message::SwtorMessage;
 use crate::dal::db::user_character_messages::UserCharacterMessages;
+use crate::offsets::{HookReport, OffsetTable};
 
 #[derive(Serialize, Deserialize)]
 pub enum FromClient {
@@ -21,6 +22,10 @@ pub enum FromClient {
         retry: bool,
         character_message: UserCharacterMessages,
         callback_id: i64,
+    },
+    ConfigureOffsets {
+        dynamic_lookup: bool,
+        table: OffsetTable,
     },
 }
 
@@ -34,6 +39,7 @@ pub enum FromService {
         result: Result<(), String>,
     },
     KeepWindowInFocus(bool),
+    HookReport(HookReport),
 }
 
 type CallbackSender = tokio::sync::oneshot::Sender<Result<(), String>>;
@@ -102,18 +108,20 @@ impl ServiceConnection {
 
 pub const DEFAULT_PORT: u16 = 30100;
 
-pub fn start_server(app_handle: AppHandle, connection: Arc<ServiceConnection>) {
+/// Binds the listener the service connects to and starts accepting on a
+/// background thread. Binding happens synchronously so the caller knows the
+/// port is ours before launching the service; a failure usually means another
+/// ChaTOR instance is already running.
+pub fn start_server(app_handle: AppHandle, connection: Arc<ServiceConnection>) -> Result<(), String> {
+    let listener = TcpListener::bind(format!("0.0.0.0:{}", DEFAULT_PORT)).map_err(|e| {
+        let msg = format!("Failed to bind TCP server on port {}: {}", DEFAULT_PORT, e);
+        error!("{}", msg);
+        msg
+    })?;
+
+    info!("Service connection server listening on port {}", DEFAULT_PORT);
+
     thread::spawn(move || {
-        let listener = match TcpListener::bind(format!("0.0.0.0:{}", DEFAULT_PORT)) {
-            Ok(l) => l,
-            Err(e) => {
-                error!("Failed to bind TCP server on port {}: {}", DEFAULT_PORT, e);
-                return;
-            }
-        };
-
-        info!("Service connection server listening on port {}", DEFAULT_PORT);
-
         for incoming in listener.incoming() {
             match incoming {
                 Ok(stream) => {
@@ -145,6 +153,8 @@ pub fn start_server(app_handle: AppHandle, connection: Arc<ServiceConnection>) {
             }
         }
     });
+
+    Ok(())
 }
 
 fn read_loop(app: AppHandle, connection: Arc<ServiceConnection>, stream: TcpStream) {
@@ -205,6 +215,19 @@ fn handle_service_message(
                 "keep_window_in_focus",
                 serde_json::json!({ "value": value }),
             );
+        }
+        FromService::HookReport(report) => {
+            for h in &report.hooks {
+                info!(
+                    "Hook {}: rva={} source={} installed={} {}",
+                    h.name,
+                    h.rva.map(|r| format!("0x{:x}", r)).unwrap_or_else(|| "none".into()),
+                    h.source,
+                    h.installed,
+                    h.detail.as_deref().unwrap_or("")
+                );
+            }
+            let _ = app.emit("hook_report", &report);
         }
     }
 }

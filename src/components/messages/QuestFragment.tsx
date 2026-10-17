@@ -18,7 +18,7 @@ export default function QuestFragment({ fragment }: QuestFragmentProps) {
     }, [fragment.id]);
 
     if (name != undefined) {
-        return <span className="break-words text-yellow-300">{"<" + name + ">"}</span>;
+        return <span className="wrap-break-word text-yellow-300">{"<" + name + ">"}</span>;
     }
-    return <span className="break-words text-yellow-300 select-none">{"<Loading>"}</span>;
+    return <span className="wrap-break-word text-yellow-300 select-none">{"<Loading>"}</span>;
 }

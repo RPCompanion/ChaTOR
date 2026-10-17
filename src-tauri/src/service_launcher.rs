@@ -1,11 +1,101 @@
+//! Launches chator-service and keeps it alive.
+//!
+//! The service connects *to* ChaTOR (ChaTOR owns the TCP listener) and exits
+//! on its own when that connection drops, so shutting ChaTOR down shuts the
+//! service down too. What this module adds on top of that:
+//!   * a supervisor thread that waits on the child, reaps it, and relaunches it
+//!     if it exits while ChaTOR is still running (crash, or a lost race against
+//!     the listener at startup), with backoff and a cap on rapid failures;
+//!   * a shutdown flag so the supervisor does not relaunch during app exit.
+//! On Linux the child is Proton's `proton run` wrapper, which blocks until the
+//! Windows process exits, so waiting on it tracks the real service lifetime.
+
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::thread;
+use std::time::{Duration, Instant};
 
-use tracing::{error, info};
+use tracing::{error, info, warn};
 
 use crate::config;
 use crate::service_connection::DEFAULT_PORT;
 use crate::steam;
+
+static SHUTTING_DOWN: AtomicBool = AtomicBool::new(false);
+
+/// Relaunch delay after the service exits.
+const RESTART_DELAY: Duration = Duration::from_secs(2);
+/// A run shorter than this counts as a rapid failure.
+const RAPID_FAILURE_WINDOW: Duration = Duration::from_secs(30);
+/// Give up after this many consecutive rapid failures.
+const MAX_RAPID_FAILURES: u32 = 5;
+
+/// Marks the app as exiting so the supervisor stops relaunching the service.
+pub fn mark_shutting_down() {
+    SHUTTING_DOWN.store(true, Ordering::SeqCst);
+}
+
+fn shutting_down() -> bool {
+    SHUTTING_DOWN.load(Ordering::SeqCst)
+}
+
+/// Launches the service and supervises it on a background thread.
+pub fn start_supervisor() {
+    thread::Builder::new()
+        .name("service-supervisor".into())
+        .spawn(supervise)
+        .expect("failed to spawn service supervisor thread");
+}
+
+fn supervise() {
+    let mut rapid_failures: u32 = 0;
+
+    loop {
+        if shutting_down() {
+            return;
+        }
+
+        let started = Instant::now();
+        let mut child = match launch_service() {
+            Some(c) => c,
+            None => {
+                error!("Service could not be launched; not retrying (fix the configuration and restart ChaTOR)");
+                return;
+            }
+        };
+
+        let status = child.wait();
+        let ran_for = started.elapsed();
+
+        if shutting_down() {
+            info!("Service exited during shutdown ({:?})", status.ok());
+            return;
+        }
+
+        match &status {
+            Ok(st) => warn!("Service exited ({}), ran for {:.1}s", st, ran_for.as_secs_f32()),
+            Err(e) => error!("Failed waiting on service process: {}", e),
+        }
+
+        if ran_for < RAPID_FAILURE_WINDOW {
+            rapid_failures += 1;
+            if rapid_failures >= MAX_RAPID_FAILURES {
+                error!(
+                    "Service failed {} times in a row within {}s of starting; giving up. Restart ChaTOR to try again.",
+                    rapid_failures,
+                    RAPID_FAILURE_WINDOW.as_secs()
+                );
+                return;
+            }
+        } else {
+            rapid_failures = 0;
+        }
+
+        info!("Relaunching service in {:?}", RESTART_DELAY);
+        thread::sleep(RESTART_DELAY);
+    }
+}
 
 pub fn launch_service() -> Option<Child> {
     let binary_path = &config::config().service_binary_path;

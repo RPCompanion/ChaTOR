@@ -126,7 +126,7 @@ export default function ChatLogWindow({ onWhisper }: ChatLogWindowProps) {
             <ChannelColorPickerModal show={show_channel_color_picker} onClose={() => setShowChannelColorPicker(false)} />
 
             <div>
-                <div className="grid grid-cols-[1fr,auto]">
+                <div className="grid grid-cols-[1fr_auto]">
                     <ChatTabs />
                     <div className="flex justify-end items-center">
                         <button className="text-white hover:text-gray-400" onClick={() => setShowChannelColorPicker(true)}>
