@@ -12,6 +12,7 @@ use tracing::{error, info};
 use crash_reporter::CrashReporter;
 use crash_reporter::sys_info::SysInfo;
 
+mod app_dir;
 mod swtor_hook;
 mod dal;
 mod share;
@@ -30,10 +31,15 @@ mod steam;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
 
+    // Must come first: config, logs, sql, gamedata and the service are all
+    // addressed relative to the app directory.
+    let app_dir = app_dir::resolve_and_enter();
+
     let _guard = logging::init();
 
     init_system();
     info!("Starting ChaTOR");
+    info!("App directory: {}", app_dir.display());
     info!("System Information {}", SysInfo::default().as_json());
     info!("Client Settings {}", dal::db::settings::get_settings().as_json());
 
@@ -218,12 +224,7 @@ fn setup_panic_hook() {
 
         let open_log_dir = || {
 
-            match std::env::current_dir() {
-                Ok(dir) => {
-                    let _ = open::that(format!("{}/{}", dir.to_str().unwrap(), "logs"));
-                },
-                Err(_) => {}
-            }
+            let _ = open::that(logging::log_dir());
 
         };
 

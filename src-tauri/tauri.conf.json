@@ -36,9 +36,8 @@
       "./config.toml",
       "./offsets.json",
       "./sql",
-      "./misc/.itch.toml",
-      "./post-build.bat",
-      "./gamedata"
+      "./gamedata",
+      "./service/"
     ],
     "shortDescription": "",
     "linux": {

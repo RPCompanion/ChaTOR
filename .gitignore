@@ -25,3 +25,7 @@ dist-ssr
 .routify
 *.code-workspace
 *.exe
+# built chator-service.exe + swtor_chat_capture.dll (copied in by chator-service/build.sh)
+/src-tauri/service/
+/release/
+/release.toml

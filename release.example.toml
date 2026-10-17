@@ -1,0 +1,15 @@
+# Copy to release.toml (gitignored) to enable `uv run build.py all --sign`.
+# Secrets are read from environment variables named here, never from this file.
+
+[signing.windows]
+# osslsigncode signs PE files from Linux (dnf install osslsigncode); use "signtool" on Windows.
+tool = "osslsigncode"
+certificate = "/path/to/codesign.pfx"      # for signtool: the certificate SHA1 thumbprint instead
+password_env = "CHATOR_SIGN_PASSWORD"
+timestamp_url = "http://timestamp.digicert.com"
+description = "ChaTOR"
+url = "https://github.com/Davenport-Physics/SWTOR-Chat"
+
+[signing.linux]
+# Detached .asc signatures for the deb/rpm/AppImage, plus SHA256SUMS is always written.
+gpg_key = "YOUR-GPG-KEY-ID"

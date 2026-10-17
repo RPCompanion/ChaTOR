@@ -98,12 +98,24 @@ fn supervise() {
 }
 
 pub fn launch_service() -> Option<Child> {
-    let binary_path = &config::config().service_binary_path;
+    // Relative paths (the packaged default is `service/chator-service.exe`)
+    // resolve against the app directory, which app_dir::resolve_and_enter()
+    // made the current directory at startup.
+    let configured = PathBuf::from(&config::config().service_binary_path);
+    let resolved = if configured.is_absolute() {
+        configured
+    } else {
+        std::env::current_dir().map(|d| d.join(&configured)).unwrap_or(configured)
+    };
 
-    if !Path::new(binary_path).exists() {
-        error!("Service binary not found at: {}", binary_path);
+    if !resolved.exists() {
+        error!(
+            "Service binary not found at: {} (service_binary_path in config.toml; run chator-service/build.sh to produce it)",
+            resolved.display()
+        );
         return None;
     }
+    let binary_path: &str = &resolved.to_string_lossy();
 
     let address = format!("127.0.0.1:{}", DEFAULT_PORT);
 
@@ -114,10 +126,29 @@ pub fn launch_service() -> Option<Child> {
     }
 }
 
+/// The client's log directory as an absolute path, so the service writes its
+/// `chator-service.log.*` files next to `chator.log.*`. Under Proton the path is
+/// handed over through Wine's Z: drive, which maps the host root.
+fn service_log_dir(for_wine: bool) -> Option<String> {
+    let dir = crate::logging::log_dir();
+    let abs = dir.canonicalize().ok()?;
+    let s = abs.to_string_lossy().into_owned();
+    if for_wine {
+        Some(format!("Z:{}", s.replace('/', "\\")))
+    } else {
+        Some(s)
+    }
+}
+
 fn launch_native(binary_path: &str, address: &str) -> Option<Child> {
     info!("Launching service natively: {} {}", binary_path, address);
 
-    match Command::new(binary_path).arg(address).spawn() {
+    let mut command = Command::new(binary_path);
+    command.arg(address);
+    if let Some(dir) = service_log_dir(false) {
+        command.env("CHATOR_LOG_DIR", dir);
+    }
+    match command.spawn() {
         Ok(child) => {
             info!("Service launched (pid: {})", child.id());
             Some(child)
@@ -175,13 +206,18 @@ fn launch_via_proton(binary_path: &str, address: &str) -> Option<Child> {
     if let Some(fallback) = &swtor_exe_fallback {
         command.env("CHATOR_SWTOR_EXE", fallback);
     }
+    let log_dir = service_log_dir(true);
+    if let Some(dir) = &log_dir {
+        command.env("CHATOR_LOG_DIR", dir);
+    }
 
     info!(
-        "Service environment:\n  STEAM_COMPAT_APP_ID={}\n  STEAM_COMPAT_LIBRARY_PATHS={}\n  STEAM_COMPAT_INSTALL_PATH={}\n  CHATOR_SWTOR_EXE={}",
+        "Service environment:\n  STEAM_COMPAT_APP_ID={}\n  STEAM_COMPAT_LIBRARY_PATHS={}\n  STEAM_COMPAT_INSTALL_PATH={}\n  CHATOR_SWTOR_EXE={}\n  CHATOR_LOG_DIR={}",
         steam::SWTOR_APP_ID,
         library_paths_env,
         swtor_install.as_ref().map(|p| p.display().to_string()).unwrap_or_else(|| "<not found>".into()),
-        swtor_exe_fallback.as_deref().unwrap_or("<not found>")
+        swtor_exe_fallback.as_deref().unwrap_or("<not found>"),
+        log_dir.as_deref().unwrap_or("<service default>")
     );
 
     match command.spawn() {

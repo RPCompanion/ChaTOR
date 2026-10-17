@@ -1,6 +1,7 @@
 
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
+use std::sync::OnceLock;
 
 #[cfg(target_os = "windows")]
 use std::os::windows::fs::MetadataExt;
@@ -13,12 +14,26 @@ use tracing_appender::{self, non_blocking::WorkerGuard};
 const WINDOWS_TICK: u64      = 10000000;
 const SEC_TO_UNIX_EPOCH: u64 = 11644473600;
 
+static LOG_DIR: OnceLock<PathBuf> = OnceLock::new();
+
+/// `./logs` next to the app when that is writable (dev, portable zip),
+/// otherwise `<data dir>/logs` (deb/rpm/AppImage installs, Program Files).
+pub fn log_dir() -> &'static Path {
+    LOG_DIR.get_or_init(|| {
+        if crate::app_dir::cwd_is_writable() {
+            PathBuf::from("./logs")
+        } else {
+            PathBuf::from(crate::dal::get_em_dirs().get_data_dir_path("logs"))
+        }
+    })
+}
+
 pub fn init() -> WorkerGuard {
 
-    let path = Path::new("./logs");
+    let path = log_dir();
     if !path.exists() {
 
-        fs::create_dir("./logs")
+        fs::create_dir_all(path)
             .expect("error while creating logs directory");
 
     } else {
@@ -27,7 +42,7 @@ pub fn init() -> WorkerGuard {
 
     }
 
-    let file_appender = tracing_appender::rolling::daily("./logs", "chator.log");
+    let file_appender = tracing_appender::rolling::daily(path, "chator.log");
     let (non_blocking, guard) = tracing_appender::non_blocking(file_appender);
 
     let env_filter = if cfg!(debug_assertions) {
@@ -58,7 +73,7 @@ pub fn init() -> WorkerGuard {
 
 fn delete_stale_files() {
 
-    let path = Path::new("./logs");
+    let path = log_dir();
     let files = fs::read_dir(path)
         .expect("error while reading logs directory");
 

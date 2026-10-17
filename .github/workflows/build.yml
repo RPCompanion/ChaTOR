@@ -1,0 +1,238 @@
+# Builds ChaTOR for Linux (deb, rpm, AppImage) and Windows (portable zip) with
+# chator-service bundled, on a single Ubuntu runner, using the same script as
+# local release builds (build.py). Windows is cross-compiled with cargo-xwin.
+#
+#   push to master / pull request   -> build, upload workflow artifacts
+#   push a tag vX.Y.Z               -> build, then publish a GitHub Release
+#                                      (and push to itch.io if configured)
+#   Actions tab -> Run workflow     -> build; optionally pick a chator-service ref
+#
+# Optional configuration (Settings -> Secrets and variables -> Actions):
+#   vars.CHATOR_SERVICE_REF          chator-service branch/tag/SHA to bundle (default: its default branch)
+#   secrets.WINDOWS_SIGNING_CERT     base64 of a .pfx code signing certificate  -> signs ChaTOR.exe,
+#   secrets.WINDOWS_SIGNING_PASSWORD its password                                 chator-service.exe, the DLL
+#   vars.ITCH_PROJECT                e.g. dakstrum/ChaTOR  } both set -> tagged releases are also pushed
+#   secrets.BUTLER_API_KEY           itch.io API key       }   to itch channels win-64 and linux-64
+
+name: Build & Release
+
+on:
+  push:
+    branches: [master]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      service_ref:
+        description: chator-service branch, tag or SHA to bundle (empty = its default branch)
+        required: false
+        default: ""
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_XWIN_VERSION: "0.23.1"
+
+jobs:
+  build:
+    name: Build Linux + Windows
+    # 22.04 keeps the glibc floor low so the deb/AppImage run on older distros.
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      artifact: ${{ steps.version.outputs.artifact }}
+    env:
+      APPIMAGE_EXTRACT_AND_RUN: "1"
+      HAS_WIN_SIGNING: ${{ secrets.WINDOWS_SIGNING_CERT != '' }}
+    steps:
+      - name: Checkout ChaTOR
+        uses: actions/checkout@v7
+        with:
+          path: ChaTOR
+
+      # chator-service must sit next to ChaTOR: it include_str!s ../ChaTOR/src-tauri/offsets.json
+      - name: Checkout chator-service
+        uses: actions/checkout@v7
+        with:
+          repository: RPCompanion/chator-service
+          ref: ${{ inputs.service_ref || vars.CHATOR_SERVICE_REF || '' }}
+          path: chator-service
+
+      - name: Read version
+        id: version
+        run: |
+          v=$(python3 -c "import json;print(json.load(open('ChaTOR/src-tauri/tauri.conf.json'))['version'])")
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          echo "artifact=ChaTOR-$v-build${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "ChaTOR $v, chator-service $(git -C chator-service rev-parse --short HEAD)"
+          if [[ "$GITHUB_REF" == refs/tags/v* && "${GITHUB_REF_NAME#v}" != "$v" ]]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match tauri.conf.json version $v"
+            exit 1
+          fi
+
+      - name: Install system packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev libssl-dev \
+            patchelf file rpm clang lld llvm
+          # cargo-xwin and Tauri's Windows resource step want unversioned
+          # clang-cl / lld-link / llvm-rc / llvm-lib from one LLVM release.
+          for d in $(find /usr/lib -maxdepth 1 -name "llvm-*" -type d | sort -V -r); do
+            if [ -x "$d/bin/clang-cl" ] && [ -x "$d/bin/lld-link" ] && [ -x "$d/bin/llvm-rc" ] && [ -x "$d/bin/llvm-lib" ]; then
+              echo "Using $d"; echo "$d/bin" >> "$GITHUB_PATH"; exit 0
+            fi
+          done
+          echo "::error::no LLVM install provides clang-cl, lld-link, llvm-rc and llvm-lib"; exit 1
+
+      - name: Install Rust (nightly + Windows target)
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Cache Rust builds
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            ChaTOR/src-tauri -> target
+            chator-service -> target
+          save-if: ${{ github.event_name != 'pull_request' }}
+
+      - name: Cache cargo-xwin MSVC SDK and Tauri bundler tools
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cache/cargo-xwin
+            ~/.cache/tauri
+          key: xwin-${{ env.CARGO_XWIN_VERSION }}-${{ runner.os }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10
+
+      - name: Install cargo-xwin
+        run: |
+          uv tool install "cargo-xwin==${CARGO_XWIN_VERSION}"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Install Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ChaTOR/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: ChaTOR
+        run: npm ci --legacy-peer-deps --no-audit --no-fund
+
+      - name: Type check and tests
+        working-directory: ChaTOR
+        run: |
+          npx tsc --noEmit -p tsconfig.json
+          npx vitest run
+
+      - name: Configure Windows code signing
+        if: env.HAS_WIN_SIGNING == 'true' && github.event_name != 'pull_request'
+        env:
+          WINDOWS_SIGNING_CERT: ${{ secrets.WINDOWS_SIGNING_CERT }}
+        run: |
+          sudo apt-get install -y --no-install-recommends osslsigncode
+          echo "$WINDOWS_SIGNING_CERT" | base64 -d > "$RUNNER_TEMP/codesign.pfx"
+          cat > ChaTOR/release.toml <<TOML
+          [signing.windows]
+          tool = "osslsigncode"
+          certificate = "$RUNNER_TEMP/codesign.pfx"
+          password_env = "WINDOWS_SIGNING_PASSWORD"
+          timestamp_url = "http://timestamp.digicert.com"
+          description = "ChaTOR"
+          url = "https://github.com/${{ github.repository }}"
+          TOML
+
+      - name: Build service, Linux bundles and Windows portable
+        working-directory: ChaTOR
+        env:
+          WINDOWS_SIGNING_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
+        run: |
+          args=(all --no-install)
+          if [[ -f release.toml ]]; then args+=(--sign); fi
+          uv run build.py "${args[@]}"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ steps.version.outputs.artifact }}
+          path: |
+            ChaTOR/release/${{ steps.version.outputs.version }}/*.deb
+            ChaTOR/release/${{ steps.version.outputs.version }}/*.rpm
+            ChaTOR/release/${{ steps.version.outputs.version }}/*.AppImage
+            ChaTOR/release/${{ steps.version.outputs.version }}/windows/*.zip
+            ChaTOR/release/${{ steps.version.outputs.version }}/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Remove signing material
+        if: always()
+        run: rm -f "$RUNNER_TEMP/codesign.pfx" ChaTOR/release.toml
+
+  release:
+    name: Publish GitHub Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: ${{ needs.build.outputs.artifact }}
+          path: dist
+
+      - uses: softprops/action-gh-release@v3
+        with:
+          files: |
+            dist/*.deb
+            dist/*.rpm
+            dist/*.AppImage
+            dist/windows/*.zip
+            dist/SHA256SUMS
+          generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          fail_on_unmatched_files: true
+
+  itch:
+    name: Push to itch.io
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v') && vars.ITCH_PROJECT != ''
+    runs-on: ubuntu-latest
+    env:
+      BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+      ITCH_PROJECT: ${{ vars.ITCH_PROJECT }}
+      VERSION: ${{ needs.build.outputs.version }}
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: ${{ needs.build.outputs.artifact }}
+          path: dist
+
+      - name: Install butler
+        run: |
+          [[ -n "$BUTLER_API_KEY" ]] || { echo "::error::secrets.BUTLER_API_KEY is not set"; exit 1; }
+          curl -fsSL -o butler.zip https://broth.itch.zone/butler/linux-amd64/LATEST/archive/default
+          unzip -q butler.zip -d butler && chmod +x butler/butler
+          echo "$PWD/butler" >> "$GITHUB_PATH"
+
+      - name: Push builds
+        run: |
+          butler -V
+          # Windows: push the folder itself so .itch.toml sits at the build root.
+          unzip -q "dist/windows/ChaTOR-$VERSION-windows-x64.zip" -d win
+          butler push win/ChaTOR "$ITCH_PROJECT:win-64" --userversion "$VERSION"
+          mkdir linux && cp dist/*.AppImage linux/ && chmod +x linux/*.AppImage
+          butler push linux "$ITCH_PROJECT:linux-64" --userversion "$VERSION"
