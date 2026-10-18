@@ -1,5 +1,5 @@
 # Builds ChaTOR for Linux (portable zip, deb, rpm, AppImage) and Windows (portable zip) with
-# chator-service bundled, on a single Ubuntu runner, using the same script as
+# chator-service bundled, plus blauncher for Windows itch launches, using the same script as
 # local release builds (build.py). Windows is cross-compiled with cargo-xwin.
 #
 #   push to master / pull request   -> build, upload workflow artifacts
@@ -10,7 +10,7 @@
 # Optional configuration (Settings -> Secrets and variables -> Actions):
 #   vars.CHATOR_SERVICE_REF          chator-service branch/tag/SHA to bundle (default: its default branch)
 #   secrets.WINDOWS_SIGNING_CERT     base64 of a .pfx code signing certificate  -> signs ChaTOR.exe,
-#   secrets.WINDOWS_SIGNING_PASSWORD its password                                 chator-service.exe, the DLL
+#   secrets.WINDOWS_SIGNING_PASSWORD its password                                 blauncher.exe, chator-service.exe, the DLL
 #   vars.ITCH_PROJECT                e.g. dakstrum/ChaTOR  } both set -> tagged releases are also pushed
 #   secrets.BUTLER_API_KEY           itch.io API key       }   to itch channels win-64 and linux-64
 
@@ -65,6 +65,12 @@ jobs:
           ref: ${{ inputs.service_ref || vars.CHATOR_SERVICE_REF || '' }}
           path: chator-service
 
+      - name: Checkout blauncher
+        uses: actions/checkout@v7
+        with:
+          repository: RPCompanion/blauncher
+          path: blauncher
+
       - name: Read version
         id: version
         run: |
@@ -103,6 +109,7 @@ jobs:
           workspaces: |
             ChaTOR/src-tauri -> target
             chator-service -> target
+            blauncher -> target
           save-if: ${{ github.event_name != 'pull_request' }}
 
       - name: Cache cargo-xwin MSVC SDK and Tauri bundler tools
@@ -137,6 +144,7 @@ jobs:
         run: |
           npx tsc --noEmit -p tsconfig.json
           npx vitest run
+          uv run --python 3.11 python -m unittest test_build
 
       - name: Configure Windows code signing
         if: env.HAS_WIN_SIGNING == 'true' && github.event_name != 'pull_request'

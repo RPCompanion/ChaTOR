@@ -28,24 +28,5 @@ fn main() {
         "#);
         let attrs = tauri_build::Attributes::new().windows_attributes(windows);
         tauri_build::try_build(attrs).expect("error while building tauri application");
-        finalize_release();
-    }
-}
-
-fn finalize_release() {
-    copy_blauncher();
-}
-
-/*
-    blauncher is only needed for builds that are released on itch.io, and not needed for builds that are
-    built through github actions.
-*/
-fn copy_blauncher() {
-    match std::fs::copy(
-        "./misc/blauncher.exe",
-        "./target/release/misc/blauncher.exe",
-    ) {
-        Ok(_) => println!("blauncher.exe copied successfully"),
-        Err(e) => println!("Error while copying blauncher.exe: {}", e),
     }
 }

@@ -6,7 +6,10 @@ use reqwest::blocking::Client;
 pub mod sys_info;
 
 use sys_info::SysInfo;
-use crate::config::config;
+
+/// Crash report endpoint. Like API_ENDPOINTS in src/lib/api.ts, every API endpoint carries its
+/// own version. Debug builds report here too: they are what runs day to day.
+const CRASH_REPORT_URL: &str = "https://api.rpcompanion.com/v1/crash_reports/chator";
 
 #[derive(Serialize, Deserialize)]
 pub struct CrashReporter {
@@ -28,7 +31,7 @@ impl CrashReporter {
     pub fn submit(&self) {
 
         let client = Client::new();
-        let response = client.post(config().crash_reporter_url.as_str())
+        let response = client.post(CRASH_REPORT_URL)
             .header("Content-Type", "application/json")
             .body(self.as_json())
             .send();

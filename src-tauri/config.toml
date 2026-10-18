@@ -1,5 +1,4 @@
 
-crash_reporter_url     = "https://apiv2.rpcompanion.com/crash_reports/chator"
 microsoft_webview2_url = "https://developer.microsoft.com/en-us/microsoft-edge/webview2/?form=MA13LH"
 # Relative paths resolve against the app directory. chator-service/build.sh
 # copies chator-service.exe + swtor_chat_capture.dll into src-tauri/service/.

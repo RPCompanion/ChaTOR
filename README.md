@@ -48,6 +48,17 @@ A third-party chat client for Star Wars: The Old Republic. Designed and tested b
 
 ChaTOR.exe will be located in ```src-tauri/target/release```
 
+### Release builds (Linux host)
+
+Check out `chator-service` and `blauncher` alongside this repo, then run
+`uv run build.py all` (or `windows` / `linux`). Override their locations with
+`CHATOR_SERVICE_DIR` and `CHATOR_BLAUNCHER_DIR`. The script requires cargo-xwin
+and LLVM tools for Windows cross-compilation; see `uv run build.py --help`.
+
+Windows releases include a freshly built `blauncher.exe`, used by the itch.io
+launch action and signed alongside the app when `--sign` is enabled. Linux
+builds do not need blauncher. Output goes to `release/<version>/`.
+
 ## Interested in the project?
 
 Consider joining our [discord](https://discord.gg/TwfBK94ree)

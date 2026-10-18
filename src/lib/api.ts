@@ -3,49 +3,51 @@ import { init_account } from "./api/account";
 import { init_servers } from "./api/system";
 import { Result, Ok, Err } from "./result";
 
-const API_URL = import.meta.env.PROD ? "https://apiv2.rpcompanion.com" : "http://localhost:6578";
+// Every endpoint carries its own version (/v1/...): a breaking change to one endpoint moves
+// just that entry to /v2/..., the rest stay as they are.
+const API_URL = import.meta.env.PROD ? "https://api.rpcompanion.com" : "http://localhost:6578";
 
 export const API_ENDPOINTS = {
 
     third_party: {
         discord_beacons: {
             star_forge:  {
-                url: `${API_URL}/third_party/discord_beacons/star_forge`,
+                url: `${API_URL}/v1/third_party/discord_beacons/star_forge`,
                 type: "GET"
             }
         }
     },
     account: {
         create: {
-            url: `${API_URL}/account/create`,
+            url: `${API_URL}/v1/account/create`,
             type: "POST"
         },
         login: {
-            url: `${API_URL}/account/login`,
+            url: `${API_URL}/v1/account/login`,
             type: "POST"
         },
     },
     character: {
         create: {
-            url: `${API_URL}/character/create`,
+            url: `${API_URL}/v1/character/create`,
             type: "POST"
         },
         delete: {
-            url: `${API_URL}/character/delete`,
+            url: `${API_URL}/v1/character/delete`,
             type: "DELETE"
         },
         template: {
-            url: `${API_URL}/character/template/{template_id}`,
+            url: `${API_URL}/v1/character/template/{template_id}`,
             type: "GET"
         },
         templates: {
-            url: `${API_URL}/character/templates`,
+            url: `${API_URL}/v1/character/templates`,
             type: "GET"
         },
     },
     system: {
         servers: {
-            url: `${API_URL}/system/servers`,
+            url: `${API_URL}/v1/system/servers`,
             type: "GET"
         }
     }

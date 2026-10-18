@@ -6,9 +6,9 @@
 """
 ChaTOR release builder (local, Linux host, no VM).
 
-Lives in the ChaTOR repo; expects the chator-service repo checked out next to it
-(../chator-service) unless CHATOR_SERVICE_DIR points elsewhere. CI runs this same
-script (.github/workflows/build.yml).
+Lives in the ChaTOR repo; expects sibling chator-service and blauncher repos
+(override with CHATOR_SERVICE_DIR and CHATOR_BLAUNCHER_DIR). blauncher is needed
+only for Windows builds. CI runs this same script (.github/workflows/build.yml).
 
     uv run build.py all                 service + Linux bundles + Windows portable zip
     uv run build.py linux               Linux only (deb / rpm / AppImage)
@@ -22,8 +22,9 @@ Pipeline
   frontend  npm install + (tauri build runs `npm run build` itself)
   linux     tauri build                                   -> src-tauri/target/release/bundle/** (deb/rpm/AppImage)
             then assemble ChaTOR/release/<version>/linux/ChaTOR/ (portable folder, same layout as Windows) + zip
+  blauncher cargo xwin build --release (Windows only, for itch.io's launch action)
   windows   tauri build --runner cargo-xwin --target x86_64-pc-windows-msvc --no-bundle
-            then assemble ChaTOR/release/<version>/windows/ChaTOR/ (exe, config, offsets, sql, gamedata, service, .itch.toml) + zip
+            then assemble ChaTOR/release/<version>/windows/ChaTOR/ (exe, blauncher.exe, config, offsets, sql, gamedata, service, .itch.toml) + zip
   sign      optional; see release.example.toml (osslsigncode for Windows PE files, gpg for Linux artifacts)
   collect   copy every artifact into ChaTOR/release/<version>/ and write SHA256SUMS
 
@@ -48,6 +49,7 @@ APP = Path(__file__).resolve().parent
 ROOT = APP.parent
 TAURI = APP / "src-tauri"
 SERVICE_CRATE = Path(os.environ.get("CHATOR_SERVICE_DIR", ROOT / "chator-service")).resolve()
+BLAUNCHER_CRATE = Path(os.environ.get("CHATOR_BLAUNCHER_DIR", ROOT / "blauncher")).resolve()
 SERVICE_DIR = TAURI / "service"
 WIN_TARGET = "x86_64-pc-windows-msvc"
 RELEASE_CONFIG = APP / "release.toml"
@@ -226,7 +228,22 @@ def build_linux(version: str) -> tuple[list[Path], Path]:
     return bundles, out
 
 
+def build_blauncher() -> Path:
+    step("blauncher for Windows (release)")
+    if not (BLAUNCHER_CRATE / "Cargo.toml").is_file():
+        raise BuildError(f"blauncher not found at {BLAUNCHER_CRATE} (set CHATOR_BLAUNCHER_DIR)")
+    require_tools("cargo-xwin", "clang-cl", "lld-link")
+    target = BLAUNCHER_CRATE / "target"
+    run(["cargo", "xwin", "build", "--release", "--locked", "--target", WIN_TARGET,
+         "--target-dir", str(target)], cwd=BLAUNCHER_CRATE)
+    exe = target / WIN_TARGET / "release" / "blauncher.exe"
+    if not DRY_RUN and not exe.is_file():
+        raise BuildError(f"no blauncher executable found at {exe}")
+    return exe
+
+
 def build_windows(version: str) -> tuple[Path, list[Path]]:
+    launcher = build_blauncher()
     step(f"ChaTOR for Windows ({WIN_TARGET} via cargo-xwin)")
     require_tools("cargo-xwin", "clang-cl", "lld-link", "llvm-rc")
     run(["npx", "tauri", "build", "--runner", "cargo-xwin", "--target", WIN_TARGET, "--no-bundle"], cwd=APP)
@@ -238,8 +255,10 @@ def build_windows(version: str) -> tuple[Path, list[Path]]:
         raise BuildError(f"no Windows executable found in {target}")
     assemble_portable(out, exe or target / "ChaTOR.exe", "ChaTOR.exe")
     if not DRY_RUN:
+        shutil.copy2(launcher, out / "blauncher.exe")
         shutil.copy2(TAURI / "misc" / ".itch.toml", out / ".itch.toml")
-    pe_files = [out / "ChaTOR.exe", out / "service" / "chator-service.exe", out / "service" / "swtor_chat_capture.dll"]
+    pe_files = [out / "ChaTOR.exe", out / "blauncher.exe",
+                out / "service" / "chator-service.exe", out / "service" / "swtor_chat_capture.dll"]
     return out, pe_files
 
 
