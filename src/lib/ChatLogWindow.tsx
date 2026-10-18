@@ -85,8 +85,12 @@ export default function ChatLogWindow({ onWhisper }: ChatLogWindowProps) {
         const observer = new ResizeObserver((entries) => {
             for (const entry of entries) {
                 if (entry.target === containerRef.current) {
-                    const newHeight = entry.contentRect.height;
-                    if (Math.abs(newHeight - savedHeight.current) < 1) break;
+                    // offsetHeight, not contentRect.height: it is the border-box height that
+                    // style.height sets above (contentRect leaves out padding + border, so the
+                    // window shrank 10px per mount), and a whole number, which the Rust side
+                    // needs (height is an i32; a fractional one fails the whole settings save).
+                    const newHeight = (entry.target as HTMLElement).offsetHeight;
+                    if (newHeight === savedHeight.current) break;
                     savedHeight.current = newHeight;
                     updateSettings((draft) => {
                         draft.chat_log.window.window.height = newHeight;

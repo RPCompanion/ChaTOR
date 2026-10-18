@@ -51,7 +51,7 @@ export default function NavbarSection({ section }: NavbarSectionProps) {
                 )}
             </button>
             {show_dropdown && (
-                <div className="panel panel-glass absolute top-11 left-0 w-52 p-1 flex flex-col animate-fade-in">
+                <div className="panel panel-glass absolute top-11 left-0 w-52 p-1 flex flex-col">
                     {section.elements?.map((element) => (
                         <button
                             key={element.name}

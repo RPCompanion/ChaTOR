@@ -80,6 +80,20 @@
   --panel-shadow: 0 10px 30px rgb(0 0 0 / 0.28);
   --knob-rgb: 147 169 191;      /* switch knob (off) */
 
+  /* .game-tooltip (item / achievement popups). Jedipedia's markup copies the in-game tooltip
+     and carries inline white and rarity colours, so it keeps the game's colours in every
+     palette: the dark/light blocks below deliberately leave these alone. */
+  --tt-bg-rgb: 0 31 49;
+  --tt-shade-rgb: 0 15 33;
+  --tt-text: #e8f1f8;
+  --tt-title: #ffbb29;
+  --tt-blue: #3ed3f4;
+  --tt-amber: #ffbb29;
+  --tt-gift: #ff005a;
+  --tt-green: #33ff4e;
+  --tt-easy: #63f578;
+  --tt-white: #96e3ff;
+
   /* react-toastify */
   --toastify-color-dark: #213a55;
   --toastify-text-color-dark: #e8f1f8;
@@ -478,6 +492,40 @@
     border-color: rgb(var(--holo-rgb) / 0.5);
     box-shadow: inset 0 2px 0 var(--color-holo-500);
   }
+
+  /* Item / achievement popup: a card around the HTML fetched from Jedipedia
+     (section.con-inv > icon div + div.tooltip). Its class names are Jedipedia's. */
+  .game-tooltip {
+    padding: 0.6rem 2.25rem 0.4rem 0.6rem;
+    color: var(--tt-text);
+    background: rgb(var(--tt-bg-rgb));
+    border: 1px solid rgb(var(--holo-rgb) / 0.7);
+    border-radius: 0.5rem;
+    box-shadow: inset 0 0 60px rgb(var(--tt-shade-rgb)),
+      0 0 calc(18px * var(--glow)) rgb(var(--holo-rgb) / 0.25), var(--panel-shadow);
+  }
+  .game-tooltip-status {   /* "Fetching from Jedipedia…" / fetch failed, in place of the content */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 1.75rem;
+    font-size: 14px;
+    color: var(--tt-blue);
+  }
+  .game-tooltip .con-inv { display: flow-root; }  /* contain the floated icon */
+  /* text column right of the icon (achievements set margin-left inline), plus a small gap */
+  .game-tooltip .tooltip-itm { margin-left: 58px; }
+  .game-tooltip .tooltip { padding-left: 0.5rem; }
+  .game-tooltip .tt-title { margin: 0 0 0.35rem; font-size: 18px; font-weight: 600; color: var(--tt-title); }
+  .game-tooltip .tt-main { margin: 0 0 0.6rem 5px; font-size: 14px; line-height: 1.35; }
+  .game-tooltip .tt-blue { color: var(--tt-blue); }
+  .game-tooltip .tt-amber { color: var(--tt-amber); }
+  .game-tooltip .tt-gift { color: var(--tt-gift); }
+  .game-tooltip .tt-green { color: var(--tt-green); }
+  .game-tooltip .tt-easy { color: var(--tt-easy); }
+  .game-tooltip .tt-white { color: var(--tt-white); }
+  .game-tooltip .tt-indent { padding-left: 10pt; }
+  .game-tooltip .tt-indent2 { padding-left: 20pt; }
 }
 
 /* react-colorful inside the channel colour modal */

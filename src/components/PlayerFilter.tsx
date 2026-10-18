@@ -52,7 +52,7 @@ export default function PlayerFilter({ elems, onElemsChange }: PlayerFilterProps
             {show_filters && (
                 <div
                     ref={dropdownRef}
-                    className="absolute top-10 z-10 panel panel-glass p-3 animate-fade-in w-64"
+                    className="absolute top-10 z-10 panel panel-glass p-3 w-64"
                 >
                     <div className="eyebrow text-center mb-2">Players</div>
                     <div className="w-full">

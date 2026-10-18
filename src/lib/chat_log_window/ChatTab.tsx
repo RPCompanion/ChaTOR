@@ -117,7 +117,7 @@ export default function ChatTab({ chat_tab, index }: ChatTabProps) {
                     {chat_tab.name}
                 </button>
                 {show_edit_tab && (
-                    <div className="flex flex-col w-40 panel panel-glass absolute p-1 z-10 animate-fade-in">
+                    <div className="flex flex-col w-40 panel panel-glass absolute p-1 z-10">
                         <button type="button" className="menu-item" onClick={() => { setShowEditTab(false); setShowEditModal(true); }}>Edit</button>
                         <button type="button" className="menu-item" onClick={on_clear_chat}>Clear Chat</button>
                         {settings.chat_log.window.chat_tabs.length > 1 && (

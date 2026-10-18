@@ -44,7 +44,7 @@ export default function Filter({ channel_filters, onChannelFiltersChange }: Filt
             {show_filters && (
                 <div
                     ref={dropdownRef}
-                    className="absolute top-10 z-10 panel panel-glass p-3 animate-fade-in w-80"
+                    className="absolute top-10 z-10 panel panel-glass p-3 w-80"
                 >
                     <div className="eyebrow mb-2">Channels</div>
                     <ChannelList channels={channel_filters} onChannelInput={onChannelFiltersChange} />
