@@ -73,7 +73,7 @@ pub fn run() {
 
             offsets::init();
             match service_connection::start_server(app.handle().clone(), connection.clone()) {
-                Ok(()) => service_launcher::start_supervisor(),
+                Ok(()) => service_launcher::start_supervisor(connection.clone()),
                 Err(_) => {
                     error!(
                         "Not launching chator-service: port {} is in use. Is another ChaTOR already running?",

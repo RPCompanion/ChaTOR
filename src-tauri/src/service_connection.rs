@@ -82,6 +82,14 @@ impl ServiceConnection {
         }
     }
 
+    /// Drops the connection; the service stops its hooks, ejects the DLL and exits when it
+    /// sees that (it keeps running as long as the connection is open).
+    pub fn disconnect(&self) {
+        if let Some(stream) = self.stream.lock().unwrap().as_ref() {
+            let _ = stream.shutdown(std::net::Shutdown::Both);
+        }
+    }
+
     pub fn next_callback_id(&self) -> i64 {
         self.next_callback_id.fetch_add(1, Ordering::Relaxed)
     }

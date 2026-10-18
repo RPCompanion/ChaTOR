@@ -3,23 +3,25 @@
 //! The service connects *to* ChaTOR (ChaTOR owns the TCP listener) and exits
 //! on its own when that connection drops, so shutting ChaTOR down shuts the
 //! service down too. What this module adds on top of that:
-//!   * a supervisor thread that waits on the child, reaps it, and relaunches it
+//!   * a supervisor thread that watches the child, reaps it, and relaunches it
 //!     if it exits while ChaTOR is still running (crash, or a lost race against
 //!     the listener at startup), with backoff and a cap on rapid failures;
+//!   * on Linux, the service only runs while SWTOR does (see `GameWatch`);
 //!   * a shutdown flag so the supervisor does not relaunch during app exit.
 //! On Linux the child is Proton's `proton run` wrapper, which blocks until the
-//! Windows process exits, so waiting on it tracks the real service lifetime.
+//! Windows process exits, so polling it tracks the real service lifetime.
 
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command};
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 use std::thread;
 use std::time::{Duration, Instant};
 
 use tracing::{error, info, warn};
 
 use crate::config;
-use crate::service_connection::DEFAULT_PORT;
+use crate::service_connection::{ServiceConnection, DEFAULT_PORT};
 use crate::steam;
 
 static SHUTTING_DOWN: AtomicBool = AtomicBool::new(false);
@@ -30,6 +32,10 @@ const RESTART_DELAY: Duration = Duration::from_secs(2);
 const RAPID_FAILURE_WINDOW: Duration = Duration::from_secs(30);
 /// Give up after this many consecutive rapid failures.
 const MAX_RAPID_FAILURES: u32 = 5;
+/// How often the supervisor checks on the service and the game.
+const POLL: Duration = Duration::from_secs(2);
+/// After asking the service to stop, how long to wait before killing its wrapper.
+const STOP_TIMEOUT: Duration = Duration::from_secs(15);
 
 /// Marks the app as exiting so the supervisor stops relaunching the service.
 pub fn mark_shutting_down() {
@@ -41,23 +47,104 @@ fn shutting_down() -> bool {
 }
 
 /// Launches the service and supervises it on a background thread.
-pub fn start_supervisor() {
+pub fn start_supervisor(connection: Arc<ServiceConnection>) {
     thread::Builder::new()
         .name("service-supervisor".into())
-        .spawn(supervise)
+        .spawn(move || supervise(&connection))
         .expect("failed to spawn service supervisor thread");
 }
 
-fn supervise() {
+/// Whether the service should run now.
+///
+/// On Linux the service runs inside SWTOR's Proton prefix, and Steam starts the game with
+/// `proton waitforexitandrun`, which first waits (`wineserver -w`) until every process in that
+/// prefix has exited. A service started before the game therefore keeps the game from starting
+/// until ChaTOR is closed, and one left running after the game exits blocks the next launch.
+/// So on Linux it only runs while `swtor.exe` does. On Windows it always runs.
+struct GameWatch {
+    #[cfg(not(windows))]
+    system: sysinfo::System,
+    #[cfg(not(windows))]
+    running: bool,
+    #[cfg(not(windows))]
+    misses: u32,
+}
+
+impl GameWatch {
+    fn new() -> Self {
+        GameWatch {
+            #[cfg(not(windows))]
+            system: sysinfo::System::new(),
+            #[cfg(not(windows))]
+            running: false,
+            #[cfg(not(windows))]
+            misses: 0,
+        }
+    }
+
+    #[cfg(windows)]
+    fn game_running(&mut self) -> bool {
+        true
+    }
+
+    /// True once a `swtor.exe` (Wine) process exists; reports it gone only after two polls in
+    /// a row without one.
+    #[cfg(not(windows))]
+    fn game_running(&mut self) -> bool {
+        use sysinfo::{ProcessRefreshKind, ProcessesToUpdate, UpdateKind};
+
+        self.system.refresh_processes_specifics(
+            ProcessesToUpdate::All,
+            true,
+            ProcessRefreshKind::nothing().without_tasks().with_cmd(UpdateKind::OnlyIfNotSet),
+        );
+        let is_swtor = |p: &sysinfo::Process| {
+            p.name().eq_ignore_ascii_case("swtor.exe")
+                || p.cmd().first().is_some_and(|arg| arg.to_string_lossy().to_ascii_lowercase().ends_with("\\swtor.exe"))
+        };
+        if self.system.processes().values().any(is_swtor) {
+            self.running = true;
+            self.misses = 0;
+        } else {
+            self.misses += 1;
+            if self.misses >= 2 {
+                self.running = false;
+            }
+        }
+        self.running
+    }
+}
+
+/// How a service run ended.
+enum Ended {
+    /// The service exited by itself (crash, lost connection race, ...).
+    Exited(Duration),
+    /// The game is no longer running, so the supervisor stopped the service.
+    GameClosed,
+    ShuttingDown,
+}
+
+fn supervise(connection: &ServiceConnection) {
     let mut rapid_failures: u32 = 0;
+    let mut game = GameWatch::new();
+    let mut waiting_logged = false;
 
     loop {
         if shutting_down() {
             return;
         }
 
-        let started = Instant::now();
-        let mut child = match launch_service() {
+        if !game.game_running() {
+            if !waiting_logged {
+                info!("Waiting for SWTOR (swtor.exe) to start before launching the service");
+                waiting_logged = true;
+            }
+            thread::sleep(POLL);
+            continue;
+        }
+        waiting_logged = false;
+
+        let child = match launch_service() {
             Some(c) => c,
             None => {
                 error!("Service could not be launched; not retrying (fix the configuration and restart ChaTOR)");
@@ -65,35 +152,75 @@ fn supervise() {
             }
         };
 
-        let status = child.wait();
-        let ran_for = started.elapsed();
+        match watch(child, connection, &mut game) {
+            Ended::ShuttingDown => return,
+            Ended::GameClosed => {
+                rapid_failures = 0;
+                continue;
+            }
+            Ended::Exited(ran_for) => {
+                if ran_for < RAPID_FAILURE_WINDOW {
+                    rapid_failures += 1;
+                    if rapid_failures >= MAX_RAPID_FAILURES {
+                        error!(
+                            "Service failed {} times in a row within {}s of starting; giving up. Restart ChaTOR to try again.",
+                            rapid_failures,
+                            RAPID_FAILURE_WINDOW.as_secs()
+                        );
+                        return;
+                    }
+                } else {
+                    rapid_failures = 0;
+                }
+
+                info!("Relaunching service in {:?}", RESTART_DELAY);
+                thread::sleep(RESTART_DELAY);
+            }
+        }
+    }
+}
+
+/// Polls a running service until it exits, ChaTOR shuts down, or the game closes (then the
+/// service is asked to stop, and its wrapper killed if it has not exited after STOP_TIMEOUT).
+fn watch(mut child: Child, connection: &ServiceConnection, game: &mut GameWatch) -> Ended {
+    let started = Instant::now();
+    loop {
+        thread::sleep(POLL);
 
         if shutting_down() {
-            info!("Service exited during shutdown ({:?})", status.ok());
-            return;
+            info!("Leaving the service to exit with ChaTOR");
+            return Ended::ShuttingDown;
         }
 
-        match &status {
-            Ok(st) => warn!("Service exited ({}), ran for {:.1}s", st, ran_for.as_secs_f32()),
-            Err(e) => error!("Failed waiting on service process: {}", e),
-        }
-
-        if ran_for < RAPID_FAILURE_WINDOW {
-            rapid_failures += 1;
-            if rapid_failures >= MAX_RAPID_FAILURES {
-                error!(
-                    "Service failed {} times in a row within {}s of starting; giving up. Restart ChaTOR to try again.",
-                    rapid_failures,
-                    RAPID_FAILURE_WINDOW.as_secs()
-                );
-                return;
+        match child.try_wait() {
+            Ok(Some(status)) => {
+                let ran_for = started.elapsed();
+                warn!("Service exited ({}), ran for {:.1}s", status, ran_for.as_secs_f32());
+                return Ended::Exited(ran_for);
             }
-        } else {
-            rapid_failures = 0;
+            Ok(None) => {}
+            Err(e) => {
+                error!("Failed waiting on service process: {}", e);
+                return Ended::Exited(started.elapsed());
+            }
         }
 
-        info!("Relaunching service in {:?}", RESTART_DELAY);
-        thread::sleep(RESTART_DELAY);
+        if !game.game_running() {
+            info!("SWTOR has exited; stopping the service so the next launch from Steam is not held up");
+            connection.disconnect();
+            let asked = Instant::now();
+            while asked.elapsed() < STOP_TIMEOUT {
+                if let Ok(Some(_)) = child.try_wait() {
+                    info!("Service stopped");
+                    return Ended::GameClosed;
+                }
+                thread::sleep(Duration::from_millis(250));
+            }
+            warn!("Service did not stop within {:?}; killing it", STOP_TIMEOUT);
+            let _ = child.kill();
+            let _ = child.wait();
+            return Ended::GameClosed;
+        }
     }
 }
 
@@ -263,5 +390,34 @@ fn find_proton_executable() -> Option<PathBuf> {
             proton_script.display()
         );
         None
+    }
+}
+
+#[cfg(all(test, not(windows)))]
+mod tests {
+    use super::*;
+
+    /// A stand-in process named swtor.exe (a copy of `sleep`) is seen as the game at once, and
+    /// its exit is reported after two polls without it. Assumes no real SWTOR is running.
+    #[test]
+    fn game_watch_follows_a_swtor_exe_process() {
+        let dir = std::env::temp_dir().join(format!("chator-gamewatch-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let fake = dir.join("swtor.exe");
+        std::fs::copy("/usr/bin/sleep", &fake).unwrap();
+
+        let mut game = GameWatch::new();
+        assert!(!game.game_running(), "not running at the start (no debounce before the game was seen)");
+
+        let mut child = Command::new(&fake).arg("30").spawn().unwrap();
+        thread::sleep(Duration::from_millis(200));
+        assert!(game.game_running());
+
+        child.kill().unwrap();
+        child.wait().unwrap();
+        assert!(game.game_running(), "one miss is not enough to call it closed");
+        assert!(!game.game_running());
+
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }
