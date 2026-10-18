@@ -5,10 +5,11 @@ import { CircleNotch } from "@phosphor-icons/react";
 import { useAppStore } from "../../store/useAppStore";
 import { HyperLinkItem } from "../../lib/hyperlink/item";
 import { HyperLinkAchievement } from "../../lib/hyperlink/achievement";
-import { get_name_by_global_id } from "../../lib/game_data";
+import { get_game_tooltip, get_name_by_global_id, type GameTooltip } from "../../lib/game_data";
 import { fetch_achievement, fetch_item } from "./utils";
 import type { Result } from "../../lib/result";
 import XButton from "../../lib/buttons/XButton";
+import GameTooltipView from "./GameTooltipView";
 
 type FetchType = (global_id: bigint, callback: (result: Result<string, string>) => void) => void;
 
@@ -18,25 +19,35 @@ interface ExternalFragmentProps {
 
 export default function ExternalFragment({ fragment }: ExternalFragmentProps) {
     const settings = useAppStore((s) => s.settings);
+    const game_data_version = useAppStore((s) => s.gameDataVersion);
     const [name, setName] = useState<string | undefined>(undefined);
     const [show_content, setShowContent] = useState(false);
+    const [tooltip, setTooltip] = useState<GameTooltip | undefined>(undefined);
     const [content, setContent] = useState<string | undefined>(undefined);
     const [fetch_failed, setFetchFailed] = useState(false);
     const fetching = useRef(false);
 
     const fetch_function: FetchType = fragment instanceof HyperLinkItem ? fetch_item : fetch_achievement;
 
-    function fetch_jediapedia_content() {
-        if (content != undefined || fetching.current) return;
+    /// Tooltip from the installed game; Jedipedia's HTML only when that is unavailable.
+    function fetch_tooltip() {
+        if (tooltip != undefined || content != undefined || fetching.current) return;
         fetching.current = true;
         setFetchFailed(false);
-        fetch_function(fragment.id, (result) => {
-            fetching.current = false;
-            if (result.is_ok()) {
-                setContent(DOMPurify.sanitize(result.unwrap()));
-            } else {
-                setFetchFailed(true);
+        get_game_tooltip(fragment.id).then((game) => {
+            if (game.is_ok()) {
+                fetching.current = false;
+                setTooltip(game.unwrap());
+                return;
             }
+            fetch_function(fragment.id, (result) => {
+                fetching.current = false;
+                if (result.is_ok()) {
+                    setContent(DOMPurify.sanitize(result.unwrap()));
+                } else {
+                    setFetchFailed(true);
+                }
+            });
         });
     }
 
@@ -46,16 +57,16 @@ export default function ExternalFragment({ fragment }: ExternalFragmentProps) {
                 const resolved_name = result.unwrap();
                 setName(resolved_name);
                 if (settings.chat_log.window.prefetch_hyperlinks) {
-                    fetch_jediapedia_content();
+                    fetch_tooltip();
                 }
             }
         });
-    }, [fragment.id]);
+    }, [fragment.id, game_data_version]);
 
     function on_click() {
         setShowContent((v) => !v);
         if (!show_content) {
-            fetch_jediapedia_content();
+            fetch_tooltip();
         }
     }
 
@@ -90,16 +101,18 @@ export default function ExternalFragment({ fragment }: ExternalFragmentProps) {
                             exit={{ y: -24, opacity: 0 }}
                             transition={{ duration: 0.18 }}
                         >
-                            {content != undefined ? (
+                            {tooltip != undefined ? (
+                                <GameTooltipView tooltip={tooltip} />
+                            ) : content != undefined ? (
                                 // Sanitized by DOMPurify on arrival. Rendered in the same commit as the
                                 // card rather than filled in by an effect afterwards, so it never paints empty.
                                 <div dangerouslySetInnerHTML={{ __html: content }} />
                             ) : fetch_failed ? (
-                                <p className="game-tooltip-status">Couldn't load this from Jedipedia. Close it and click the link to try again.</p>
+                                <p className="game-tooltip-status">Couldn't load this item. Close it and click the link to try again.</p>
                             ) : (
                                 <p className="game-tooltip-status" role="status">
                                     <CircleNotch size={18} weight="bold" className="animate-spin" />
-                                    Fetching from Jedipedia…
+                                    Loading…
                                 </p>
                             )}
                             <div className="absolute right-2 top-2">

@@ -26,6 +26,9 @@ interface AppStore {
     setCaptureStatus: (s: CaptureStatus, detail?: string) => void;
     activeCharacter: LocalCharacterInfo | undefined;
     shownCharactersError: boolean;
+    /// Bumped when names from the installed game are loaded, so "<Loading>" links retry.
+    gameDataVersion: number;
+    bumpGameDataVersion: () => void;
     setSettings: (settings: ISettings) => void;
     updateSettings: (updater: (draft: ISettings) => void) => void;
     setChatLogActive: (v: boolean) => void;
@@ -43,6 +46,8 @@ export const useAppStore = create<AppStore>()(
         setCaptureStatus: (status, detail) => set({ captureStatus: { status, detail } }),
         activeCharacter: undefined,
         shownCharactersError: false,
+        gameDataVersion: 0,
+        bumpGameDataVersion: () => set((state) => ({ gameDataVersion: state.gameDataVersion + 1 })),
         setSettings: (settings) => set({ settings }),
         updateSettings: (updater) => set((state) => ({ settings: produce(state.settings, updater) })),
         setChatLogActive: (chatLogActive) => set({ chatLogActive }),

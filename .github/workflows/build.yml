@@ -71,6 +71,13 @@ jobs:
           repository: RPCompanion/blauncher
           path: blauncher
 
+      # ChaTOR depends on ../../swtor-gamedata (path dependency) to read the installed game's data.
+      - name: Checkout swtor-gamedata
+        uses: actions/checkout@v7
+        with:
+          repository: RPCompanion/swtor-gamedata
+          path: swtor-gamedata
+
       - name: Read version
         id: version
         run: |

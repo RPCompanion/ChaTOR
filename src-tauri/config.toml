@@ -6,3 +6,7 @@ service_binary_path    = "service/chator-service.exe"
 # GET endpoint serving an offsets.json document (same schema as offsets.json)
 # with hook offsets for the latest swtor.exe builds. Leave unset to skip.
 # offsets_url = "https://example.invalid/chator/offsets.json"
+# Item / quest / achievement names are read from the installed game. Steam installs (and the
+# default EA/BioWare launcher folder on Windows) are found automatically; otherwise point this
+# at the folder that contains "Assets".
+# swtor_install_path = "C:/Program Files (x86)/Electronic Arts/BioWare/Star Wars - The Old Republic"

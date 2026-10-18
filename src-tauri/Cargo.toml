@@ -29,6 +29,8 @@ tauri = { version = "2", features = [ "devtools"] }
 
 # Hashing
 sha2 = "0.11"
+# Reads item / quest / achievement data from the installed game (sibling repo, like chator-service).
+swtor-gamedata = { path = "../../swtor-gamedata" }
 base64 = "0.23"
 uuid = "1.10"
 
@@ -70,6 +72,14 @@ scraper = "0.27"
 tauri-plugin-dialog = "2"
 tauri-plugin-fs = "2"
 native-dialog = "0.9.6"
+
+# swtor-gamedata decodes ~150k game objects after a game patch: about 7 s unoptimized vs 1 s
+# optimized. Keep it fast in the debug build too.
+[profile.dev.package.swtor-gamedata]
+opt-level = 3
+
+[profile.dev.package.zstd-sys]
+opt-level = 3
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.

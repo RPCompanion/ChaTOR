@@ -14,6 +14,10 @@ pub fn find_steam_install_path() -> Option<PathBuf> {
     let candidates = [
         home_dir().map(|h| h.join(".local/share/Steam")),
         home_dir().map(|h| h.join(".steam/steam")),
+        #[cfg(windows)]
+        std::env::var_os("ProgramFiles(x86)").map(|p| PathBuf::from(p).join("Steam")),
+        #[cfg(windows)]
+        std::env::var_os("ProgramFiles").map(|p| PathBuf::from(p).join("Steam")),
     ];
 
     for candidate in candidates.into_iter().flatten() {
@@ -39,7 +43,8 @@ pub fn find_steam_library_paths() -> Vec<PathBuf> {
                 let trimmed = line.trim();
                 if trimmed.starts_with("\"path\"") {
                     if let Some(path) = extract_vdf_value(trimmed) {
-                        let lib_path = PathBuf::from(path);
+                        // Windows paths are written with escaped backslashes ("C:\\Steam").
+                        let lib_path = PathBuf::from(path.replace("\\\\", "\\"));
                         if lib_path.exists() && !libraries.contains(&lib_path) {
                             libraries.push(lib_path);
                         }

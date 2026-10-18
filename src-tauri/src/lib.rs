@@ -72,6 +72,7 @@ pub fn run() {
                 .expect("error while setting always on top.");
 
             offsets::init();
+            dal::game_data::start_live_load(app.handle().clone(), config::config().swtor_install_path.clone());
             match service_connection::start_server(app.handle().clone(), connection.clone()) {
                 Ok(()) => service_launcher::start_supervisor(connection.clone()),
                 Err(_) => {
@@ -113,6 +114,7 @@ pub fn run() {
             dal::db::chat_log::datetags::get_all_date_tag_favourites,
             dal::db::chat_log::datetags::save_date_tag,
             dal::game_data::get_name_by_global_id,
+            dal::game_data::get_game_tooltip,
             network::fetch_content,
             network::fetch_jediapedia_content,
             get_version

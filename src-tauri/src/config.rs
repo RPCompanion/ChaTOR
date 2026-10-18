@@ -11,6 +11,9 @@ pub struct Config {
     /// GET endpoint returning an offsets.json document for recent swtor.exe builds.
     #[serde(default)]
     pub offsets_url: Option<String>,
+    /// SWTOR install directory (the one holding `Assets`), when it is not found automatically.
+    #[serde(default)]
+    pub swtor_install_path: Option<String>,
 }
 
 static CONFIG: OnceLock<Config> = OnceLock::new();

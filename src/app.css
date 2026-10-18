@@ -93,6 +93,20 @@
   --tt-green: #33ff4e;
   --tt-easy: #63f578;
   --tt-white: #96e3ff;
+  /* item title / icon frame colours by quality (game tooltips; keys from swtor-gamedata) */
+  --tt-q-cheap: #959494;
+  --tt-q-none: #959494;
+  --tt-q-standard: #ffffff;
+  --tt-q-premium: #00fe00;
+  --tt-q-prototype: #1d8cfe;
+  --tt-q-artifact: #bf00fd;
+  --tt-q-legendary: #e9bd54;
+  --tt-q-legacy: #e9bd54;
+  --tt-q-currency: #efbc55;
+  --tt-q-quest: #f5f537;
+  --tt-q-mission: #f5f537;
+  --tt-q-custom: #dc5d00;
+  --tt-q-moddable: #dc5d00;
 
   /* react-toastify */
   --toastify-color-dark: #213a55;
@@ -504,7 +518,7 @@
     box-shadow: inset 0 0 60px rgb(var(--tt-shade-rgb)),
       0 0 calc(18px * var(--glow)) rgb(var(--holo-rgb) / 0.25), var(--panel-shadow);
   }
-  .game-tooltip-status {   /* "Fetching from Jedipedia…" / fetch failed, in place of the content */
+  .game-tooltip-status {   /* "Loading…" / fetch failed, in place of the content */
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -526,6 +540,28 @@
   .game-tooltip .tt-white { color: var(--tt-white); }
   .game-tooltip .tt-indent { padding-left: 10pt; }
   .game-tooltip .tt-indent2 { padding-left: 20pt; }
+
+  /* GameTooltipView: icon column (with the quality frame) and quality colours */
+  .game-tooltip .game-tooltip-icon { float: left; width: 56px; font-size: 10px; text-align: center; }
+  .game-tooltip .game-tooltip-icon img { display: block; border: 2px solid var(--tt-q, transparent); border-radius: 4px; }
+  .game-tooltip .game-tooltip-icon-missing {
+    width: 56px; height: 56px;
+    border: 1px dashed rgb(var(--holo-rgb) / 0.4);
+    border-radius: 4px;
+  }
+  .game-tooltip .q-cheap { --tt-q: var(--tt-q-cheap); color: var(--tt-q); }
+  .game-tooltip .q-none { --tt-q: var(--tt-q-none); color: var(--tt-q); }
+  .game-tooltip .q-standard { --tt-q: var(--tt-q-standard); color: var(--tt-q); }
+  .game-tooltip .q-premium { --tt-q: var(--tt-q-premium); color: var(--tt-q); }
+  .game-tooltip .q-prototype { --tt-q: var(--tt-q-prototype); color: var(--tt-q); }
+  .game-tooltip .q-artifact { --tt-q: var(--tt-q-artifact); color: var(--tt-q); }
+  .game-tooltip .q-legendary { --tt-q: var(--tt-q-legendary); color: var(--tt-q); }
+  .game-tooltip .q-legacy { --tt-q: var(--tt-q-legacy); color: var(--tt-q); }
+  .game-tooltip .q-currency { --tt-q: var(--tt-q-currency); color: var(--tt-q); }
+  .game-tooltip .q-quest { --tt-q: var(--tt-q-quest); color: var(--tt-q); }
+  .game-tooltip .q-mission { --tt-q: var(--tt-q-mission); color: var(--tt-q); }
+  .game-tooltip .q-custom { --tt-q: var(--tt-q-custom); color: var(--tt-q); }
+  .game-tooltip .q-moddable { --tt-q: var(--tt-q-moddable); color: var(--tt-q); }
 }
 
 /* react-colorful inside the channel colour modal */
