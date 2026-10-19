@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { GAME_MESSAGE_MAXIMUM } from "../../lib/messages";
 import { Result } from "../../lib/result";
 import { create_custom_emote } from "../../lib/network/custom_emote";
+import Checkbox from "../../lib/Checkbox";
 
 interface EmoteModalProps {
     show_modal: boolean;
@@ -14,10 +15,12 @@ interface EmoteModalProps {
 export default function EmoteModal({ show_modal, onSave, onCancel }: EmoteModalProps) {
     const [emote_name, setEmoteName] = useState("");
     const [emote, setEmote] = useState("");
+    const [favourite, setFavourite] = useState(true);
 
     function clear_vars() {
         setEmoteName("");
         setEmote("");
+        setFavourite(true);
     }
 
     function on_cancel() {
@@ -38,7 +41,7 @@ export default function EmoteModal({ show_modal, onSave, onCancel }: EmoteModalP
             toast.error(validation.unwrap_err());
             return;
         }
-        create_custom_emote(emote_name, emote);
+        create_custom_emote(emote_name, emote, favourite);
         clear_vars();
         onSave();
     }
@@ -80,6 +83,10 @@ export default function EmoteModal({ show_modal, onSave, onCancel }: EmoteModalP
                             />
                             <button type="submit" className="hidden">Submit</button>
                         </form>
+                        <div className="flex flex-row items-center gap-2 w-4/5">
+                            <Checkbox checked={favourite} onChange={setFavourite} size="small">Favourite</Checkbox>
+                            <span className="text-xs text-ink-300">Favourite emotes appear below the message box on the Automatic and Manual chat pages.</span>
+                        </div>
                         <div className="flex flex-row gap-2">
                             <button type="button" className="btn btn-primary" onClick={on_save}>Save</button>
                             <button type="button" className="btn" onClick={on_cancel}>Cancel</button>

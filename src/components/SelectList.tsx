@@ -22,15 +22,15 @@ export default function SelectList({ elems, search, onInput }: SelectListProps) 
     return (
         <>
             {filtered.map((elem) => (
-                <div key={elem.value} className="flex flex-row gap-1">
+                <label key={elem.value} className="flex flex-row items-center gap-2 cursor-pointer select-none">
                     <input
                         type="checkbox"
                         checked={elem.selected}
                         onChange={() => on_input(elem)}
-                        className="text-lg"
+                        className="checkbox"
                     />
-                    <label className="text-ink-100 text-lg">{elem.value}</label>
-                </div>
+                    <span className="text-ink-100 text-lg">{elem.value}</span>
+                </label>
             ))}
         </>
     );

@@ -398,16 +398,19 @@ mod tests {
     use super::*;
 
     /// A stand-in process named swtor.exe (a copy of `sleep`) is seen as the game at once, and
-    /// its exit is reported after two polls without it. Assumes no real SWTOR is running.
+    /// its exit is reported after two polls without it. Skipped while a real SWTOR is running.
     #[test]
     fn game_watch_follows_a_swtor_exe_process() {
+        let mut game = GameWatch::new();
+        if game.game_running() {
+            eprintln!("SWTOR is running; skipping");
+            return;
+        }
+
         let dir = std::env::temp_dir().join(format!("chator-gamewatch-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         let fake = dir.join("swtor.exe");
         std::fs::copy("/usr/bin/sleep", &fake).unwrap();
-
-        let mut game = GameWatch::new();
-        assert!(!game.game_running(), "not running at the start (no debounce before the game was seen)");
 
         let mut child = Command::new(&fake).arg("30").spawn().unwrap();
         thread::sleep(Duration::from_millis(200));

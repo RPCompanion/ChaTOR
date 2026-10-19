@@ -28,13 +28,19 @@ export function init_custom_emotes() {
     });
 }
 
-export function create_custom_emote(emote_name: string, emote: string) {
+/// Favourite emotes are listed on the automatic / manual chat pages.
+export function create_custom_emote(emote_name: string, emote: string, favourite: boolean = false) {
     invoke("create_custom_emote", {
         emoteName: emote_name,
         emote: emote,
-        orderIndex: get_next_order_index(false)
+        orderIndex: get_next_order_index(favourite)
     }).then((response: any) => {
-        useEmoteStore.getState().addCustomEmote(response);
+        const created = response as ICustomEmote;
+        useEmoteStore.getState().addCustomEmote(created);
+        // The backend creates emotes as non-favourites; flag it in a second step.
+        if (favourite) {
+            update_custom_emote({ ...created, favourite: true });
+        }
     }).catch((error) => {
         console.log(error);
     });

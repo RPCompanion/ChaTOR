@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Star } from "@phosphor-icons/react";
 import { useEmoteStore } from "../../store/useEmoteStore";
 import EmoteContainer from "./EmoteContainer";
 import EmoteModal from "./EmoteModal";
@@ -15,6 +16,11 @@ export default function CustomEmotesPage() {
             <div className="h-12"></div>
             <div className="w-full relative">
                 <div>
+                    <p className="flex flex-row items-center justify-center gap-1 px-4 text-sm text-ink-300">
+                        <Star size={16} weight="fill" className="flex-none text-ember-400" />
+                        Star an emote to make it a favourite: favourites appear below the message box on the
+                        Automatic and Manual chat pages, ready to post with one click.
+                    </p>
                     <div className="h-2"></div>
                     {fav_emotes.length > 0 && (
                         <>

@@ -15,22 +15,28 @@ export default function Layout() {
     }, [settings.app.theme]);
 
     return (
+        // Exactly one window tall: title bar, navbar and footer stay put and only the page
+        // between them scrolls.
         <div
-            className={`flex flex-col min-h-screen text-ink-100 app-shell
+            className={`flex flex-col h-screen overflow-hidden text-ink-100 app-shell
                 ${!show_decorations ? "border-x border-b border-holo-500/30" : ""}`}
             style={{ opacity }}
         >
             {!show_decorations && (
                 <>
                     <NonDecoratedHeader />
-                    <div className="h-8"></div>
+                    <div className="h-8 flex-none"></div>
                 </>
             )}
-            <div className="grow flex flex-col">
+            <div className="flex-none">
                 <Navbar />
-                <Outlet />
             </div>
-            <FooterControls />
+            <main className="flex-1 min-h-0 flex flex-col overflow-y-auto scrollbar-thin scrollbar-thumb-holo-900 scrollbar-track-space-950">
+                <Outlet />
+            </main>
+            <div className="flex-none">
+                <FooterControls />
+            </div>
         </div>
     );
 }

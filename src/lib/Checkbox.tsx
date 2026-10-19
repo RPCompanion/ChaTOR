@@ -18,7 +18,7 @@ export default function Checkbox({ checked, onChange, size = "normal", children 
                 type="checkbox"
                 checked={checked}
                 onChange={(e) => onChange(e.target.checked)}
-                className="cursor-pointer w-3.5 h-3.5"
+                className={`checkbox ${size === "small" ? "checkbox-sm" : ""}`}
             />
             <span>{children}</span>
         </label>

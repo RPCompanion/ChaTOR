@@ -40,10 +40,22 @@ export default function Emote({ emote: initial_emote, favourite }: EmoteProps) {
         <div
             ref={setNodeRef}
             style={style}
-            className="flex flex-row gap-2 px-2 relative"
+            className="flex flex-row items-center gap-2 px-2 relative"
             onMouseEnter={() => setShowOtherButtons(true)}
             onMouseLeave={() => setShowOtherButtons(false)}
         >
+            <button
+                type="button"
+                className={`flex-none transition-colors ${emote.favourite ? "text-ember-400" : "text-ink-500 hover:text-ember-400"}`}
+                onClick={toggle_favourite}
+                aria-pressed={emote.favourite}
+                aria-label={emote.favourite ? "Remove from favourites" : "Add to favourites"}
+                title={emote.favourite
+                    ? "Favourite: shown on the Automatic and Manual chat pages. Click to remove."
+                    : "Add to favourites, to show it on the Automatic and Manual chat pages"}
+            >
+                <Star size={22} weight={emote.favourite ? "fill" : "regular"} />
+            </button>
             <input
                 type="text"
                 value={emote.emote_name}
@@ -64,16 +76,6 @@ export default function Emote({ emote: initial_emote, favourite }: EmoteProps) {
             <AnimatePresence>
                 {show_other_buttons && (
                     <>
-                        <motion.button
-                            className="absolute left-0 bottom-4 text-ember-500"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.15 }}
-                            onClick={toggle_favourite}
-                        >
-                            <Star size={24} />
-                        </motion.button>
                         <motion.div
                             className="absolute right-0 bottom-3"
                             initial={{ opacity: 0 }}

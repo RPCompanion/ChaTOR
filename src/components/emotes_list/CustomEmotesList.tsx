@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import {
     DndContext,
     closestCenter,
@@ -18,7 +19,18 @@ export default function CustomEmotesList() {
 
     let items: IDNDCustomEmote[] = get_relevant_emotes_from_list(custom_emotes, true);
 
-    if (items.length === 0) return null;
+    if (items.length === 0) {
+        return (
+            <>
+                <div className="title-bar select-none">Favourite Emotes</div>
+                <p className="text-sm text-ink-300 text-center">
+                    No favourite emotes yet. Star emotes on{" "}
+                    <Link to="/custom_emotes" className="text-holo-300 hover:underline">Add/Edit Emotes</Link>
+                    {" "}to post them from here with one click.
+                </p>
+            </>
+        );
+    }
 
     function on_drag_end(event: DragEndEvent) {
         const { active, over } = event;

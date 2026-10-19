@@ -447,6 +447,42 @@
     box-shadow: 0 0 8px rgb(var(--holo-rgb) / calc(0.8 * var(--glow)));
   }
 
+  /* Checkbox built on a native checkbox (Checkbox.tsx, SelectList.tsx); tick drawn by ::before */
+  .checkbox {
+    appearance: none;
+    flex: none;
+    display: inline-grid;
+    place-content: center;
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+    border: 1px solid rgb(var(--holo-rgb) / 0.55);
+    border-radius: 0.2rem;
+    background: rgb(var(--input-rgb) / 0.8);
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s, box-shadow 0.12s;
+  }
+  .checkbox::before {
+    content: "";
+    width: 0.3rem;
+    height: 0.55rem;
+    margin-top: -0.1rem;
+    border: solid var(--color-space-950);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    visibility: hidden;
+  }
+  .checkbox:hover { border-color: rgb(var(--holo-rgb) / 0.9); }
+  .checkbox:checked {
+    background: var(--color-holo-500);
+    border-color: var(--color-holo-500);
+    box-shadow: 0 0 calc(6px * var(--glow)) rgb(var(--holo-rgb) / 0.45);
+  }
+  .checkbox:checked::before { visibility: visible; }
+  .checkbox:focus-visible { outline: 2px solid rgb(var(--holo-rgb) / 0.6); outline-offset: 2px; }
+  .checkbox-sm { width: 0.875rem; height: 0.875rem; }
+  .checkbox-sm::before { width: 0.25rem; height: 0.5rem; }
+
   /* Navbar entries */
   .nav-item {
     display: inline-flex;
