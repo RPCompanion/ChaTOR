@@ -6,21 +6,24 @@
     "Known offset names (unknown names are ignored by the DLL):",
     "  chat_recv       chat receive handler, hooked for logging. Also found at runtime via the \"ReceiveChatMessage\" string when dynamic lookup is enabled; this value is the fallback.",
     "  roll_handler    template substitution function used for /roll output",
-    "  cmd_dispatch    chat command dispatch (send path)",
-    "  global_ptr      global holding the command context chain (cmd_dispatch arg)",
-    "  context_vtable  vtable of the object at [global_ptr]+0x30 (sanity check)",
-    "  manager_vtable  vtable of the object at context+0x48 (sanity check)",
+    "  cmd_dispatch    chat command dispatch (send path). Also found at runtime via the dword 0x41d98bec inside it when dynamic lookup is enabled.",
+    "  global_ptr      global holding the OmegaClientApp, start of the chain to cmd_dispatch's manager. With dynamic lookup the DLL finds it (and the two vtables) itself through RTTI class names.",
+    "  context_vtable  vtable of the OmegaAreaObject at [global_ptr]+0x30 (sanity check)",
+    "  manager_vtable  vtable of the AreaServerRequestIFaceProxy at context+0x48 (sanity check)",
     "  friends_list    friends list update handler (currently unused)"
   ],
   "versions": [
     {
       "sha256": "0f32b9d9562dafce89be662014615e0cc288f042a3fcfbbd8c38271abcd690f5",
       "label": "2026-10-16",
-      "notes": "global_ptr / vtables not yet re-derived for this build; cmd_dispatch send falls back to the manager pointer captured from live game calls.",
+      "notes": "global_ptr / vtables found 2026-10-18 by following the live chain to the manager captured from a game call; RTTI names match.",
       "offsets": {
         "chat_recv": "0x5220b0",
         "roll_handler": "0xe56780",
-        "cmd_dispatch": "0x3e25b0"
+        "cmd_dispatch": "0x3e25b0",
+        "global_ptr": "0x1bac4a8",
+        "context_vtable": "0x1483df8",
+        "manager_vtable": "0x1483e98"
       }
     },
     {
