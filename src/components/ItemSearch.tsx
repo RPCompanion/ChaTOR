@@ -181,8 +181,8 @@ export default function ItemSearch({ onInsert }: ItemSearchProps) {
                                     <div className="flex items-center gap-3">
                                         <button type="button" className="btn btn-primary" onClick={insert}>Add to message</button>
                                         <span className="text-xs text-ink-300">
-                                            Adds “[{selected.result.name}]” to your message. It posts as a clickable item
-                                            link in /e, /s and /y messages.
+                                            Adds “[{selected.result.name}]” to your message, where it posts as a clickable
+                                            item link. In channels like /g that works once someone has posted there this session.
                                         </span>
                                     </div>
                                 </>

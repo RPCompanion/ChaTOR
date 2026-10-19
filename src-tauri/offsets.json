@@ -10,7 +10,10 @@
     "  global_ptr      global holding the OmegaClientApp, start of the chain to cmd_dispatch's manager. With dynamic lookup the DLL finds it (and the two vtables) itself through RTTI class names.",
     "  context_vtable  vtable of the OmegaAreaObject at [global_ptr]+0x30 (sanity check)",
     "  manager_vtable  vtable of the AreaServerRequestIFaceProxy at context+0x48 (sanity check)",
-    "  friends_list    friends list update handler (currently unused)"
+    "  friends_list    friends list update handler (currently unused)",
+    "  chat_channel_recv     ChatGatewayObject's channel-message handler, hooked to learn channel ids. Also found at runtime through RTTI (ChatGatewayResponseIFace vtable, entry 0).",
+    "  chat_channel_message  chat gateway RPC: message to a channel (guild, general, ...). Also found at runtime by its RPC id 0x89193f50.",
+    "  chat_whisper          chat gateway RPC: whisper. Also found at runtime by its RPC id 0x5a249b1a."
   ],
   "versions": [
     {
@@ -23,7 +26,10 @@
         "cmd_dispatch": "0x3e25b0",
         "global_ptr": "0x1bac4a8",
         "context_vtable": "0x1483df8",
-        "manager_vtable": "0x1483e98"
+        "manager_vtable": "0x1483e98",
+        "chat_channel_recv": "0x139cf0",
+        "chat_channel_message": "0x3e4e80",
+        "chat_whisper": "0x3e4c20"
       }
     },
     {

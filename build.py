@@ -174,7 +174,11 @@ def stage_release_service() -> None:
     for name in SERVICE_FILES:
         if not (src / name).is_file():
             raise BuildError(f"{src / name} missing; run without --skip-service (or `uv run build.py service`)")
-        shutil.copy2(src / name, SERVICE_DIR / name)
+        # Copy beside and rename over: a running SWTOR may have the old DLL mapped, and
+        # overwriting that file in place would change the game's mapped pages.
+        staged = SERVICE_DIR / f".{name}.new"
+        shutil.copy2(src / name, staged)
+        staged.replace(SERVICE_DIR / name)
 
 
 def frontend_deps() -> None:
