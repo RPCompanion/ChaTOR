@@ -22,6 +22,18 @@
         const sample_messages = [
           { timestamp: new Date().toISOString(), from: "Elizala", to: "", channel: { type: 3 }, message_fragments: [{ type: "Text", text: "Elizala looks around the cantina." }], message: "Elizala looks around the cantina." },
         ];
+        const items = [
+          { name: "Red Crystal", ids: ["16141067450205160335"] },
+          { name: "Red Crystal Container", ids: ["16141067450205160336"] },
+          { name: "Red Sharp Crystal", ids: ["16141067450205160337", "16141067450205160338"] },
+          { name: "Advanced Red Eviscerating Crystal", ids: ["16141067450205160339", "16141067450205160340", "16141067450205160341"] },
+        ];
+        const tooltip = (id) => ({
+          kind: "item", id, name: items.find((i) => i.ids.includes(id))?.name ?? "Red Crystal", quality: "premium", icon_url: null,
+          cartel_market: false, count: null, roll_level: null, binding: "Binds on Equip", unique: false, armor_type: null,
+          durability: null, stats: [{ name: "Critical Rating", value: 41 }], modifications: [], required_level: 10,
+          abilities: [], description: "A crystal that can be used in lightsabers and blasters.",
+        });
         window.__TAURI_INTERNALS__ = {
           metadata: {
             currentWindow: { label: "main" },
@@ -38,6 +50,12 @@
               case "get_account": return null;
               case "get_todays_chat_log": case "get_distinct_dates": case "get_all_date_tag_favourites": return [];
               case "plugin:event|listen": return 1;
+              case "search_game_items": {
+                const terms = args.query.toLowerCase().split(/\s+/).filter(Boolean);
+                return items.filter((i) => terms.every((t) => i.name.toLowerCase().includes(t)));
+              }
+              case "get_game_tooltip": return tooltip(args.globalId);
+              case "get_item_link": return '<HL LID="BCOAAl1OxGUOPAAABh">';
               case "plugin:window|is_maximized": return false;
               case "plugin:window|inner_size": case "plugin:window|outer_size": return { width: 800, height: 900 };
               default:
@@ -49,13 +67,21 @@
         };
         window.__TAURI_INTERNALS__.invoke.__shim = true;
         const s = document.createElement("script"); s.type = "module"; s.src = "/src/main.tsx"; document.body.appendChild(s);
-        // ?click=<aria-label or button text>,<...>  clicks those buttons in order after load
+        // ?click=<aria-label or button text>,<...>  clicks those buttons in order after load;
+        // a step "=<text>" types <text> into the focused input instead
         const clicks = (q.get("click") || "").split(",").filter(Boolean);
         if (clicks.length) {
           let i = 0;
           const tick = () => {
             if (i >= clicks.length) return;
             const want = clicks[i];
+            if (want.startsWith("=")) {
+              const el = document.activeElement;
+              const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(el), "value")?.set;
+              if (setter) { setter.call(el, want.slice(1)); el.dispatchEvent(new Event("input", { bubbles: true })); i++; }
+              setTimeout(tick, 400);
+              return;
+            }
             const btn = [...document.querySelectorAll("button")].find(
               (b) => b.getAttribute("aria-label") === want || b.textContent.trim() === want
             );

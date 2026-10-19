@@ -23,6 +23,15 @@ export default function AppSettings() {
                     ))}
                 </select>
             </Setting>
+            <Setting setting="Font size" sub_text="Scales all text and spacing in ChaTOR.">
+                <SettingsRangeSlider
+                    value={settings.app.font_size ?? 100}
+                    min={80}
+                    max={150}
+                    step={5}
+                    onChange={(v) => updateSettings((d) => { d.app.font_size = v; })}
+                />
+            </Setting>
             <Setting setting="Show window decorations" sub_text="Disable setting for a more seamless looking window.">
                 <SettingsToggle
                     checked={settings.app.show_window_decorations}

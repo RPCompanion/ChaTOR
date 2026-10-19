@@ -559,15 +559,15 @@
     align-items: center;
     gap: 0.5rem;
     min-height: 1.75rem;
-    font-size: 14px;
+    font-size: 0.875rem;
     color: var(--tt-blue);
   }
   .game-tooltip .con-inv { display: flow-root; }  /* contain the floated icon */
   /* text column right of the icon (achievements set margin-left inline), plus a small gap */
   .game-tooltip .tooltip-itm { margin-left: 58px; }
   .game-tooltip .tooltip { padding-left: 0.5rem; }
-  .game-tooltip .tt-title { margin: 0 0 0.35rem; font-size: 18px; font-weight: 600; color: var(--tt-title); }
-  .game-tooltip .tt-main { margin: 0 0 0.6rem 5px; font-size: 14px; line-height: 1.35; }
+  .game-tooltip .tt-title { margin: 0 0 0.35rem; font-size: 1.125rem; font-weight: 600; color: var(--tt-title); }
+  .game-tooltip .tt-main { margin: 0 0 0.6rem 5px; font-size: 0.875rem; line-height: 1.35; }
   .game-tooltip .tt-blue { color: var(--tt-blue); }
   .game-tooltip .tt-amber { color: var(--tt-amber); }
   .game-tooltip .tt-gift { color: var(--tt-gift); }
@@ -578,7 +578,7 @@
   .game-tooltip .tt-indent2 { padding-left: 20pt; }
 
   /* GameTooltipView: icon column (with the quality frame) and quality colours */
-  .game-tooltip .game-tooltip-icon { float: left; width: 56px; font-size: 10px; text-align: center; }
+  .game-tooltip .game-tooltip-icon { float: left; width: 56px; font-size: 0.625rem; text-align: center; }
   .game-tooltip .game-tooltip-icon img { display: block; border: 2px solid var(--tt-q, transparent); border-radius: 4px; }
   .game-tooltip .game-tooltip-icon-missing {
     width: 56px; height: 56px;

@@ -75,6 +75,8 @@ export interface IAppSettings {
     always_on_top: boolean;
     show_page_header: boolean;
     theme: Theme;
+    /// Root font size in percent (100 = default).
+    font_size: number;
 }
 
 export interface ISettings {

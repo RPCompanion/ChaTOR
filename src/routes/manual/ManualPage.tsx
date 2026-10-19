@@ -12,12 +12,24 @@ import StandardMenuButton from "../../lib/buttons/StandardMenuButton";
 import CustomEmotesList from "../../components/emotes_list/CustomEmotesList";
 import ChatLogWindow from "../../lib/ChatLogWindow";
 import RollBar from "../../components/RollBar";
+import ItemSearch from "../../components/ItemSearch";
+import { add_item_link, apply_item_links, type ItemLink } from "../../lib/item_links";
 
 const MAX_MESSAGES = 5;
 
 export default function ManualPage() {
     const settings = useAppStore((s) => s.settings);
     const [messages, setMessages] = useState<string[]>([""]);
+    const [links, setLinks] = useState<ItemLink[]>([]);
+
+    /// Appends an item from ItemSearch to the last message box, with a space before it.
+    function insert_text(label: string, markup?: string) {
+        setMessages((ms) => {
+            const last = ms[ms.length - 1];
+            return [...ms.slice(0, -1), (last === "" || last.endsWith(" ") ? last : last + " ") + label];
+        });
+        if (markup) setLinks((l) => add_item_link(l, { label, markup }));
+    }
     const [show_modal, setShowModal] = useState(false);
     const [automated_posting, setAutomatedPosting] = useState(true);
 
@@ -53,7 +65,7 @@ export default function ManualPage() {
 
     async function submit_messages() {
         setShowModal(false);
-        const response = await submit_post("ChatMessage", messages.map((m) => unicode_escape(m)));
+        const response = await submit_post("ChatMessage", messages.map((m) => unicode_escape(apply_item_links(m, links))));
         if (response.is_err()) {
             toast.error(response.unwrap_err());
             return;
@@ -64,7 +76,7 @@ export default function ManualPage() {
     }
 
     async function on_single_post(idx: number) {
-        const response = await submit_post("ChatMessage", [messages[idx]]);
+        const response = await submit_post("ChatMessage", [apply_item_links(messages[idx], links)]);
         if (response.is_err()) {
             toast.error(response.unwrap_err());
         }
@@ -99,6 +111,7 @@ export default function ManualPage() {
                             Automated posting
                         </Checkbox>
                         <RollBar />
+                        <ItemSearch onInsert={insert_text} />
                         {!settings.chat.clear_chat_after_posting && (
                             <button
                                 type="button"

@@ -10,7 +10,6 @@ import { HyperLinkItem } from "../../lib/hyperlink/item";
 import { HyperLinkQuest } from "../../lib/hyperlink/quest";
 import { HyperLinkAchievement } from "../../lib/hyperlink/achievement";
 import ExternalFragment from "./ExternalFragment";
-import QuestFragment from "./QuestFragment";
 
 interface MessageFragmentProps {
     fragment: string | Hyperlink;
@@ -50,7 +49,7 @@ export default function MessageFragment({ fragment, channel_type }: MessageFragm
         return <ExternalFragment fragment={fragment} />;
     }
     if (fragment instanceof HyperLinkQuest) {
-        return <QuestFragment fragment={fragment} />;
+        return <ExternalFragment fragment={fragment} />;
     }
     if (fragment instanceof HyperLinkAchievement) {
         return <ExternalFragment fragment={fragment} />;

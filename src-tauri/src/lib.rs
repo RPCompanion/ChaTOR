@@ -115,6 +115,8 @@ pub fn run() {
             dal::db::chat_log::datetags::save_date_tag,
             dal::game_data::get_name_by_global_id,
             dal::game_data::get_game_tooltip,
+            dal::game_data::search_game_items,
+            dal::game_data::get_item_link,
             network::fetch_content,
             network::fetch_jediapedia_content,
             get_version

@@ -14,6 +14,11 @@ export default function Layout() {
         document.documentElement.dataset.theme = settings.app.theme ?? "lighter";
     }, [settings.app.theme]);
 
+    // The UI is sized in rem, so the root font size scales all of it.
+    useEffect(() => {
+        document.documentElement.style.fontSize = `${settings.app.font_size ?? 100}%`;
+    }, [settings.app.font_size]);
+
     return (
         // Exactly one window tall: title bar, navbar and footer stay put and only the page
         // between them scrolls.

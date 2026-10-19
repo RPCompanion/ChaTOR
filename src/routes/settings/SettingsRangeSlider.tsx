@@ -4,10 +4,11 @@ interface SettingsRangeSliderProps {
     value: number;
     min: number;
     max: number;
+    step?: number;
     onChange: (value: number) => void;
 }
 
-export default function SettingsRangeSlider({ value, min, max, onChange }: SettingsRangeSliderProps) {
+export default function SettingsRangeSlider({ value, min, max, step = 1, onChange }: SettingsRangeSliderProps) {
     return (
         <div className="flex items-center gap-3 w-56">
             <input
@@ -15,6 +16,7 @@ export default function SettingsRangeSlider({ value, min, max, onChange }: Setti
                 value={value}
                 min={min}
                 max={max}
+                step={step}
                 onChange={(e) => onChange(Number(e.target.value))}
                 className="w-full cursor-pointer"
             />

@@ -24,7 +24,11 @@ pub struct AppSettings {
 
     /// UI palette: "dark", "lighter" (default) or "light".
     #[serde(default = "default_theme")]
-    pub theme: String
+    pub theme: String,
+
+    /// Root font size in percent (100 = 16px); everything sized in rem scales with it.
+    #[serde(default = "default_font_size")]
+    pub font_size: i32
 
 }
 
@@ -61,6 +65,10 @@ fn default_theme() -> String {
     "lighter".to_string()
 }
 
+fn default_font_size() -> i32 {
+    100
+}
+
 impl Default for AppSettings {
 
     fn default() -> AppSettings {
@@ -73,7 +81,8 @@ impl Default for AppSettings {
             always_on_top: false,
             opacity: 100,
             show_page_header: true,
-            theme: default_theme()
+            theme: default_theme(),
+            font_size: default_font_size()
 
         }
 

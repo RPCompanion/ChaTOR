@@ -5,6 +5,7 @@ import { CircleNotch } from "@phosphor-icons/react";
 import { useAppStore } from "../../store/useAppStore";
 import { HyperLinkItem } from "../../lib/hyperlink/item";
 import { HyperLinkAchievement } from "../../lib/hyperlink/achievement";
+import { HyperLinkQuest } from "../../lib/hyperlink/quest";
 import { get_game_tooltip, get_name_by_global_id, type GameTooltip } from "../../lib/game_data";
 import { fetch_achievement, fetch_item } from "./utils";
 import type { Result } from "../../lib/result";
@@ -14,7 +15,7 @@ import GameTooltipView from "./GameTooltipView";
 type FetchType = (global_id: bigint, callback: (result: Result<string, string>) => void) => void;
 
 interface ExternalFragmentProps {
-    fragment: HyperLinkItem | HyperLinkAchievement;
+    fragment: HyperLinkItem | HyperLinkAchievement | HyperLinkQuest;
 }
 
 export default function ExternalFragment({ fragment }: ExternalFragmentProps) {
@@ -27,7 +28,13 @@ export default function ExternalFragment({ fragment }: ExternalFragmentProps) {
     const [fetch_failed, setFetchFailed] = useState(false);
     const fetching = useRef(false);
 
-    const fetch_function: FetchType = fragment instanceof HyperLinkItem ? fetch_item : fetch_achievement;
+    // Jedipedia fallback when the game data is unavailable (it never had quest tooltips).
+    const fetch_function: FetchType | undefined =
+        fragment instanceof HyperLinkItem ? fetch_item
+        : fragment instanceof HyperLinkAchievement ? fetch_achievement
+        : undefined;
+    // Chat shows items and achievements as {Name}, quests as <Name>.
+    const [open, close] = fragment instanceof HyperLinkQuest ? ["<", ">"] : ["{", "}"];
 
     /// Tooltip from the installed game; Jedipedia's HTML only when that is unavailable.
     function fetch_tooltip() {
@@ -38,6 +45,11 @@ export default function ExternalFragment({ fragment }: ExternalFragmentProps) {
             if (game.is_ok()) {
                 fetching.current = false;
                 setTooltip(game.unwrap());
+                return;
+            }
+            if (fetch_function == undefined) {
+                fetching.current = false;
+                setFetchFailed(true);
                 return;
             }
             fetch_function(fragment.id, (result) => {
@@ -74,7 +86,7 @@ export default function ExternalFragment({ fragment }: ExternalFragmentProps) {
         <>
             {name != undefined ? (
                 <span className="wrap-break-word text-ember-400 cursor-pointer select-none" onClick={on_click}>
-                    {"{" + name + "}"}
+                    {open + name + close}
                 </span>
             ) : (
                 <span className="wrap-break-word text-ember-400 select-none">{"<Loading>"}</span>

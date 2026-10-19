@@ -15,11 +15,21 @@ import CustomEmotesList from "../../components/emotes_list/CustomEmotesList";
 import ChatLogWindow from "../../lib/ChatLogWindow";
 import CustomCommand from "../../components/CustomCommand";
 import RollBar from "../../components/RollBar";
+import ItemSearch from "../../components/ItemSearch";
+import { add_item_link, apply_item_links, show_item_links, type ItemLink } from "../../lib/item_links";
 
 export default function AutomaticPage() {
     const settings = useAppStore((s) => s.settings);
     const active_chat_tab_index = useChatLogStore((s) => s.activeChatTabIndex);
     const [message, setMessage] = useState("");
+    const [links, setLinks] = useState<ItemLink[]>([]);
+
+    /// Appends an item from ItemSearch to the message, with a space before it.
+    function insert_text(label: string, markup?: string) {
+        setMessage((m) => (m === "" || m.endsWith(" ") ? m : m + " ") + label);
+        if (markup) setLinks((l) => add_item_link(l, { label, markup }));
+        setTimeout(() => textarea_ref.current?.focus(), 0);
+    }
     const [messages, setMessages] = useState<string[]>([]);
     const [show_modal, setShowModal] = useState(false);
     const textarea_ref = useRef<HTMLTextAreaElement>(null);
@@ -45,19 +55,23 @@ export default function AutomaticPage() {
             return;
         }
         const custom_command = get_custom_command();
-        const response = new AutoMessageSplitter(unicode_escape(message), undefined, custom_command).split();
+        // Split with the links' markup in place so the length limit counts what is really posted.
+        const response = new AutoMessageSplitter(unicode_escape(apply_item_links(message, links)), undefined, custom_command).split();
         if (response.is_err()) {
             toast.error("Error: " + response.unwrap_err());
             return;
         }
-        setMessages(response.unwrap());
+        setMessages(response.unwrap().map((m) => show_item_links(m, links)));
         setShowModal(true);
     }
 
     async function on_submitted() {
         setShowModal(false);
-        const response = await submit_post("ChatMessage", messages);
-        if (response.is_err()) return;
+        const response = await submit_post("ChatMessage", messages.map((m) => apply_item_links(m, links)));
+        if (response.is_err()) {
+            toast.error(response.unwrap_err());
+            return;
+        }
         if (settings.chat.clear_chat_after_posting) {
             setMessage("");
         }
@@ -84,8 +98,9 @@ export default function AutomaticPage() {
             <PageFormatting title="Automatic Formatting Mode">
                 <div className="flex flex-col gap-2">
                     {show_chat_log && <ChatLogWindow onWhisper={on_whisper} />}
-                    <div className="relative flex items-center h-7">
+                    <div className="relative flex items-center gap-2 h-7">
                         <RollBar />
+                        <ItemSearch onInsert={insert_text} />
                         {!settings.chat.clear_chat_after_posting && (
                             <button
                                 type="button"

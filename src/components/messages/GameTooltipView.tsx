@@ -1,5 +1,5 @@
 import React from "react";
-import type { GameItemTooltip, GameStat, GameTooltip } from "../../lib/game_data";
+import type { GameItemTooltip, GameQuestTooltip, GameStat, GameTooltip } from "../../lib/game_data";
 
 // Line order and wording follow the Jedipedia tooltips this replaces (see swtor-gamedata's
 // tooltip.rs); colours come from the .game-tooltip classes in app.css.
@@ -69,7 +69,34 @@ function ItemBody({ item }: { item: GameItemTooltip }) {
     );
 }
 
+function QuestBody({ quest }: { quest: GameQuestTooltip }) {
+    const details = [
+        quest.category,
+        quest.required_level != null ? `Level ${quest.required_level}` : null,
+        quest.repeatable ? "Repeatable" : null,
+    ].filter((d): d is string => d != null);
+
+    return (
+        <>
+            <p className="tt-title">{quest.name}</p>
+            {details.length > 0 && <div className="tt-main tt-blue">{details.join(" · ")}</div>}
+            {quest.description.map((text, i) => (
+                <p key={i} className="tt-main whitespace-pre-line">{text}</p>
+            ))}
+            {quest.objectives.length > 0 && (
+                <div className="tt-main">
+                    <div className="tt-white">Objectives</div>
+                    {quest.objectives.map((o, i) => <div key={i} className="tt-blue tt-indent">{o}</div>)}
+                </div>
+            )}
+        </>
+    );
+}
+
 export default function GameTooltipView({ tooltip }: { tooltip: GameTooltip }) {
+    if (tooltip.kind === "quest") {
+        return <section className="con-inv"><QuestBody quest={tooltip} /></section>;
+    }
     const frame = tooltip.kind === "item" ? `q-${tooltip.quality}` : undefined;
     return (
         <section className="con-inv">

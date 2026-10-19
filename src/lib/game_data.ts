@@ -87,12 +87,49 @@ export interface GameAchievementTooltip {
     prestige: number | null;
 }
 
-export type GameTooltip = GameItemTooltip | GameAchievementTooltip;
+export interface GameQuestTooltip {
+    kind: "quest";
+    id: string;
+    name: string | null;
+    category: string | null;
+    required_level: number | null;
+    repeatable: boolean;
+    /// Journal text of the quest's first step.
+    description: string[];
+    objectives: string[];
+    icon_url: null;
+}
+
+export type GameTooltip = GameItemTooltip | GameAchievementTooltip | GameQuestTooltip;
 
 /// Fails when the game data is not available (game not found / not loaded yet).
 export async function get_game_tooltip(global_id: bigint): Promise<Result<GameTooltip, string>> {
     try {
         return Ok(await invoke<GameTooltip>("get_game_tooltip", { globalId: global_id.toString() }));
+    } catch (error) {
+        return Err(error as string);
+    }
+}
+
+export interface ItemSearchResult {
+    name: string;
+    /// Every item with this name (item level / quality variants).
+    ids: string[];
+}
+
+/// Items matching every word of `query` (at least 2 letters), best matches first.
+export async function search_game_items(query: string): Promise<ItemSearchResult[]> {
+    try {
+        return await invoke<ItemSearchResult[]>("search_game_items", { query });
+    } catch {
+        return [];
+    }
+}
+
+/// Chat link markup (`<HL LID="...">`) for an item; needs the installed game's data.
+export async function get_item_link(global_id: string): Promise<Result<string, string>> {
+    try {
+        return Ok(await invoke<string>("get_item_link", { globalId: global_id }));
     } catch (error) {
         return Err(error as string);
     }
