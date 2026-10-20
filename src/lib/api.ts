@@ -4,38 +4,29 @@ import { refresh_auth } from "./api/account";
 import { init_servers } from "./api/system";
 import { Result, Ok, Err } from "./result";
 import { useAccountStore } from "../store/useAccountStore";
-
-const PRODUCTION_API_URL = "https://api.rpcompanion.com";
-const LOCAL_API_URL = "http://localhost:6578";
-const USE_PRODUCTION_API_KEY = "use_production_api";
+import { useAppStore } from "../store/useAppStore";
 
 /**
- * Release frontends always use production. Dev frontends (`vite`, `npm run tauri dev`) use the
- * local server unless the "Use production API" developer setting is on (kept in localStorage,
- * so it is known before the settings arrive from Tauri).
+ * Rust picks the API (src-tauri/src/auth.rs, api_base) and the frontend uses the same one:
+ * production, or the local server when running under `tauri dev` with the "Use production API"
+ * developer setting off. That setting lives in the app settings, not in the webview.
  */
-export function uses_production_api(): boolean {
-    if (import.meta.env.PROD) {
-        return true;
-    }
-    try {
-        return localStorage.getItem(USE_PRODUCTION_API_KEY) === "true";
-    } catch {
-        return false;
-    }
-}
-
-/** Switches the API base. Each server has its own sign-in, so the account status is reloaded. */
-export function set_uses_production_api(enabled: boolean) {
-    try {
-        localStorage.setItem(USE_PRODUCTION_API_KEY, String(enabled));
-    } catch {}
-    useAccountStore.getState().setAuth({ state: "unknown" });
-    init_api();
-}
-
 export function api_url(): string {
-    return uses_production_api() ? PRODUCTION_API_URL : LOCAL_API_URL;
+    return useAccountStore.getState().apiBase;
+}
+
+/** The developer toggle. Each server has its own sign-in, so the account status is reloaded. */
+export async function set_uses_production_api(enabled: boolean) {
+    // Keeps the settings store in step, so its next save does not switch it back.
+    useAppStore.getState().updateSettings((draft) => { draft.app.use_production_api = enabled; });
+    useAccountStore.getState().setAuth({ state: "unknown" });
+    try {
+        useAccountStore.getState().setApiBase(await invoke<string>("set_use_production_api", { enabled }));
+    } catch (e) {
+        console.log(e);
+    }
+    refresh_auth();
+    init_servers();
 }
 
 // The base is read on every access, so switching servers needs no reload.
@@ -103,11 +94,12 @@ export async function http_get<T, E>(endpoint: string | Request): Promise<Result
 
 }
 
-export function init_api() {
-    // Sign-in requests are made by Rust (src-tauri/src/auth.rs), which needs the same target.
-    // Release builds ignore it there and always use production.
-    invoke("set_api_target", { production: uses_production_api() })
-        .then(refresh_auth)
-        .catch(console.log);
+export async function init_api() {
+    try {
+        useAccountStore.getState().setApiBase(await invoke<string>("get_api_base"));
+    } catch (e) {
+        console.log(e);
+    }
+    refresh_auth();
     init_servers();
 }

@@ -28,7 +28,12 @@ pub struct AppSettings {
 
     /// Root font size in percent (100 = 16px); everything sized in rem scales with it.
     #[serde(default = "default_font_size")]
-    pub font_size: i32
+    pub font_size: i32,
+
+    /// Developer setting, only used when running against the dev server (`tauri dev`): talk to
+    /// the production rpcompanion API instead of the local one. See `auth::api_base`.
+    #[serde(default)]
+    pub use_production_api: bool
 
 }
 
@@ -82,7 +87,8 @@ impl Default for AppSettings {
             opacity: 100,
             show_page_header: true,
             theme: default_theme(),
-            font_size: default_font_size()
+            font_size: default_font_size(),
+            use_production_api: false
 
         }
 

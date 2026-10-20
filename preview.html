@@ -55,6 +55,7 @@
                 return { state };
               }
               case "auth_sign_in": return new Promise(() => {});
+              case "get_api_base": case "set_use_production_api": return "https://api.rpcompanion.com";
               case "get_todays_chat_log": case "get_distinct_dates": case "get_all_date_tag_favourites": return [];
               case "plugin:event|listen": return 1;
               case "search_game_items": {

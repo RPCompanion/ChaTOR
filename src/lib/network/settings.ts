@@ -77,6 +77,8 @@ export interface IAppSettings {
     theme: Theme;
     /// Root font size in percent (100 = default).
     font_size: number;
+    /// Developer setting: under `tauri dev`, use the production API instead of the local one.
+    use_production_api?: boolean;
 }
 
 export interface ISettings {

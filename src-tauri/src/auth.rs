@@ -9,7 +9,6 @@
 //! listener with a one-time ticket, then trade flow secret + ticket for a session.
 
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{LazyLock, Mutex};
 use std::time::Duration;
 
@@ -22,15 +21,12 @@ use tokio::sync::oneshot;
 use tracing::{info, warn};
 
 const PRODUCTION_API: &str = "https://api.rpcompanion.com";
-#[cfg(debug_assertions)]
 const LOCAL_API: &str = "http://localhost:6578";
 
 /// Only URLs starting with this are opened in the browser, whatever the API returns.
 const DISCORD_AUTHORIZE: &str = "https://discord.com/oauth2/authorize?";
 
 const KEYRING_SERVICE: &str = "ChaTOR";
-
-static USE_PRODUCTION: AtomicBool = AtomicBool::new(true);
 
 /// Sessions kept for this run only, when the OS credential store is unavailable.
 static MEMORY_TOKENS: LazyLock<Mutex<HashMap<&'static str, String>>> = LazyLock::new(Default::default);
@@ -46,22 +42,37 @@ static HTTP: LazyLock<Client> = LazyLock::new(|| {
         .expect("HTTP client")
 });
 
-/// Debug builds only: the "Use production API" developer setting. Release builds always
-/// talk to production.
-#[tauri::command]
-pub fn set_api_target(production: bool) {
-    USE_PRODUCTION.store(production, Ordering::Relaxed);
+/// The one place that picks the API, for Rust and (through `get_api_base`) the frontend:
+/// production, except when running against the dev server (`tauri dev`, the same condition
+/// that makes the frontend a dev build) with the "Use production API" developer setting off.
+fn api_base() -> &'static str {
+    if tauri::is_dev() && !production_selected() { LOCAL_API } else { PRODUCTION_API }
 }
 
-fn api_base() -> &'static str {
+#[cfg(not(test))]
+fn production_selected() -> bool {
+    crate::dal::db::settings::get_settings().app.use_production_api
+}
 
-    #[cfg(debug_assertions)]
-    if !USE_PRODUCTION.load(Ordering::Relaxed) {
-        return LOCAL_API;
-    }
+/// Tests have no settings loaded and run against a local API.
+#[cfg(test)]
+fn production_selected() -> bool {
+    false
+}
 
-    PRODUCTION_API
+#[tauri::command]
+pub fn get_api_base() -> &'static str {
+    api_base()
+}
 
+/// The developer toggle. Saved with the settings, so it survives restarts and reloads.
+#[tauri::command]
+pub fn set_use_production_api(enabled: bool) -> &'static str {
+    let mut settings = crate::dal::db::settings::get_settings();
+    settings.app.use_production_api = enabled;
+    crate::dal::db::settings::update_settings(settings);
+    info!("API: {}", api_base());
+    api_base()
 }
 
 /// Production and local servers issue different sessions, so each has its own entry.
@@ -321,6 +332,7 @@ pub async fn auth_sign_in(app: AppHandle) -> Result<AuthStatus, AuthError> {
 /// browser).
 async fn sign_in(cancel: oneshot::Receiver<()>, open_browser: impl FnOnce(&str) -> std::io::Result<()>) -> Result<String, AuthError> {
 
+    info!("Signing in through {}", api_base());
     let listener = TcpListener::bind(("127.0.0.1", 0)).await.map_err(|e| {
         warn!("Unable to open the sign-in listener: {}", e);
         AuthError::new("listener", "Could not open a local port for sign-in.")
@@ -517,7 +529,6 @@ mod tests {
     #[tokio::test]
     #[ignore]
     async fn sign_in_against_local_api() {
-        set_api_target(false);
         let (_cancel, cancel_rx) = oneshot::channel();
 
         let token = sign_in(cancel_rx, |authorize_url| {
