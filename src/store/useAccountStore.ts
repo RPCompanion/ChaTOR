@@ -1,20 +1,21 @@
 import { create } from 'zustand';
 import type { IServer } from '../lib/api/system';
+import type { AuthStatus } from '../lib/api/account';
 
 interface AccountStore {
-    accountToken: string | null;
-    sessionToken: string | null;
+    auth: AuthStatus;
+    signingIn: boolean;
     servers: IServer[];
-    setAccountToken: (token: string | null) => void;
-    setSessionToken: (token: string | null) => void;
+    setAuth: (auth: AuthStatus) => void;
+    setSigningIn: (signingIn: boolean) => void;
     setServers: (servers: IServer[]) => void;
 }
 
 export const useAccountStore = create<AccountStore>()((set) => ({
-    accountToken: null,
-    sessionToken: null,
+    auth: { state: "unknown" },
+    signingIn: false,
     servers: [],
-    setAccountToken: (accountToken) => set({ accountToken }),
-    setSessionToken: (sessionToken) => set({ sessionToken }),
+    setAuth: (auth) => set({ auth }),
+    setSigningIn: (signingIn) => set({ signingIn }),
     setServers: (servers) => set({ servers }),
 }));

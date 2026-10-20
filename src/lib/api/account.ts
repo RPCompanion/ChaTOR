@@ -1,73 +1,102 @@
 import { invoke } from "@tauri-apps/api/core";
+import { toast } from "react-toastify";
 import { useAccountStore } from "../../store/useAccountStore";
-import { API_ENDPOINTS } from "../api";
 
-export interface ISession {
-    session_token: string;
+// Sign-in runs in Rust (src-tauri/src/auth.rs): the session token stays in the OS credential
+// store and never reaches the webview. These calls only see the resulting status.
+
+export interface IIdentity {
+    provider: string;
+    display_name: string | null;
+    avatar_url: string | null;
 }
 
 export interface IAccount {
-    account_token: string;
+    account_id: string;
+    created_at: string;
+    identities: IIdentity[];
 }
 
-export interface INewAccount {
-    account_token: string;
-    session_token: string;
+export interface IBan {
+    reason: string;
+    /** null: permanent */
+    expires_at: string | null;
 }
 
-async function login() {
-    const { accountToken } = useAccountStore.getState();
-    if (accountToken === null) {
-        return;
+export type AuthStatus =
+    | { state: "unknown" }
+    | { state: "signed_out" }
+    | { state: "signed_in"; account: IAccount; persisted: boolean }
+    | { state: "offline" }
+    | { state: "banned"; ban: IBan };
+
+export interface IAuthError {
+    code: string;
+    message: string;
+    ban?: IBan | null;
+}
+
+export function describe_ban(ban: IBan): string {
+    if (ban.expires_at === null) {
+        return `This account is banned: ${ban.reason}`;
     }
+    return `This account is banned until ${new Date(ban.expires_at).toLocaleString()}: ${ban.reason}`;
+}
 
-    const headers = new Headers();
-    headers.append("Content-Type", "application/json");
+/** Checks the stored session with the server. */
+export async function refresh_auth() {
+    try {
+        useAccountStore.getState().setAuth(await invoke<AuthStatus>("auth_status"));
+    } catch (e) {
+        console.log(e);
+        useAccountStore.getState().setAuth({ state: "offline" });
+    }
+}
 
-    const request = new Request(API_ENDPOINTS.account.login.url, {
-        method: API_ENDPOINTS.account.login.type,
-        body: JSON.stringify({ account_token: accountToken }),
-        headers,
-    });
+// Starting again cancels the previous attempt; only the latest one may update the store.
+let sign_in_attempt = 0;
+
+/** Opens Discord in the browser and waits for the user to approve (or cancel). */
+export async function sign_in() {
+    const attempt = ++sign_in_attempt;
+    useAccountStore.getState().setSigningIn(true);
 
     try {
-        const response = await fetch(request);
-        if (!response.ok) {
+        const status = await invoke<AuthStatus>("auth_sign_in");
+        if (attempt !== sign_in_attempt) {
             return;
         }
-        const new_session: ISession = await response.json();
-        useAccountStore.getState().setSessionToken(new_session.session_token);
+        useAccountStore.getState().setAuth(status);
+        if (status.state === "signed_in" && !status.persisted) {
+            toast.warn("Signed in for this session only: ChaTOR could not save the sign-in to your system's keyring.");
+        }
+    } catch (e) {
+        if (attempt !== sign_in_attempt) {
+            return;
+        }
+        const error = e as IAuthError;
+        if (error.ban) {
+            useAccountStore.getState().setAuth({ state: "banned", ban: error.ban });
+            toast.error(describe_ban(error.ban));
+        } else if (error.code !== "cancelled") {
+            toast.error(error.message ?? String(e));
+        }
+    } finally {
+        if (attempt === sign_in_attempt) {
+            useAccountStore.getState().setSigningIn(false);
+        }
+    }
+}
+
+export function cancel_sign_in() {
+    invoke("auth_cancel_sign_in").catch(console.log);
+}
+
+/** `all`: end every session of the account, on every device. */
+export async function sign_out(all: boolean = false) {
+    try {
+        useAccountStore.getState().setAuth(await invoke<AuthStatus>("auth_sign_out", { all }));
     } catch (e) {
         console.log(e);
     }
-}
-
-async function create_account() {
-    const request = new Request(API_ENDPOINTS.account.create.url, {
-        method: API_ENDPOINTS.account.create.type,
-    });
-
-    try {
-        const response = await fetch(request);
-        if (!response.ok) {
-            return;
-        }
-        const new_account: INewAccount = await response.json();
-        useAccountStore.getState().setAccountToken(new_account.account_token);
-        useAccountStore.getState().setSessionToken(new_account.session_token);
-        invoke("save_account", { account: { account_token: new_account.account_token } });
-    } catch (e) {
-        console.log(e);
-    }
-}
-
-export function init_account() {
-    invoke("get_account")
-        .then((response) => {
-            useAccountStore.getState().setAccountToken((response as IAccount).account_token);
-            login();
-        })
-        .catch(() => {
-            create_account();
-        });
 }

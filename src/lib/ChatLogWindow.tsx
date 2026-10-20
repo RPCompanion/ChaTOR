@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { Gear } from "@phosphor-icons/react";
+import { Palette } from "@phosphor-icons/react";
 import { ESwtorChannel } from "./network/swtor_channel";
 import { useAppStore } from "../store/useAppStore";
 import { useChatLogStore } from "../store/useChatLogStore";
@@ -134,7 +134,7 @@ export default function ChatLogWindow({ onWhisper }: ChatLogWindowProps) {
                     <ChatTabs />
                     <div className="flex justify-end items-center">
                         <button className="text-ink-100 hover:text-holo-300" aria-label="Channel colors" title="Channel colors" onClick={() => setShowChannelColorPicker(true)}>
-                            <Gear size={26} />
+                            <Palette size={24} />
                         </button>
                     </div>
                 </div>

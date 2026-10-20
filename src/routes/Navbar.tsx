@@ -1,6 +1,9 @@
 import React, { useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { GearSix } from "@phosphor-icons/react";
 import { trigger_navbar_callbacks, type INavbarSection } from "../lib/navbar/navbar";
 import NavbarSection from "../lib/navbar/NavbarSection";
+import AccountMenu from "../components/AccountMenu";
 import { useAppStore } from "../store/useAppStore";
 import { useClickOutside } from "../lib/useClickOutside";
 import type { ISettings } from "../lib/network/settings";
@@ -11,11 +14,6 @@ const EMOTE_SECTION: INavbarSection = {
         { name: "Add/Edit Emotes", link: "/custom_emotes" },
         { name: "Emote Board", link: "/emote_board" },
     ],
-};
-
-const SETTINGS_SECTION: INavbarSection = {
-    name: "Settings",
-    link: "/settings",
 };
 
 const ROLEPLAY_SECTION: INavbarSection = {
@@ -42,6 +40,26 @@ function get_chat_section(settings: ISettings): INavbarSection {
     return chat_section;
 }
 
+function SettingsButton() {
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    return (
+        <button
+            type="button"
+            className={`nav-item ${location.pathname === "/settings" ? "active" : ""}`}
+            onClick={() => {
+                trigger_navbar_callbacks();
+                navigate("/settings");
+            }}
+            aria-label="Settings"
+            title="Settings"
+        >
+            <GearSix size={20} />
+        </button>
+    );
+}
+
 export default function Navbar() {
     const settings = useAppStore((s) => s.settings);
     const chat_section = get_chat_section(settings);
@@ -56,8 +74,9 @@ export default function Navbar() {
                 <NavbarSection section={EMOTE_SECTION} />
                 <NavbarSection section={ROLEPLAY_SECTION} />
             </div>
-            <div className="flex flex-row-reverse items-stretch">
-                <NavbarSection section={SETTINGS_SECTION} />
+            <div className="flex flex-row items-stretch">
+                <AccountMenu />
+                <SettingsButton />
             </div>
         </div>
     );

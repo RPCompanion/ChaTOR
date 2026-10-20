@@ -13,6 +13,7 @@ use crash_reporter::CrashReporter;
 use crash_reporter::sys_info::SysInfo;
 
 mod app_dir;
+mod auth;
 mod swtor_hook;
 mod dal;
 mod share;
@@ -92,8 +93,11 @@ pub fn run() {
             swtor_hook::post::submit_post,
             open_link,
             dal::open_db_dir,
-            dal::db::account::get_account,
-            dal::db::account::save_account,
+            auth::set_api_target,
+            auth::auth_status,
+            auth::auth_sign_in,
+            auth::auth_cancel_sign_in,
+            auth::auth_sign_out,
             dal::db::account::character::save_character,
             dal::db::account::character::get_all_characters,
             dal::db::custom_emote::get_all_custom_emotes,

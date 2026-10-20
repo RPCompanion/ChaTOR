@@ -6,6 +6,7 @@ import ChatManualSection from "./ChatManualSection";
 import ChatAutomaticSection from "./ChatAutomaticSection";
 import ChatLogging from "./ChatLogging";
 import ChatLogWindowSettings from "./ChatLogWindowSettings";
+import DeveloperSettings from "./DeveloperSettings";
 
 export default function SettingsPage() {
     return (
@@ -17,6 +18,7 @@ export default function SettingsPage() {
                 <ChatAutomaticSection />
                 <ChatLogging />
                 <ChatLogWindowSettings />
+                {import.meta.env.DEV && <DeveloperSettings />}
             </div>
         </PageFormatting>
     );

@@ -19,7 +19,7 @@ tauri-build = { version = "2", features = [] }
 
 # Async
 futures = "0.3"
-tokio = { version = "1", features = ["time", "macros"] }
+tokio = { version = "1", features = ["time", "macros", "net", "io-util", "sync", "rt"] }
 
 # Database
 rusqlite = { version = "0.40", features = ["bundled", "uuid", "serde_json"] }
@@ -67,11 +67,12 @@ toml = "1.1"
 
 # Web
 # reqwest 0.13 defaults to rustls/aws-lc; keep the native TLS backend (OpenSSL / Schannel) used before.
-reqwest = { version = "0.13", default-features = false, features = ["blocking", "native-tls", "charset", "http2", "system-proxy"] }
+reqwest = { version = "0.13", default-features = false, features = ["blocking", "json", "native-tls", "charset", "http2", "system-proxy"] }
 scraper = "0.27"
 tauri-plugin-dialog = "2"
 tauri-plugin-fs = "2"
 native-dialog = "0.9.6"
+keyring = "4.2"
 
 # swtor-gamedata decodes ~150k game objects after a game patch: about 7 s unoptimized vs 1 s
 # optimized. Keep it fast in the debug build too.

@@ -47,7 +47,14 @@
             switch (cmd) {
               case "get_settings": return defaults;
               case "get_version": return "0.1.43";
-              case "get_account": return null;
+              // ?auth=signed_in|banned|offline (default signed_out)
+              case "auth_status": case "auth_sign_out": {
+                const state = cmd === "auth_status" ? (q.get("auth") ?? "signed_out") : "signed_out";
+                if (state === "signed_in") return { state, persisted: true, account: { account_id: "00000000-0000-4000-8000-000000000000", created_at: "2026-10-19T00:00:00Z", identities: [{ provider: "discord", display_name: "Elizala", avatar_url: null }] } };
+                if (state === "banned") return { state, ban: { reason: "Harassment in global chat", expires_at: null } };
+                return { state };
+              }
+              case "auth_sign_in": return new Promise(() => {});
               case "get_todays_chat_log": case "get_distinct_dates": case "get_all_date_tag_favourites": return [];
               case "plugin:event|listen": return 1;
               case "search_game_items": {
