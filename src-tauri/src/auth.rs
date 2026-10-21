@@ -12,7 +12,7 @@ use std::collections::HashMap;
 use std::sync::{LazyLock, Mutex};
 use std::time::Duration;
 
-use reqwest::{Client, StatusCode, Url};
+use reqwest::{StatusCode, Url};
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
@@ -20,8 +20,7 @@ use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::oneshot;
 use tracing::{info, warn};
 
-const PRODUCTION_API: &str = "https://api.rpcompanion.com";
-const LOCAL_API: &str = "http://localhost:6578";
+use crate::api::{api_base, ApiError, HTTP, PRODUCTION_API};
 
 /// Only URLs starting with this are opened in the browser, whatever the API returns.
 const DISCORD_AUTHORIZE: &str = "https://discord.com/oauth2/authorize?";
@@ -33,47 +32,6 @@ static MEMORY_TOKENS: LazyLock<Mutex<HashMap<&'static str, String>>> = LazyLock:
 
 /// Cancels the sign-in in progress, if any.
 static CANCEL_SIGN_IN: Mutex<Option<oneshot::Sender<()>>> = Mutex::new(None);
-
-static HTTP: LazyLock<Client> = LazyLock::new(|| {
-    Client::builder()
-        .timeout(Duration::from_secs(20))
-        .user_agent(concat!("ChaTOR/", env!("CARGO_PKG_VERSION")))
-        .build()
-        .expect("HTTP client")
-});
-
-/// The one place that picks the API, for Rust and (through `get_api_base`) the frontend:
-/// production, except when running against the dev server (`tauri dev`, the same condition
-/// that makes the frontend a dev build) with the "Use production API" developer setting off.
-fn api_base() -> &'static str {
-    if tauri::is_dev() && !production_selected() { LOCAL_API } else { PRODUCTION_API }
-}
-
-#[cfg(not(test))]
-fn production_selected() -> bool {
-    crate::dal::db::settings::get_settings().app.use_production_api
-}
-
-/// Tests have no settings loaded and run against a local API.
-#[cfg(test)]
-fn production_selected() -> bool {
-    false
-}
-
-#[tauri::command]
-pub fn get_api_base() -> &'static str {
-    api_base()
-}
-
-/// The developer toggle. Saved with the settings, so it survives restarts and reloads.
-#[tauri::command]
-pub fn set_use_production_api(enabled: bool) -> &'static str {
-    let mut settings = crate::dal::db::settings::get_settings();
-    settings.app.use_production_api = enabled;
-    crate::dal::db::settings::update_settings(settings);
-    info!("API: {}", api_base());
-    api_base()
-}
 
 /// Production and local servers issue different sessions, so each has its own entry.
 fn keyring_user() -> &'static str {
@@ -96,8 +54,8 @@ pub struct Account {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct BanInfo {
-    reason: String,
-    expires_at: Option<String>
+    pub reason: String,
+    pub expires_at: Option<String>
 }
 
 #[derive(Serialize, Debug)]
@@ -109,40 +67,6 @@ pub enum AuthStatus {
     /// Signed in, but the server could not be reached.
     Offline,
     Banned { ban: BanInfo }
-}
-
-/// What a failed command reports to the UI. `code` is the API's error code, or one of
-/// "network", "cancelled", "timeout", "listener", "browser", "invalid_response".
-#[derive(Serialize, Deserialize, Debug)]
-pub struct AuthError {
-    code: String,
-    message: String,
-    #[serde(default)]
-    ban: Option<BanInfo>
-}
-
-impl AuthError {
-
-    fn new(code: &str, message: impl Into<String>) -> Self {
-        Self { code: code.into(), message: message.into(), ban: None }
-    }
-
-    fn network(e: reqwest::Error) -> Self {
-        warn!("ChaTOR API request failed: {}", e.without_url());
-        Self::new("network", "Could not reach the ChaTOR server. Check your connection and try again.")
-    }
-
-}
-
-/// The API's error body ({code, message, ban?}), or a generic error for anything else.
-async fn api_error(response: reqwest::Response) -> AuthError {
-
-    let status = response.status();
-    match response.json::<AuthError>().await {
-        Ok(error) => error,
-        Err(_) => AuthError::new("invalid_response", format!("The ChaTOR server answered {}.", status))
-    }
-
 }
 
 // ----- Token storage -------------------------------------------------------------------------
@@ -214,19 +138,19 @@ fn is_persisted() -> bool {
 
 // ----- Status / sign out ---------------------------------------------------------------------
 
-async fn fetch_account(token: &str) -> Result<Account, AuthError> {
+async fn fetch_account(token: &str) -> Result<Account, ApiError> {
 
     let response = HTTP.get(format!("{}/v1/account/me", api_base()))
         .bearer_auth(token)
         .send()
         .await
-        .map_err(AuthError::network)?;
+        .map_err(ApiError::network)?;
 
     if !response.status().is_success() {
-        return Err(api_error(response).await);
+        return Err(ApiError::from_response(response).await);
     }
 
-    response.json().await.map_err(|_| AuthError::new("invalid_response", "Unexpected answer from the ChaTOR server."))
+    response.json().await.map_err(|_| ApiError::invalid_response())
 
 }
 
@@ -245,7 +169,7 @@ pub async fn auth_status() -> AuthStatus {
             clear_token().await;
             AuthStatus::SignedOut
         },
-        Err(AuthError { ban: Some(ban), .. }) => {
+        Err(ApiError { ban: Some(ban), .. }) => {
             clear_token().await;
             AuthStatus::Banned { ban }
         },
@@ -306,7 +230,7 @@ pub fn auth_cancel_sign_in() {
 }
 
 #[tauri::command]
-pub async fn auth_sign_in(app: AppHandle) -> Result<AuthStatus, AuthError> {
+pub async fn auth_sign_in(app: AppHandle) -> Result<AuthStatus, ApiError> {
 
     // A second click restarts sign-in; the first attempt ends as cancelled.
     auth_cancel_sign_in();
@@ -330,41 +254,41 @@ pub async fn auth_sign_in(app: AppHandle) -> Result<AuthStatus, AuthError> {
 
 /// `open_browser` opens Discord's consent page (a parameter so tests can stand in for the
 /// browser).
-async fn sign_in(cancel: oneshot::Receiver<()>, open_browser: impl FnOnce(&str) -> std::io::Result<()>) -> Result<String, AuthError> {
+async fn sign_in(cancel: oneshot::Receiver<()>, open_browser: impl FnOnce(&str) -> std::io::Result<()>) -> Result<String, ApiError> {
 
     info!("Signing in through {}", api_base());
     let listener = TcpListener::bind(("127.0.0.1", 0)).await.map_err(|e| {
         warn!("Unable to open the sign-in listener: {}", e);
-        AuthError::new("listener", "Could not open a local port for sign-in.")
+        ApiError::new("listener", "Could not open a local port for sign-in.")
     })?;
-    let port = listener.local_addr().map_err(|_| AuthError::new("listener", "Could not open a local port for sign-in."))?.port();
+    let port = listener.local_addr().map_err(|_| ApiError::new("listener", "Could not open a local port for sign-in."))?.port();
 
     let response = HTTP.post(format!("{}/v1/auth/discord/start", api_base()))
         .json(&serde_json::json!({ "redirect_port": port }))
         .send()
         .await
-        .map_err(AuthError::network)?;
+        .map_err(ApiError::network)?;
     if !response.status().is_success() {
-        return Err(api_error(response).await);
+        return Err(ApiError::from_response(response).await);
     }
     let flow: StartResponse = response.json()
         .await
-        .map_err(|_| AuthError::new("invalid_response", "Unexpected answer from the ChaTOR server."))?;
+        .map_err(|_| ApiError::invalid_response())?;
 
     if !flow.authorize_url.starts_with(DISCORD_AUTHORIZE) {
         warn!("Refusing to open a sign-in URL that is not Discord's");
-        return Err(AuthError::new("invalid_response", "Unexpected sign-in address from the ChaTOR server."));
+        return Err(ApiError::new("invalid_response", "Unexpected sign-in address from the ChaTOR server."));
     }
     open_browser(&flow.authorize_url).map_err(|e| {
         warn!("Unable to open the browser: {}", e);
-        AuthError::new("browser", "Could not open your web browser.")
+        ApiError::new("browser", "Could not open your web browser.")
     })?;
 
     let deadline = Duration::from_secs(flow.expires_in.clamp(60, 900));
     let callback = tokio::select! {
         callback = wait_for_callback(&listener, &flow.flow_id) => callback,
-        _ = cancel => return Err(AuthError::new("cancelled", "Sign-in cancelled.")),
-        _ = tokio::time::sleep(deadline) => return Err(AuthError::new("timeout", "Sign-in timed out. Please try again."))
+        _ = cancel => return Err(ApiError::new("cancelled", "Sign-in cancelled.")),
+        _ = tokio::time::sleep(deadline) => return Err(ApiError::new("timeout", "Sign-in timed out. Please try again."))
     };
     drop(listener);
 
@@ -386,14 +310,14 @@ async fn sign_in(cancel: oneshot::Receiver<()>, open_browser: impl FnOnce(&str) 
         }))
         .send()
         .await
-        .map_err(AuthError::network)?;
+        .map_err(ApiError::network)?;
     if !response.status().is_success() {
-        return Err(api_error(response).await);
+        return Err(ApiError::from_response(response).await);
     }
 
     let session: NewSession = response.json()
         .await
-        .map_err(|_| AuthError::new("invalid_response", "Unexpected answer from the ChaTOR server."))?;
+        .map_err(|_| ApiError::invalid_response())?;
     Ok(session.session_token)
 
 }
@@ -504,7 +428,10 @@ fn callback_page(status: &str, title: &str, text: &str) -> String {
 #[cfg(test)]
 mod tests {
 
+    use reqwest::Client;
+
     use super::*;
+    use crate::api::LOCAL_API;
 
     #[test]
     fn parses_callbacks() {

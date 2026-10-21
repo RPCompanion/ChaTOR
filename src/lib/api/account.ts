@@ -1,6 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { toast } from "react-toastify";
 import { useAccountStore } from "../../store/useAccountStore";
+import type { IApiError } from "../api";
 
 // Sign-in runs in Rust (src-tauri/src/auth.rs): the session token stays in the OS credential
 // store and never reaches the webview. These calls only see the resulting status.
@@ -29,12 +30,6 @@ export type AuthStatus =
     | { state: "signed_in"; account: IAccount; persisted: boolean }
     | { state: "offline" }
     | { state: "banned"; ban: IBan };
-
-export interface IAuthError {
-    code: string;
-    message: string;
-    ban?: IBan | null;
-}
 
 export function describe_ban(ban: IBan): string {
     if (ban.expires_at === null) {
@@ -74,7 +69,7 @@ export async function sign_in() {
         if (attempt !== sign_in_attempt) {
             return;
         }
-        const error = e as IAuthError;
+        const error = e as IApiError;
         if (error.ban) {
             useAccountStore.getState().setAuth({ state: "banned", ban: error.ban });
             toast.error(describe_ban(error.ban));

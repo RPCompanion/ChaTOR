@@ -1,5 +1,5 @@
+import { invoke } from "@tauri-apps/api/core";
 import { useAccountStore } from "../../store/useAccountStore";
-import { API_ENDPOINTS } from "../api";
 
 export interface IServer {
     server_id: number;
@@ -7,16 +7,8 @@ export interface IServer {
 }
 
 export async function init_servers() {
-    const request = new Request(API_ENDPOINTS.system.servers.url, {
-        method: API_ENDPOINTS.system.servers.type,
-    });
-
     try {
-        const response = await fetch(request);
-        if (!response.ok) {
-            return;
-        }
-        useAccountStore.getState().setServers(await response.json());
+        useAccountStore.getState().setServers(await invoke<IServer[]>("get_servers"));
     } catch (e) {
         console.log(e);
     }

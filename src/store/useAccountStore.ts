@@ -3,7 +3,7 @@ import type { IServer } from '../lib/api/system';
 import type { AuthStatus } from '../lib/api/account';
 
 interface AccountStore {
-    /** Set from Rust at startup (see api_url in lib/api.ts). */
+    /** Where API requests go, as picked by Rust (shown in the Developer settings). */
     apiBase: string;
     auth: AuthStatus;
     signingIn: boolean;

@@ -12,6 +12,7 @@ use tracing::{error, info};
 use crash_reporter::CrashReporter;
 use crash_reporter::sys_info::SysInfo;
 
+mod api;
 mod app_dir;
 mod auth;
 mod swtor_hook;
@@ -93,8 +94,12 @@ pub fn run() {
             swtor_hook::post::submit_post,
             open_link,
             dal::open_db_dir,
-            auth::get_api_base,
-            auth::set_use_production_api,
+            api::get_api_base,
+            api::set_use_production_api,
+            api::get_servers,
+            api::get_star_forge_beacons,
+            api::get_character_templates,
+            api::get_character_template,
             auth::auth_status,
             auth::auth_sign_in,
             auth::auth_cancel_sign_in,

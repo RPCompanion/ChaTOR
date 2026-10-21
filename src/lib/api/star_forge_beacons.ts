@@ -1,5 +1,6 @@
 
-import { API_ENDPOINTS, http_get, type IGenericAPIError } from "../api";
+import { invoke } from "@tauri-apps/api/core";
+import { api_error_message } from "../api";
 import { Result, Ok, Err } from "../result";
 
 export interface IStarForgeBeacon {
@@ -13,20 +14,10 @@ export interface IStarForgeBeacon {
 
 export async function get_star_forge_beacons(): Promise<Result<IStarForgeBeacon[], string>> {
 
-    let star_forge_api = API_ENDPOINTS.third_party.discord_beacons.star_forge;
-
-    let response;
-    
     try {
-        response = await http_get<IStarForgeBeacon[], IGenericAPIError>(star_forge_api.url);
-    } catch(err) {
-        return Err("Failed to fetch data from the server.")
+        return Ok(await invoke<IStarForgeBeacon[]>("get_star_forge_beacons"));
+    } catch (e) {
+        return Err(api_error_message(e));
     }
-
-    if (response.is_err()) {
-        return Err(response.unwrap_err().message);
-    }
-
-    return Ok(response.unwrap());
 
 }
